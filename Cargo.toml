@@ -1,0 +1,30 @@
+[package]
+name = "memx"
+version = "0.1.0"
+authors = ["aki <aki.akaguma@hotmail.com>"]
+edition = "2018"
+description = "memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()"
+keywords = ["memcmp", "memchr", "memmem"]
+categories = ["algorithms"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/aki-akaguma/memx"
+
+[features]
+default = []
+cmp_bytes = []
+
+[dependencies]
+
+[dev-dependencies]
+criterion = "0.3"
+
+[workspace]
+members = [
+    "xtask",
+]
+
+[[bench]]
+name = "bench-ss-algo"
+path = "benches/bench-ss-algo.rs"
+harness = false
