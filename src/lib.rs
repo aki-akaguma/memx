@@ -1,30 +1,39 @@
 use std::cmp::Ordering;
-mod basic;
+
+mod arch;
+mod libc;
+mod mem;
+
+#[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
+pub struct RangeError;
 
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memeq_avx(a, b) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe {  memeq_sse2(a, b) }
-    } else {
-        memeq_basic(a, b)
-    }
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memeq_impl(a, b);
+    //
+    #[cfg(any(target_arch = "aarch64", target_arch = "armv7"))]
+    let r = libc::_memeq_impl(a, b);
+    //
+    #[cfg(not(any(
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64",
+        target_arch = "armv7"
+    )))]
+    let r = mem::_memeq_impl(a, b);
+    //
+    r
 }
 
 pub fn memeq_basic(a: &[u8], b: &[u8]) -> bool {
-    basic::memeq_impl(a, b)
+    mem::_memeq_impl(a, b)
 }
 
-#[target_feature(enable = "sse2")]
-pub unsafe fn memeq_sse2(a: &[u8], b: &[u8]) -> bool {
-    basic::memeq_impl(a, b)
+pub fn memeq_libc(a: &[u8], b: &[u8]) -> bool {
+    libc::_memeq_impl(a, b)
 }
 
-#[target_feature(enable = "avx")]
-pub unsafe fn memeq_avx(a: &[u8], b: &[u8]) -> bool {
-    basic::memeq_impl(a, b)
-}
-
+/*
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     if is_x86_feature_detected!("avx") {
         unsafe { memcmp_avx(a, b) }
@@ -146,9 +155,7 @@ pub unsafe fn memset_sse2(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeEr
 pub unsafe fn memset_avx(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     basic::memset_impl(buf, c, n)
 }
-
-#[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
-pub struct RangeError;
+*/
 
 /*
  * Refer.
