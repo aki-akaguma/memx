@@ -1,6 +1,5 @@
-
-//mod mem_chr;
-//pub(crate) use mem_chr::mem_chr_impl;
+mod libc_chr;
+pub(crate) use libc_chr::_memchr_impl;
 
 mod libc_cmp;
 pub(crate) use libc_cmp::_memcmp_impl;

@@ -15,6 +15,13 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |  225.550 uc |  225.530 uc |  225.470 uc |  225.560 uc |
+| memx_memchr             |  255.610 uc |   94.443 uc |  263.300 uc |   93.153 uc |
+| memx_memchr_basic       |  257.020 uc |   92.717 uc |  263.200 uc |   91.207 uc |
+| memx_memchr_libc        |  291.170 uc |   83.617 uc |  646.250 uc |  198.870 uc |
+
+|         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
 | std_memcmp              |  253.010 uc |  334.350 uc |  419.660 uc |  372.390 uc |
 | memx_memcmp             |  231.610 uc |  282.000 uc |  229.550 uc |  282.410 uc |
 | memx_memcmp_basic       |  568.900 uc |  496.000 uc |  567.050 uc |  495.880 uc |
@@ -28,6 +35,13 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 | memx_memeq_libc         |  338.200 uc |  404.930 uc |  604.540 uc |  658.000 uc |
 
   2. i686:
+
+|         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |   85.668 uc |   85.534 uc |   85.459 uc |   85.455 uc |
+| memx_memchr             |  302.520 uc |  131.960 uc |  316.640 uc |  137.510 uc |
+| memx_memchr_basic       |  300.150 uc |  136.240 uc |  316.690 uc |  137.940 uc |
+| memx_memchr_libc        |  364.510 uc |   97.201 uc |  603.660 uc |  153.680 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
