@@ -15,21 +15,33 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| plain_memeq             |  559.110 uc |  491.800 uc |  550.460 uc |  494.600 uc |
-| std_memeq               |  318.740 uc |  344.230 uc |  571.000 uc |  519.360 uc |
-| memx_memeq              |  189.210 uc |  246.930 uc |  183.880 uc |  247.880 uc |
-| memx_memeq_basic        |  554.850 uc |  492.360 uc |  550.540 uc |  493.680 uc |
-| memx_memeq_libc         |  328.350 uc |  399.950 uc |  603.270 uc |  644.310 uc |
+| std_memcmp              |  253.010 uc |  334.350 uc |  419.660 uc |  372.390 uc |
+| memx_memcmp             |  231.610 uc |  282.000 uc |  229.550 uc |  282.410 uc |
+| memx_memcmp_basic       |  568.900 uc |  496.000 uc |  567.050 uc |  495.880 uc |
+| memx_memcmp_libc        |  350.580 uc |  425.370 uc |  537.150 uc |  476.790 uc |
+
+|         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memeq               |  277.660 uc |  330.270 uc |  570.310 uc |  523.730 uc |
+| memx_memeq              |  190.760 uc |  252.530 uc |  188.910 uc |  253.260 uc |
+| memx_memeq_basic        |  569.100 uc |  494.500 uc |  568.900 uc |  494.340 uc |
+| memx_memeq_libc         |  338.200 uc |  404.930 uc |  604.540 uc |  658.000 uc |
 
   2. i686:
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| plain_memeq             |  567.840 uc |  504.920 uc |  564.000 uc |  517.670 uc |
-| std_memeq               |  322.190 uc |  369.080 uc |  606.880 uc |  632.140 uc |
-| memx_memeq              |  281.720 uc |  371.920 uc |  300.970 uc |  409.950 uc |
-| memx_memeq_basic        |  552.390 uc |  505.240 uc |  564.210 uc |  523.520 uc |
-| memx_memeq_libc         |  368.910 uc |  468.050 uc |  707.210 uc |  839.970 uc |
+| std_memcmp              |  262.970 uc |  365.830 uc |  562.350 uc |  526.390 uc |
+| memx_memcmp             |  308.270 uc |  416.620 uc |  320.760 uc |  444.170 uc |
+| memx_memcmp_basic       |  610.440 uc |  842.000 uc |  621.930 uc |  863.560 uc |
+| memx_memcmp_libc        |  402.930 uc |  529.090 uc |  646.850 uc |  728.580 uc |
+
+|         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memeq               |  285.640 uc |  350.920 uc |  632.690 uc |  657.960 uc |
+| memx_memeq              |  289.600 uc |  383.810 uc |  307.630 uc |  419.700 uc |
+| memx_memeq_basic        |  587.200 uc |  525.210 uc |  578.270 uc |  531.900 uc |
+| memx_memeq_libc         |  367.890 uc |  482.970 uc |  720.300 uc |  857.800 uc |
 
 - std is std::str::find()
 - `us` is micro seconds

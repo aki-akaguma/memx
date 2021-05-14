@@ -7,6 +7,33 @@ mod mem;
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
 pub struct RangeError;
 
+pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memcmp_impl(a, b);
+    //
+    #[cfg(any(target_arch = "aarch64", target_arch = "armv7"))]
+    let r = libc::_memcmp_impl(a, b);
+    //
+    #[cfg(not(any(
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64",
+        target_arch = "armv7"
+    )))]
+    let r = mem::_memcmp_impl(a, b);
+    //
+    r
+}
+
+pub fn memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
+    mem::_memcmp_impl(a, b)
+}
+
+pub fn memcmp_libc(a: &[u8], b: &[u8]) -> Ordering {
+    libc::_memcmp_impl(a, b)
+}
+
+
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memeq_impl(a, b);
@@ -33,31 +60,29 @@ pub fn memeq_libc(a: &[u8], b: &[u8]) -> bool {
     libc::_memeq_impl(a, b)
 }
 
+
+pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memset_impl(buf, c, n);
+    //
+    #[cfg(not(any(
+        target_arch = "x86_64",
+        target_arch = "x86",
+    )))]
+    let r = libc::_memset_impl(buf, c, n);
+    //
+    r
+}
+
+pub fn memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+    mem::_memset_impl(buf, c, n)
+}
+
+pub fn memset_libc(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+    libc::_memset_impl(buf, c, n)
+}
+
 /*
-pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memcmp_avx(a, b) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe {  memcmp_sse2(a, b) }
-    } else {
-        memcmp_basic(a, b)
-    }
-}
-
-pub fn memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
-    basic::memcmp_impl(a, b)
-}
-
-#[target_feature(enable = "sse2")]
-pub unsafe fn memcmp_sse2(a: &[u8], b: &[u8]) -> Ordering {
-    basic::memcmp_impl(a, b)
-}
-
-#[target_feature(enable = "avx")]
-pub unsafe fn memcmp_avx(a: &[u8], b: &[u8]) -> Ordering {
-    basic::memcmp_impl(a, b)
-}
-
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
     if is_x86_feature_detected!("avx") {
         unsafe { memchr_avx(buf, c) }
@@ -128,32 +153,6 @@ pub unsafe fn memcpy_sse2(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), Ra
 #[target_feature(enable = "avx")]
 pub unsafe fn memcpy_avx(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), RangeError> {
     basic::memcpy_impl(dst, src, n)
-}
-
-pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memset_avx(buf, c, n) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe { memset_sse2(buf, c, n) }
-    } else {
-        memset_basic(buf, c, n)
-    }
-}
-
-pub fn memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    basic::memset_impl(buf, c, n)
-}
-
-// auto-vector: Ok
-#[target_feature(enable = "sse2")]
-pub unsafe fn memset_sse2(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    basic::memset_impl(buf, c, n)
-}
-
-// auto-vector: Ok
-#[target_feature(enable = "avx")]
-pub unsafe fn memset_avx(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    basic::memset_impl(buf, c, n)
 }
 */
 
