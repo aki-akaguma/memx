@@ -4,12 +4,15 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 ## Features
 
 * Rewriting with rust lang.
-* Support the zero overhead trait.
 * minimum support: rustc 1.41.1 (f3e1a954d 2020-02-24)
+
+## Todo
+
+- [ ] Support the zero overhead trait.
 
 ## Benchmark
 
-- compile by rustc 1.52.0 (88f19c6da 2021-05-03)
+- compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
 
   1. x86_64:
 
