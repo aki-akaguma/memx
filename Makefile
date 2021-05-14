@@ -2,12 +2,13 @@
 # env CARGO_PROFILE_RELEASE_LTO=fat
 
 #BENCH_STR = --bench=bench-memeq --bench=bench-memeq
-BENCH_STR = --bench=bench-memcmp
+BENCH_STR = --bench=bench-memchr
+#BENCH_STR = --bench=bench-memcmp
 #BENCH_STR = --bench=bench-memeq
 #BENCH_STR = --bench=bench-memset
 
-#TARGET_GNU = --target=x86_64-unknown-linux-gnu
-#TARGET_MUSL = --target=x86_64-unknown-linux-musl
+TARGET_GNU = --target=x86_64-unknown-linux-gnu
+TARGET_MUSL = --target=x86_64-unknown-linux-musl
 #TARGET_GNU = --target=aarch64-unknown-linux-gnu
 #TARGET_MUSL = --target=aarch64-unknown-linux-musl
 #TARGET_GNU = --target=mips64el-unknown-linux-gnuabi64
@@ -15,8 +16,8 @@ BENCH_STR = --bench=bench-memcmp
 
 #TARGET_GNU = --target=powerpc64le-unknown-linux-gnu
 
-TARGET_GNU = --target=i686-unknown-linux-gnu
-TARGET_MUSL = --target=i686-unknown-linux-musl
+#TARGET_GNU = --target=i686-unknown-linux-gnu
+#TARGET_MUSL = --target=i686-unknown-linux-musl
 #TARGET_GNU = --target=armv7-unknown-linux-gnueabihf
 #TARGET_MUSL = --target=armv7-unknown-linux-musleabihf
 

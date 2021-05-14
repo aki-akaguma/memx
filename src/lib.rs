@@ -7,6 +7,24 @@ mod mem;
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
 pub struct RangeError;
 
+pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memchr_impl(buf, c);
+    //
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86",)))]
+    let r = mem::_memchr_impl(buf, c);
+    //
+    r
+}
+
+pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
+    mem::_memchr_impl(buf, c)
+}
+
+pub fn memchr_libc(buf: &[u8], c: u8) -> Option<usize> {
+    libc::_memchr_impl(buf, c)
+}
+
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memcmp_impl(a, b);
@@ -32,7 +50,6 @@ pub fn memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
 pub fn memcmp_libc(a: &[u8], b: &[u8]) -> Ordering {
     libc::_memcmp_impl(a, b)
 }
-
 
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
@@ -60,15 +77,11 @@ pub fn memeq_libc(a: &[u8], b: &[u8]) -> bool {
     libc::_memeq_impl(a, b)
 }
 
-
 pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memset_impl(buf, c, n);
     //
-    #[cfg(not(any(
-        target_arch = "x86_64",
-        target_arch = "x86",
-    )))]
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86",)))]
     let r = libc::_memset_impl(buf, c, n);
     //
     r

@@ -1,5 +1,5 @@
-use crate::RangeError;
 use crate::mem as basic;
+use crate::RangeError;
 
 #[inline(always)]
 #[cfg(target_arch = "x86_64")]
