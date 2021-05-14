@@ -25,6 +25,16 @@ members = [
 ]
 
 [[bench]]
+name = "bench-memcmp"
+path = "benches/bench-memcmp.rs"
+harness = false
+
+[[bench]]
 name = "bench-memeq"
 path = "benches/bench-memeq.rs"
+harness = false
+
+[[bench]]
+name = "bench-memset"
+path = "benches/bench-memset.rs"
 harness = false
