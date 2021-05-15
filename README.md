@@ -62,6 +62,16 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 | memx_memeq_basic        |  587.200 uc |  525.210 uc |  578.270 uc |  531.900 uc |
 | memx_memeq_libc         |  367.890 uc |  482.970 uc |  720.300 uc |  857.800 uc |
 
+  3. armv7:
+
+|         `name`          |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|
+| std_memchr              | 1007.700 uc |  990.200 uc |
+| memx_memchr             |  934.710 uc |  545.120 uc |
+| memx_memchr_basic       |  939.770 uc |  545.930 uc |
+| memx_memchr_libc        | 1908.200 uc |  846.770 uc |
+| memchr_memchr           | 1352.700 uc |  585.240 uc |
+
 - std is std::str::find()
 - `us` is micro seconds
 - `:en` is english haystack.
