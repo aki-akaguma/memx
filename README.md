@@ -42,10 +42,11 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr              |   85.668 uc |   85.534 uc |   85.459 uc |   85.455 uc |
-| memx_memchr             |  302.520 uc |  131.960 uc |  316.640 uc |  137.510 uc |
-| memx_memchr_basic       |  300.150 uc |  136.240 uc |  316.690 uc |  137.940 uc |
-| memx_memchr_libc        |  364.510 uc |   97.201 uc |  603.660 uc |  153.680 uc |
+| std_memchr              |   83.806 uc |   83.824 uc |   85.359 uc |   85.323 uc |
+| memx_memchr             |  335.410 uc |  132.370 uc |  336.920 uc |  138.760 uc |
+| memx_memchr_basic       |  302.390 uc |  131.960 uc |  339.340 uc |  139.240 uc |
+| memx_memchr_libc        |  372.080 uc |  100.040 uc |  580.580 uc |  153.270 uc |
+| memchr_memchr           |  488.860 uc |  194.320 uc |  533.760 uc |  199.280 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|

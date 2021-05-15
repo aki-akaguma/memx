@@ -32,6 +32,7 @@ fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     basic::_memchr_impl(buf, c)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "sse2")]
 unsafe fn _memchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
     //
@@ -54,6 +55,7 @@ unsafe fn _memchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
     basic::_memchr_impl(&buf[next_idx..], c)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx")]
 unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
     //
@@ -76,11 +78,13 @@ unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
     _memchr_sse2(&buf[next_idx..], c)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline(always)]
 unsafe fn _c16_value(c: u8) -> std::arch::x86_64::__m128i {
     std::arch::x86_64::_mm_set1_epi8(c as i8)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline]
 unsafe fn _check_c16_uu(
     buf_ptr: *const u8,
@@ -102,11 +106,13 @@ unsafe fn _check_c16_uu(
     }
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline(always)]
 unsafe fn _c32_value(c: u8) -> std::arch::x86_64::__m256i {
     std::arch::x86_64::_mm256_set1_epi8(c as i8)
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline]
 unsafe fn _check_c32_uu(
     buf_ptr: *const u8,
