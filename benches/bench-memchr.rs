@@ -75,6 +75,26 @@ fn process_memx_memchr_libc(texts: &[&str], pat_byte: u8) -> usize {
     found
 }
 
+#[inline(never)]
+fn process_memchr_memchr(texts: &[&str], pat_byte: u8) -> usize {
+    let mut found: usize = 0;
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        let mut curr_idx = 0;
+        while curr_idx < line_len {
+            let r = memchr::memchr(pat_byte, &line_bytes[curr_idx..]);
+            if let Some(pos) = r {
+                found += 1;
+                curr_idx = pos + curr_idx + 1;
+            } else {
+                break;
+            }
+        }
+    }
+    found
+}
+
 mod create_data;
 
 fn criterion_benchmark(c: &mut Criterion) {
@@ -88,6 +108,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     let n = process_memx_memchr_basic(black_box(&vv), black_box(pat_byte));
     assert_eq!(n, match_cnt);
     let n = process_memx_memchr_libc(black_box(&vv), black_box(pat_byte));
+    assert_eq!(n, match_cnt);
+    let n = process_memchr_memchr(black_box(&vv), black_box(pat_byte));
     assert_eq!(n, match_cnt);
     //
     c.bench_function("std_memchr", |b| {
@@ -108,6 +130,11 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("memx_memchr_libc", |b| {
         b.iter(|| {
             let _r = process_memx_memchr_libc(black_box(&vv), black_box(pat_byte));
+        })
+    });
+    c.bench_function("memchr_memchr", |b| {
+        b.iter(|| {
+            let _r = process_memchr_memchr(black_box(&vv), black_box(pat_byte));
         })
     });
 }

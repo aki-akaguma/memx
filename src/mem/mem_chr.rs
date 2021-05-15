@@ -61,6 +61,7 @@ pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
+    //
     let loop_size = 4;
     let c4: u32 = _c4_value(c);
     while buf_ptr <= unsafe { end_ptr.sub(loop_size) } {
@@ -129,6 +130,8 @@ fn _check_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize>
 */
 
 /*
+ * The simple implement:
+
 #[inline(always)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     for i in 0..buf.len() {

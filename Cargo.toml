@@ -18,6 +18,7 @@ cmp_bytes = []
 
 [dev-dependencies]
 criterion = "0.3"
+memchr = "*"
 
 [workspace]
 members = [
