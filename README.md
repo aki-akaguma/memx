@@ -38,6 +38,7 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 | memx_memeq_basic        |  569.100 uc |  494.500 uc |  568.900 uc |  494.340 uc |
 | memx_memeq_libc         |  338.200 uc |  404.930 uc |  604.540 uc |  658.000 uc |
 
+
   2. i686:
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
@@ -62,15 +63,37 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 | memx_memeq_basic        |  587.200 uc |  525.210 uc |  578.270 uc |  531.900 uc |
 | memx_memeq_libc         |  367.890 uc |  482.970 uc |  720.300 uc |  857.800 uc |
 
-  3. armv7:
 
-|         `name`          |  `musl:en`  |  `musl:ja`  |
+  3. armv7-linux-androideabi:
+
+|         `name`          | `andro:en`  | `andro:ja`  |
 |:------------------------|------------:|------------:|
-| std_memchr              | 1007.700 uc |  990.200 uc |
-| memx_memchr             |  934.710 uc |  545.120 uc |
-| memx_memchr_basic       |  939.770 uc |  545.930 uc |
-| memx_memchr_libc        | 1908.200 uc |  846.770 uc |
-| memchr_memchr           | 1352.700 uc |  585.240 uc |
+| std_memchr              |  783.860 uc |  876.260 uc |
+| memx_memchr             |  923.360 uc |  550.750 uc |
+| memx_memchr_basic       |  910.230 uc |  551.400 uc |
+| memx_memchr_libc        | 2256.000 uc | 1103.600 uc |
+| memchr_memchr           | 1379.000 uc |  611.320 uc |
+
+|         `name`          | `andro:en`  | `andro:ja`  |
+|:------------------------|------------:|------------:|
+| std_memcmp              | 2533.200 uc | 3178.400 uc |
+| memx_memcmp             | 2137.500 uc | 2185.600 uc |
+| memx_memcmp_basic       | 2136.800 uc | 2187.200 uc |
+| memx_memcmp_libc        | 2396.000 uc | 3217.200 uc |
+
+|         `name`          | `andro:en`  | `andro:ja`  |
+|:------------------------|------------:|------------:|
+| std_memeq               | 2762.700 uc | 3116.400 uc |
+| memx_memeq              | 2756.600 uc | 2638.300 uc |
+| memx_memeq_basic        | 2616.600 uc | 2609.300 uc |
+| memx_memeq_libc         | 2298.500 uc | 3123.100 uc |
+
+|         `name`          | `andro:en`  | `andro:ja`  |
+|:------------------------|------------:|------------:|
+| std_memset              |   84.693 uc |  153.710 uc |
+| memx_memset             |   45.985 uc |   82.639 uc |
+| memx_memset_basic       |   45.744 uc |   82.058 uc |
+| memx_memset_libc        |   60.770 uc |  113.470 uc |
 
 - std is std::str::find()
 - `us` is micro seconds
