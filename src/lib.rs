@@ -29,14 +29,13 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memcmp_impl(a, b);
     //
-    #[cfg(any(target_arch = "aarch64", target_arch = "armv7"))]
+    #[cfg(target_arch = "aarch64")]
     let r = libc::_memcmp_impl(a, b);
     //
     #[cfg(not(any(
         target_arch = "x86_64",
         target_arch = "x86",
         target_arch = "aarch64",
-        target_arch = "armv7"
     )))]
     let r = mem::_memcmp_impl(a, b);
     //
@@ -55,14 +54,13 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memeq_impl(a, b);
     //
-    #[cfg(any(target_arch = "aarch64", target_arch = "armv7"))]
+    #[cfg(target_arch = "aarch64")]
     let r = libc::_memeq_impl(a, b);
     //
     #[cfg(not(any(
         target_arch = "x86_64",
         target_arch = "x86",
         target_arch = "aarch64",
-        target_arch = "armv7"
     )))]
     let r = mem::_memeq_impl(a, b);
     //
@@ -81,7 +79,10 @@ pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memset_impl(buf, c, n);
     //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86",)))]
+    #[cfg(target_arch = "arm")]
+    let r = mem::_memset_impl(buf, c, n);
+    //
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "arm")))]
     let r = libc::_memset_impl(buf, c, n);
     //
     r
