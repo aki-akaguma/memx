@@ -32,11 +32,7 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     #[cfg(target_arch = "aarch64")]
     let r = libc::_memcmp_impl(a, b);
     //
-    #[cfg(not(any(
-        target_arch = "x86_64",
-        target_arch = "x86",
-        target_arch = "aarch64",
-    )))]
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64",)))]
     let r = mem::_memcmp_impl(a, b);
     //
     r
@@ -50,6 +46,27 @@ pub fn memcmp_libc(a: &[u8], b: &[u8]) -> Ordering {
     libc::_memcmp_impl(a, b)
 }
 
+pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memcpy_impl(dst, src);
+    //
+    #[cfg(target_arch = "arm")]
+    let r = mem::_memcpy_impl(dst, src);
+    //
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "arm")))]
+    let r = libc::_memcpy_impl(dst, src);
+    //
+    r
+}
+
+pub fn memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    mem::_memcpy_impl(dst, src)
+}
+
+pub fn memcpy_libc(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    libc::_memcpy_impl(dst, src)
+}
+
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memeq_impl(a, b);
@@ -57,11 +74,7 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(target_arch = "aarch64")]
     let r = libc::_memeq_impl(a, b);
     //
-    #[cfg(not(any(
-        target_arch = "x86_64",
-        target_arch = "x86",
-        target_arch = "aarch64",
-    )))]
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64",)))]
     let r = mem::_memeq_impl(a, b);
     //
     r
@@ -73,6 +86,27 @@ pub fn memeq_basic(a: &[u8], b: &[u8]) -> bool {
 
 pub fn memeq_libc(a: &[u8], b: &[u8]) -> bool {
     libc::_memeq_impl(a, b)
+}
+
+pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    let r = arch::x86::_memmem_impl(haystack, needle);
+    //
+    #[cfg(target_arch = "aarch64")]
+    let r = libc::_memmem_impl(haystack, needle);
+    //
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64",)))]
+    let r = mem::_memmem_impl(haystack, needle);
+    //
+    r
+}
+
+pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    mem::_memmem_impl(haystack, needle)
+}
+
+pub fn memmem_libc(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    libc::_memmem_impl(haystack, needle)
 }
 
 pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
@@ -97,30 +131,6 @@ pub fn memset_libc(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
 }
 
 /*
-pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memchr_avx(buf, c) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe {  memchr_sse2(buf, c) }
-    } else {
-        memchr_basic(buf, c)
-    }
-}
-
-pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    basic::memchr_impl(buf, c)
-}
-
-#[target_feature(enable = "sse2")]
-pub unsafe fn memchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
-    basic::memchr_impl(buf, c)
-}
-
-#[target_feature(enable = "avx")]
-pub unsafe fn memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
-    basic::memchr_impl(buf, c)
-}
-
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if is_x86_feature_detected!("avx") {
         unsafe { memmem_avx(haystack, needle) }

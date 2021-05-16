@@ -2,8 +2,12 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.2 (2021-05-16)
+=====
+
 * add extern crate memchr into memchr bench
 * add arm support to memset()
+* add memmem() and memcpy()
 
 0.1.1 (2021-05-14)
 =====
