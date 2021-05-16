@@ -1,19 +1,3 @@
-/*
-#[inline(always)]
-pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    let a_len = a.len();
-    let b_len = b.len();
-    if a_len != b_len {
-        return false;
-    }
-    for i in 0..a_len {
-        if a[i] != b[i] {
-            return false;
-        }
-    }
-    true
-}
-*/
 #[inline(always)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     let a_len = a.len();
@@ -36,3 +20,21 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     }
     true
 }
+/*
+ * The simple implement:
+
+#[inline(always)]
+pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
+    let a_len = a.len();
+    let b_len = b.len();
+    if a_len != b_len {
+        return false;
+    }
+    for i in 0..a_len {
+        if a[i] != b[i] {
+            return false;
+        }
+    }
+    true
+}
+*/
