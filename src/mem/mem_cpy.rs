@@ -35,6 +35,18 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         dst_ptr = unsafe { dst_ptr.add(loop_size) };
         src_ptr = unsafe { src_ptr.add(loop_size) };
     }
+    /*
+    let loop_size = 2;
+    while dst_ptr <= unsafe { end_ptr.sub(loop_size) } {
+        let dst_ptr_c2 = dst_ptr as *mut u16;
+        let src_ptr_c2 = src_ptr as *const u16;
+        unsafe {
+            *dst_ptr_c2 = *src_ptr_c2;
+        }
+        dst_ptr = unsafe { dst_ptr.add(loop_size) };
+        src_ptr = unsafe { src_ptr.add(loop_size) };
+    }
+    */
     //
     while dst_ptr < end_ptr {
         unsafe {
