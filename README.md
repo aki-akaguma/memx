@@ -26,10 +26,10 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  253.010 uc |  334.350 uc |  419.660 uc |  372.390 uc |
-| memx_memcmp             |  231.610 uc |  282.000 uc |  229.550 uc |  282.410 uc |
-| memx_memcmp_basic       |  568.900 uc |  496.000 uc |  567.050 uc |  495.880 uc |
-| memx_memcmp_libc        |  350.580 uc |  425.370 uc |  537.150 uc |  476.790 uc |
+| std_memcmp              |  256.250 uc |  335.030 uc |  417.780 uc |  372.920 uc |
+| memx_memcmp             |  245.860 uc |  308.080 uc |  236.750 uc |  301.260 uc |
+| memx_memcmp_basic       |  233.880 uc |  282.990 uc |  240.250 uc |  283.920 uc |
+| memx_memcmp_libc        |  350.370 uc |  425.330 uc |  485.850 uc |  579.300 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
@@ -40,18 +40,18 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  277.660 uc |  330.270 uc |  570.310 uc |  523.730 uc |
-| memx_memeq              |  190.760 uc |  252.530 uc |  188.910 uc |  253.260 uc |
-| memx_memeq_basic        |  569.100 uc |  494.500 uc |  568.900 uc |  494.340 uc |
-| memx_memeq_libc         |  338.200 uc |  404.930 uc |  604.540 uc |  658.000 uc |
+| std_memeq               |  273.290 uc |  325.620 uc |  436.800 uc |  394.020 uc |
+| memx_memeq              |  187.990 uc |  247.410 uc |  186.700 uc |  250.140 uc |
+| memx_memeq_basic        |  187.830 uc |  248.090 uc |  186.720 uc |  250.000 uc |
+| memx_memeq_libc         |  331.060 uc |  399.220 uc |  476.150 uc |  543.250 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  519.260 uc |  459.990 uc |  519.170 uc |  452.600 uc |
-| memx_memmem             |  117.870 uc |  118.820 uc |  116.980 uc |  117.240 uc |
-| memx_memmem_basic       |  114.770 uc |  114.570 uc |  115.440 uc |  117.770 uc |
-| memx_memmem_libc        |  132.730 uc |  121.720 uc |  220.420 uc |  263.270 uc |
-| memchr_memmem           |  195.140 uc |  223.020 uc |  187.820 uc |  227.010 uc |
+| std_memmem              |  514.280 uc |  456.430 uc |  510.550 uc |  472.260 uc |
+| memx_memmem             |  114.860 uc |  114.660 uc |  116.720 uc |  116.660 uc |
+| memx_memmem_basic       |  115.220 uc |  115.490 uc |  115.990 uc |  116.610 uc |
+| memx_memmem_libc        |  132.520 uc |  122.250 uc |  220.890 uc |  276.960 uc |
+| memchr_memmem           |  185.760 uc |  209.940 uc |  194.000 uc |  222.120 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
@@ -73,10 +73,10 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  262.970 uc |  365.830 uc |  562.350 uc |  526.390 uc |
-| memx_memcmp             |  308.270 uc |  416.620 uc |  320.760 uc |  444.170 uc |
-| memx_memcmp_basic       |  610.440 uc |  842.000 uc |  621.930 uc |  863.560 uc |
-| memx_memcmp_libc        |  402.930 uc |  529.090 uc |  646.850 uc |  728.580 uc |
+| std_memcmp              |  266.600 uc |  365.520 uc |  557.240 uc |  530.380 uc |
+| memx_memcmp             |  315.770 uc |  371.150 uc |  324.900 uc |  422.970 uc |
+| memx_memcmp_basic       |  327.260 uc |  371.040 uc |  321.080 uc |  399.910 uc |
+| memx_memcmp_libc        |  391.420 uc |  526.450 uc |  666.070 uc |  739.410 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
@@ -87,18 +87,18 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  285.640 uc |  350.920 uc |  632.690 uc |  657.960 uc |
-| memx_memeq              |  289.600 uc |  383.810 uc |  307.630 uc |  419.700 uc |
-| memx_memeq_basic        |  587.200 uc |  525.210 uc |  578.270 uc |  531.900 uc |
-| memx_memeq_libc         |  367.890 uc |  482.970 uc |  720.300 uc |  857.800 uc |
+| std_memeq               |  281.120 uc |  350.180 uc |  628.440 uc |  645.750 uc |
+| memx_memeq              |  305.810 uc |  358.870 uc |  308.670 uc |  365.060 uc |
+| memx_memeq_basic        |  310.720 uc |  354.170 uc |  306.370 uc |  365.360 uc |
+| memx_memeq_libc         |  367.540 uc |  476.240 uc |  713.050 uc |  848.700 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  694.170 uc |  553.590 uc |  719.230 uc |  592.090 uc |
-| memx_memmem             |  138.060 uc |  141.380 uc |  139.860 uc |  140.870 uc |
-| memx_memmem_basic       |  138.450 uc |  141.520 uc |  140.610 uc |  139.890 uc |
-| memx_memmem_libc        |  183.220 uc |  170.680 uc |  246.280 uc |  257.000 uc |
-| memchr_memmem           |  470.810 uc |  468.150 uc |  497.870 uc |  510.480 uc |
+| std_memmem              |  692.010 uc |  558.620 uc |  724.800 uc |  590.770 uc |
+| memx_memmem             |  138.470 uc |  135.850 uc |  136.450 uc |  136.980 uc |
+| memx_memmem_basic       |  139.030 uc |  135.280 uc |  137.430 uc |  137.520 uc |
+| memx_memmem_libc        |  185.490 uc |  172.060 uc |  247.830 uc |  258.750 uc |
+| memchr_memmem           |  473.520 uc |  487.570 uc |  506.670 uc |  492.670 uc |
 
 |         `name`          | `bench:en`  | `bench:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
@@ -110,49 +110,49 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
   3. armv7-linux-androideabi:
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memchr              |  783.860 uc |  876.260 uc |
-| memx_memchr             |  923.360 uc |  550.750 uc |
-| memx_memchr_basic       |  910.230 uc |  551.400 uc |
-| memx_memchr_libc        | 2256.000 uc | 1103.600 uc |
-| memchr_memchr           | 1379.000 uc |  611.320 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |  783.860 uc |  876.260 uc | 1138.700 uc |  909.620 uc |
+| memx_memchr             |  923.360 uc |  550.750 uc |  957.560 uc |  540.520 uc |
+| memx_memchr_basic       |  910.230 uc |  551.400 uc |  929.510 uc |  552.020 uc |
+| memx_memchr_libc        | 2256.000 uc | 1103.600 uc | 1895.200 uc |  824.120 uc |
+| memchr_memchr           | 1379.000 uc |  611.320 uc | 1365.600 uc |  582.080 uc |
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memcmp              | 2533.200 uc | 3178.400 uc |
-| memx_memcmp             | 2137.500 uc | 2185.600 uc |
-| memx_memcmp_basic       | 2136.800 uc | 2187.200 uc |
-| memx_memcmp_libc        | 2396.000 uc | 3217.200 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memcmp              | 2888.200 uc | 2469.200 uc | 2108.000 uc | 2083.500 uc |
+| memx_memcmp             | 1148.400 uc | 1439.500 uc | 1376.400 uc | 1521.300 uc |
+| memx_memcmp_basic       | 1146.600 uc | 1429.700 uc | 1381.200 uc | 1519.500 uc |
+| memx_memcmp_libc        | 2363.000 uc | 3198.000 uc | 2310.200 uc | 2390.100 uc |
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memcpy              | 2685.300 uc | 3121.200 uc |
-| memx_memcpy             | 1171.100 uc | 1170.100 uc |
-| memx_memcpy_basic       | 1142.800 uc | 1144.200 uc |
-| memx_memcpy_libc        | 2198.700 uc | 2197.300 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memcpy              | 2685.300 uc | 3121.200 uc | 2736.200 uc | 4416.000 uc |
+| memx_memcpy             | 1171.100 uc | 1170.100 uc | 1000.800 uc | 1793.300 uc |
+| memx_memcpy_basic       | 1142.800 uc | 1144.200 uc | 1068.000 uc | 1818.200 uc |
+| memx_memcpy_libc        | 2198.700 uc | 2197.300 uc | 1856.500 uc | 2985.200 uc |
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memeq               | 2762.700 uc | 3116.400 uc |
-| memx_memeq              | 2756.600 uc | 2638.300 uc |
-| memx_memeq_basic        | 2616.600 uc | 2609.300 uc |
-| memx_memeq_libc         | 2298.500 uc | 3123.100 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memeq               | 2454.400 uc | 2461.800 uc | 1889.500 uc | 1940.400 uc |
+| memx_memeq              |  997.370 uc | 1340.900 uc |  868.390 uc | 1115.100 uc |
+| memx_memeq_basic        |  997.440 uc | 1464.200 uc |  884.570 uc | 1136.900 uc |
+| memx_memeq_libc         | 2286.200 uc | 3101.400 uc | 2013.800 uc | 2185.600 uc |
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memmem              | 3308.000 uc | 2657.800 uc |
-| memx_memmem             |  590.420 uc |  586.190 uc |
-| memx_memmem_basic       |  588.150 uc |  586.600 uc |
-| memx_memmem_libc        | 1987.000 uc | 1985.200 uc |
-| memchr_memmem           | 1918.800 uc | 1936.700 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memmem              | 2781.000 uc | 2119.100 uc | 2717.800 uc | 1984.600 uc |
+| memx_memmem             |  580.130 uc |  582.210 uc |  617.470 uc |  655.810 uc |
+| memx_memmem_basic       |  579.280 uc |  582.330 uc |  617.390 uc |  659.470 uc |
+| memx_memmem_libc        | 1982.600 uc | 1997.000 uc | 1454.600 uc | 1488.700 uc |
+| memchr_memmem           | 1934.900 uc | 1960.200 uc | 1844.700 uc | 1954.500 uc |
 
-|         `name`          | `andro:en`  | `andro:ja`  |
-|:------------------------|------------:|------------:|
-| std_memset              |   84.693 uc |  153.710 uc |
-| memx_memset             |   45.985 uc |   82.639 uc |
-| memx_memset_basic       |   45.744 uc |   82.058 uc |
-| memx_memset_libc        |   60.770 uc |  113.470 uc |
+|         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memset              |   84.693 uc |  153.710 uc |   75.490 uc |   15.630 uc |
+| memx_memset             |   45.985 uc |   82.639 uc |   45.347 uc |   81.686 uc |
+| memx_memset_basic       |   45.744 uc |   82.058 uc |   45.365 uc |   81.650 uc |
+| memx_memset_libc        |   60.770 uc |  113.470 uc |    4.496 uc |    8.083 uc |
 
 - std is std::str::find()
 - `us` is micro seconds

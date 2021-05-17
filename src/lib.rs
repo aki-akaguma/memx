@@ -131,56 +131,6 @@ pub fn memset_libc(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
 }
 
 /*
-pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memmem_avx(haystack, needle) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe {  memmem_sse2(haystack, needle) }
-    } else {
-        memmem_basic(haystack, needle)
-    }
-}
-
-pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    basic::memmem_impl(haystack, needle)
-}
-
-#[target_feature(enable = "sse2")]
-pub unsafe fn memmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    basic::memmem_impl(haystack, needle)
-}
-
-#[target_feature(enable = "avx")]
-pub unsafe fn memmem_avx(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    basic::memmem_impl(haystack, needle)
-}
-
-pub fn memcpy(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), RangeError> {
-    if is_x86_feature_detected!("avx") {
-        unsafe { memcpy_avx(dst, src, n) }
-    } else if is_x86_feature_detected!("sse2") {
-        unsafe {  memcpy_sse2(dst, src, n) }
-    } else {
-        memcpy_basic(dst, src, n)
-    }
-}
-
-pub fn memcpy_basic(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), RangeError> {
-    basic::memcpy_impl(dst, src, n)
-}
-
-#[target_feature(enable = "sse2")]
-pub unsafe fn memcpy_sse2(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), RangeError> {
-    basic::memcpy_impl(dst, src, n)
-}
-
-#[target_feature(enable = "avx")]
-pub unsafe fn memcpy_avx(dst: &mut [u8], src: &[u8], n: usize) -> Result<(), RangeError> {
-    basic::memcpy_impl(dst, src, n)
-}
-*/
-
-/*
  * Refer.
  *   https://mmi.hatenablog.com/entry/2017/07/27/230005
  *   you should have memcpy(), memcmp(), memset() on nostd environments
