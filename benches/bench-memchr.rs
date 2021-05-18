@@ -6,11 +6,23 @@ fn process_std_memchr(texts: &[&str], pat_byte: u8) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
+        let mut curr_idx = 0;
+        while curr_idx < line_len {
+            let r = &line_bytes[curr_idx..].iter().position(|&x| x == pat_byte);
+            if let Some(pos) = r {
+                found += 1;
+                curr_idx = pos + curr_idx + 1;
+            } else {
+                break;
+            }
+        }
+        /*
         for i in 0..line_len {
             if line_bytes[i] == pat_byte {
                 found += 1;
             }
         }
+        */
     }
     found
 }

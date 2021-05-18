@@ -1,72 +1,3 @@
-/*
- * Why is the next code slow ??? <2021-05-17>
- * 
-#[inline(always)]
-pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
-    let start_ptr = buf.as_ptr();
-    let (buf_pre, buf_align, buf_suf) = unsafe { buf.align_to::<u32>() };
-    //
-    {
-        let r = _memchr_impl_bytes(buf_pre, c);
-        if r.is_some() {
-            return r;
-        }
-    }
-    {
-        let r = _memchr_impl_u32(buf_align, c);
-        if let Some(pos) = r {
-            let buf_align_ptr = buf_align.as_ptr() as *const u8;
-            return Some(unsafe { buf_align_ptr.offset_from(start_ptr) } as usize + pos);
-        }
-    }
-    {
-        let r = _memchr_impl_bytes(buf_suf, c);
-        if let Some(pos) = r {
-            let buf_suf_ptr = buf_suf.as_ptr() as *const u8;
-            return Some(unsafe { buf_suf_ptr.offset_from(start_ptr) } as usize + pos);
-        }
-    }
-    None
-}
-
-#[inline(always)]
-pub fn _memchr_impl_u32(buf: &[u32], c: u8) -> Option<usize> {
-    let buf_len = buf.len();
-    let mut buf_ptr = buf.as_ptr();
-    let start_ptr = buf_ptr;
-    let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    //
-    let c4: u32 = _c4_value(c);
-    while buf_ptr < end_ptr {
-        let r = _check_c4(buf_ptr as *const u8, c4, start_ptr as *const u8);
-        if !r.is_none() {
-            return r;
-        }
-        buf_ptr = unsafe { buf_ptr.add(1) };
-    }
-    None
-}
-
-#[inline(always)]
-pub fn _memchr_impl_bytes(buf: &[u8], c: u8) -> Option<usize> {
-    //
-    let buf_len = buf.len();
-    let mut buf_ptr = buf.as_ptr();
-    let start_ptr = buf_ptr;
-    let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    //
-    while buf_ptr < end_ptr {
-        unsafe {
-            if *buf_ptr == c {
-                return Some(buf_ptr.offset_from(start_ptr) as usize);
-            }
-            buf_ptr = buf_ptr.add(1);
-        }
-    }
-    None
-}
-*/
-
 #[inline(always)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     //
@@ -211,6 +142,75 @@ pub fn _memchr_impl_(buf: &[u8], c: u8) -> Option<usize> {
             return Some(unsafe { buf_ptr.offset_from(start_ptr) } as usize);
         }
         buf_ptr = unsafe { buf_ptr.add(1) };
+    }
+    None
+}
+*/
+
+/*
+ * Why is the next code slow ??? <2021-05-17>
+ * 
+#[inline(always)]
+pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    let start_ptr = buf.as_ptr();
+    let (buf_pre, buf_align, buf_suf) = unsafe { buf.align_to::<u32>() };
+    //
+    {
+        let r = _memchr_impl_bytes(buf_pre, c);
+        if r.is_some() {
+            return r;
+        }
+    }
+    {
+        let r = _memchr_impl_u32(buf_align, c);
+        if let Some(pos) = r {
+            let buf_align_ptr = buf_align.as_ptr() as *const u8;
+            return Some(unsafe { buf_align_ptr.offset_from(start_ptr) } as usize + pos);
+        }
+    }
+    {
+        let r = _memchr_impl_bytes(buf_suf, c);
+        if let Some(pos) = r {
+            let buf_suf_ptr = buf_suf.as_ptr() as *const u8;
+            return Some(unsafe { buf_suf_ptr.offset_from(start_ptr) } as usize + pos);
+        }
+    }
+    None
+}
+
+#[inline(always)]
+pub fn _memchr_impl_u32(buf: &[u32], c: u8) -> Option<usize> {
+    let buf_len = buf.len();
+    let mut buf_ptr = buf.as_ptr();
+    let start_ptr = buf_ptr;
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
+    //
+    let c4: u32 = _c4_value(c);
+    while buf_ptr < end_ptr {
+        let r = _check_c4(buf_ptr as *const u8, c4, start_ptr as *const u8);
+        if !r.is_none() {
+            return r;
+        }
+        buf_ptr = unsafe { buf_ptr.add(1) };
+    }
+    None
+}
+
+#[inline(always)]
+pub fn _memchr_impl_bytes(buf: &[u8], c: u8) -> Option<usize> {
+    //
+    let buf_len = buf.len();
+    let mut buf_ptr = buf.as_ptr();
+    let start_ptr = buf_ptr;
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
+    //
+    while buf_ptr < end_ptr {
+        unsafe {
+            if *buf_ptr == c {
+                return Some(buf_ptr.offset_from(start_ptr) as usize);
+            }
+            buf_ptr = buf_ptr.add(1);
+        }
     }
     None
 }

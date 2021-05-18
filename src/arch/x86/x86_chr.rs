@@ -5,6 +5,12 @@ use crate::mem as basic;
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     unsafe { _memchr_sse2(buf, c) }
     /*
+     * <WSID>
+     * The is_x86_feature_detected!() routine is slower,
+     * and not support no_std.
+     * What should i do ?
+     * </WSID>
+     * 
     if is_x86_feature_detected!("avx") {
         unsafe { _memchr_avx(buf, c) }
     } else {
@@ -18,6 +24,12 @@ pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     _memchr_basic(buf, c)
     /*
+     * <WSID>
+     * The is_x86_feature_detected!() routine is slower,
+     * and not support no_std.
+     * What should i do ?
+     * </WSID>
+     * 
     if is_x86_feature_detected!("avx") {
         unsafe { _memchr_avx(buf, c) }
     } else if is_x86_feature_detected!("sse2") {

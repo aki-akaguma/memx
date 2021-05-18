@@ -5,14 +5,6 @@ use std::cmp::Ordering;
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     //_memcmp_sse2(a, b)
     _memcmp_basic(a, b)
-    /*
-    #[cfg(target_arch = "x86_64")]
-    let r = _memcmp_sse2(a, b);
-    #[cfg(target_arch = "x86")]
-    let r = _memcmp_basic(a, b);
-    //
-    r
-    */
 }
 
 fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {

@@ -16,8 +16,8 @@ BENCH_NM = bench-memchr
 BENCH_FNM = $(subst -,_,$(BENCH_NM))
 BENCH_STR = --bench=$(BENCH_NM)
 
-#TARGET_GNU = x86_64-unknown-linux-gnu
-#TARGET_MUSL = x86_64-unknown-linux-musl
+TARGET_GNU = x86_64-unknown-linux-gnu
+TARGET_MUSL = x86_64-unknown-linux-musl
 #TARGET_GNU = i686-unknown-linux-gnu
 #TARGET_MUSL = i686-unknown-linux-musl
 
@@ -28,9 +28,9 @@ BENCH_STR = --bench=$(BENCH_NM)
 
 #TARGET_GNU = powerpc64le-unknown-linux-gnu
 
-TARGET_GNU = armv7-linux-androideabi
+#TARGET_GNU = armv7-linux-androideabi
 #TARGET_GNU = armv7-unknown-linux-gnueabihf
-TARGET_MUSL = armv7-unknown-linux-musleabihf
+#TARGET_MUSL = armv7-unknown-linux-musleabihf
 
 TSK = taskset -c 2
 
