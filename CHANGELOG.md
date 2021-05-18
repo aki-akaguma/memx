@@ -2,8 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.3 (2021-05-18)
+=====
+
 * refactering source code: x86
-* add the benchmarking of android
+* add the benchmarking of armv7 android
 
 0.1.2 (2021-05-16)
 =====

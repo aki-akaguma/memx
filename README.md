@@ -112,11 +112,11 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 |         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr              |  783.860 uc |  876.260 uc | 1138.700 uc |  909.620 uc |
-| memx_memchr             |  923.360 uc |  550.750 uc |  957.560 uc |  540.520 uc |
-| memx_memchr_basic       |  910.230 uc |  551.400 uc |  929.510 uc |  552.020 uc |
-| memx_memchr_libc        | 2256.000 uc | 1103.600 uc | 1895.200 uc |  824.120 uc |
-| memchr_memchr           | 1379.000 uc |  611.320 uc | 1365.600 uc |  582.080 uc |
+| std_memchr              | 1436.800 uc |  887.990 uc | 1256.700 uc |  961.610 uc |
+| memx_memchr             |  928.430 uc |  567.180 uc |  933.350 uc |  547.490 uc |
+| memx_memchr_basic       |  937.170 uc |  568.900 uc |  954.080 uc |  571.800 uc |
+| memx_memchr_libc        | 2241.300 uc | 1102.300 uc | 1878.800 uc |  820.650 uc |
+| memchr_memchr           | 1328.500 uc |  617.300 uc | 1479.800 uc |  592.800 uc |
 
 |         `name`          | `andro:en`  | `andro:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
@@ -168,3 +168,6 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 
 
 ## References
+
+ * [making-a-char-searcher-in-c](https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html)
+ * [bithacks-ZeroInWord](https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord)
