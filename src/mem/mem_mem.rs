@@ -22,6 +22,7 @@ pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     }
     None
 }
+
 /*
  * Reference:
  * The naive optimize algorithm for utf8 sequence.

@@ -2,6 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.4 (2021-05-22)
+=====
+
+* more refine tunings: memcmp(), memeq(), memmem()
+
 0.1.3 (2021-05-18)
 =====
 

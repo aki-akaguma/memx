@@ -9,7 +9,7 @@ extern "C" {
 }
 
 #[inline(always)]
-pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     let buf_len = buf.len();
     let buf_ptr = buf.as_ptr();
     let r_ptr = unsafe { memchr(buf_ptr, c.into(), buf_len) };

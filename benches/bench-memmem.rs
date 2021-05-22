@@ -52,7 +52,7 @@ fn process_memx_memmem_basic(texts: &[&str], pattern: &str) -> usize {
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::memmem_basic(&line_bytes[curr_idx..], pat_bytes);
+            let r = memx::mem::memmem_basic(&line_bytes[curr_idx..], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = curr_idx + pos + pat_len;
@@ -74,7 +74,7 @@ fn process_memx_memmem_libc(texts: &[&str], pattern: &str) -> usize {
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::memmem_libc(&line_bytes[curr_idx..], pat_bytes);
+            let r = memx::libc::memmem_libc(&line_bytes[curr_idx..], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = curr_idx + pos + pat_len;

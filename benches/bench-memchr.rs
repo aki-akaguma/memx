@@ -55,7 +55,7 @@ fn process_memx_memchr_basic(texts: &[&str], pat_byte: u8) -> usize {
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::memchr_basic(&line_bytes[curr_idx..], pat_byte);
+            let r = memx::mem::memchr_basic(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
@@ -75,7 +75,7 @@ fn process_memx_memchr_libc(texts: &[&str], pat_byte: u8) -> usize {
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::memchr_libc(&line_bytes[curr_idx..], pat_byte);
+            let r = memx::libc::memchr_libc(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;

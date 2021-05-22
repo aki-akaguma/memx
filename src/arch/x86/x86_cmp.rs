@@ -2,9 +2,17 @@ use crate::mem as basic;
 use std::cmp::Ordering;
 
 #[inline(always)]
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
-    //_memcmp_sse2(a, b)
-    _memcmp_basic(a, b)
+    /*
+    #[cfg(target_feature = "avx")]
+    let r = unsafe { _memeq_avx(a, b) };
+    #[cfg(target_feature = "sse2")]
+    let r = unsafe { _memeq_sse2(a, b) };
+    #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
+    */
+    let r = _memcmp_basic(a, b);
+    r
 }
 
 fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
@@ -13,6 +21,7 @@ fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
 
 //
 // Why is the next routine slow ??? <2021-05-17>
+/*
 #[cfg(target_arch = "x86_64")]
 #[cfg(target_feature = "sse2")]
 fn _memcmp_sse2(a: &[u8], b: &[u8]) -> Ordering {
@@ -139,3 +148,4 @@ unsafe fn _cmp_bytes_16_au(a_ptr: *const u8, b_ptr: *const u8) -> bool {
     let mask = _mm_movemask_epi8(mm_eq);
     mask == 0xffff
 }
+*/
