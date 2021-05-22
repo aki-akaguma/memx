@@ -21,7 +21,7 @@ fn process_memx_memset_basic(texts: &mut [Vec<u8>], pat_u8: u8) {
     for i in 0..texts.len() {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
-        let _ = memx::memset_basic(&mut *line_bytes, pat_u8, line_len);
+        let _ = memx::mem::memset_basic(&mut *line_bytes, pat_u8, line_len);
     }
 }
 
@@ -30,7 +30,7 @@ fn process_memx_memset_libc(texts: &mut [Vec<u8>], pat_u8: u8) {
     for i in 0..texts.len() {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
-        let _ = memx::memset_libc(&mut *line_bytes, pat_u8, line_len);
+        let _ = memx::libc::memset_libc(&mut *line_bytes, pat_u8, line_len);
     }
 }
 

@@ -1,5 +1,5 @@
 #[inline(always)]
-pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
@@ -149,7 +149,7 @@ pub fn _memchr_impl_(buf: &[u8], c: u8) -> Option<usize> {
 
 /*
  * Why is the next code slow ??? <2021-05-17>
- * 
+ *
 #[inline(always)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     let start_ptr = buf.as_ptr();

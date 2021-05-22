@@ -31,7 +31,7 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let _ = memx::memcpy_basic(&mut line_bytes[i..], pat_bytes);
+            let _ = memx::mem::memcpy_basic(&mut line_bytes[i..], pat_bytes);
         }
     }
 }
@@ -43,7 +43,7 @@ fn process_memx_memcpy_libc(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let _ = memx::memcpy_libc(&mut line_bytes[i..], pat_bytes);
+            let _ = memx::libc::memcpy_libc(&mut line_bytes[i..], pat_bytes);
         }
     }
 }

@@ -56,7 +56,7 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = memx::memcmp_basic(&line_bytes[i..(i + pat_len)], pat_bytes);
+            let r = memx::mem::memcmp_basic(&line_bytes[i..(i + pat_len)], pat_bytes);
             match r {
                 Ordering::Equal => found_eq += 1,
                 Ordering::Less => found_le += 1,
@@ -78,7 +78,7 @@ fn process_memx_memcmp_libc(texts: &[&str], pattern: &str) -> (usize, usize, usi
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = memx::memcmp_libc(&line_bytes[i..(i + pat_len)], pat_bytes);
+            let r = memx::libc::memcmp_libc(&line_bytes[i..(i + pat_len)], pat_bytes);
             match r {
                 Ordering::Equal => found_eq += 1,
                 Ordering::Less => found_le += 1,

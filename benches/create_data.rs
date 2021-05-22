@@ -156,7 +156,7 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
     let mut i = 0;
     loop {
         i += 1;
-        if i > 50 {
+        if i > 30 {
             break;
         }
         if i % 2 == 0 {
@@ -165,16 +165,11 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 10200;
-    let less_cnt = 6750;
+    let match_cnt = 6120;
+    let less_cnt = 4050;
     let greater_cnt = 0;
-    (
-        v,
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        match_cnt,
-        less_cnt,
-        greater_cnt,
-    )
+    let match_s = "aaaaaaaaaaaaaaaaaaaaaaaaaaa";    // 27 bytes
+    (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 
 pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize) {
@@ -189,7 +184,7 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
     let mut i = 0;
     loop {
         i += 1;
-        if i > 90 {
+        if i > 36 {
             break;
         }
         if i % 2 == 0 {
@@ -198,10 +193,11 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 10170;
-    let less_cnt = 20340;
+    let match_cnt = 3204;
+    let less_cnt = 6408;
     let greater_cnt = 0;
-    (v, "あああああああああ", match_cnt, less_cnt, greater_cnt)
+    let match_s = "あああああああああああああああああああああああああああああああああ"; // 99 bytes
+    (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 
 pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {

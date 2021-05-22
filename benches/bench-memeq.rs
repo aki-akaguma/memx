@@ -43,7 +43,7 @@ fn process_memx_memeq_basic(texts: &[&str], pattern: &str) -> usize {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            if memx::memeq_basic(&line_bytes[i..(i + pat_len)], pat_bytes) {
+            if memx::mem::memeq_basic(&line_bytes[i..(i + pat_len)], pat_bytes) {
                 found += 1;
             }
         }
@@ -60,7 +60,7 @@ fn process_memx_memeq_libc(texts: &[&str], pattern: &str) -> usize {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            if memx::memeq_libc(&line_bytes[i..(i + pat_len)], pat_bytes) {
+            if memx::libc::memeq_libc(&line_bytes[i..(i + pat_len)], pat_bytes) {
                 found += 1;
             }
         }
