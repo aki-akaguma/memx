@@ -7,6 +7,7 @@ use std::arch::x86_64 as mmx;
 
 use mmx::__m128i;
 use mmx::_mm_cmpeq_epi8;
+use mmx::_mm_load_si128;
 use mmx::_mm_loadu_si128;
 use mmx::_mm_movemask_epi8;
 use mmx::_mm_set1_epi8;
@@ -45,28 +46,82 @@ fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     basic::_memchr_impl(buf, c)
 }
 
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 pub unsafe fn _memchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
+    _memchr_sse2_impl(buf, c)
+}
+
+macro_rules! _unroll_one_chr_16_uu {
+    ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _chr_c16_uu(aa_ptr, $cc, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_chr_16_aa {
+    ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _chr_c16_aa(aa_ptr, $cc, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+#[inline(always)]
+fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
-    let end_ptr = buf_ptr.add(buf_len);
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
-    let loop_size = 16;
-    let c16: __m128i = _c16_value(c);
-    while buf_ptr <= end_ptr.sub(loop_size) {
-        let r = _check_c16_uu(buf_ptr, c16, start_ptr);
-        if !r.is_none() {
-            return r;
+    if buf_len >= 16 {
+        let cc: __m128i = unsafe { _c16_value(c) };
+        {
+            let remaining_align = 0x10 - (buf_ptr as usize) & 0x0F;
+            let loop_size = 16;
+            _unroll_one_chr_16_uu!(buf_ptr, cc, start_ptr, loop_size, 0);
+            //
+            buf_ptr = unsafe { buf_ptr.add(remaining_align) };
         }
-        buf_ptr = buf_ptr.add(loop_size);
+        //
+        {
+            let unroll = 8;
+            let loop_size = 16;
+            let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while buf_ptr <= end_ptr_16_8 {
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
+                //
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            }
+        }
+        {
+            let loop_size = 16;
+            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
+            while buf_ptr <= end_ptr_16 {
+                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                //
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            }
+        }
     }
     //
-    let next_idx = buf_ptr.offset_from(start_ptr) as usize;
-    basic::_memchr_impl(&buf[next_idx..], c)
+    basic::_memchr_remaining_15_bytes_impl(buf_ptr, c, start_ptr, end_ptr)
 }
 
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
 pub unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
     //
@@ -86,7 +141,12 @@ pub unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
     }
     //
     let next_idx = buf_ptr.offset_from(start_ptr) as usize;
-    _memchr_sse2(&buf[next_idx..], c)
+    let r = _memchr_sse2(&buf[next_idx..], c);
+    if let Some(pos) = r {
+        Some(pos + next_idx)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -95,13 +155,22 @@ unsafe fn _c16_value(c: u8) -> __m128i {
 }
 
 #[inline(always)]
-unsafe fn _check_c16_uu(
-    buf_ptr: *const u8,
-    mm_c16: __m128i,
-    start_ptr: *const u8,
-) -> Option<usize> {
+unsafe fn _chr_c16_uu(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
+    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
+    let mask = _mm_movemask_epi8(mm_eq);
+    if mask != 0 {
+        Some(buf_ptr.offset_from(start_ptr) as usize + mask.trailing_zeros() as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
+unsafe fn _chr_c16_aa(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
+    //
+    let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
     let mask = _mm_movemask_epi8(mm_eq);
     if mask != 0 {

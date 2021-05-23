@@ -168,7 +168,7 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
     let match_cnt = 6120;
     let less_cnt = 4050;
     let greater_cnt = 0;
-    let match_s = "aaaaaaaaaaaaaaaaaaaaaaaaaaa";    // 27 bytes
+    let match_s = "aaaaaaaaaaaaaaaaaaaaaaaaaaa"; // 27 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 

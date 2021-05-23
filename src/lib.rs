@@ -8,10 +8,16 @@ pub mod mem;
 pub struct RangeError;
 
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
     let r = arch::x86::_memchr_impl(buf, c);
     //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86",)))]
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
     let r = mem::_memchr_impl(buf, c);
     //
     r

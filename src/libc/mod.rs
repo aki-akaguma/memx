@@ -16,8 +16,8 @@ pub(crate) use libc_mem::_memmem_impl;
 mod libc_set;
 pub(crate) use libc_set::_memset_impl;
 
-use std::cmp::Ordering;
 use super::RangeError;
+use std::cmp::Ordering;
 
 pub fn memchr_libc(buf: &[u8], c: u8) -> Option<usize> {
     crate::libc::_memchr_impl(buf, c)

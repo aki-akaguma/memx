@@ -1,5 +1,7 @@
 mod mem_chr;
 pub(crate) use mem_chr::_memchr_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_chr::_memchr_remaining_15_bytes_impl;
 
 mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
@@ -16,8 +18,8 @@ pub(crate) use mem_mem::_memmem_impl;
 mod mem_set;
 pub(crate) use mem_set::_memset_impl;
 
-use std::cmp::Ordering;
 use super::RangeError;
+use std::cmp::Ordering;
 
 pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memchr_impl(buf, c)
