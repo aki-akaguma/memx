@@ -62,9 +62,17 @@ $(foreach bnm,$(bench_nms),$(eval $(call build-armv7-templ,$(bnm))))
 $(foreach bnm,$(bench_nms),$(eval $(call bench-armv7-templ,$(bnm))))
 
 
+clean-memchr:
+	@rm -f target/stamp/stamp.build.bench-memchr.*
+	@rm -f target/stamp/stamp.bench.bench-memchr.*
+
 clean-memcmp:
 	@rm -f target/stamp/stamp.build.bench-memcmp.*
 	@rm -f target/stamp/stamp.bench.bench-memcmp.*
+
+clean-memcpy:
+	@rm -f target/stamp/stamp.build.bench-memcpy.*
+	@rm -f target/stamp/stamp.bench.bench-memcpt.*
 
 clean-memeq:
 	@rm -f target/stamp/stamp.build.bench-memeq.*
@@ -74,11 +82,28 @@ clean-memmem:
 	@rm -f target/stamp/stamp.build.bench-memeq.*
 	@rm -f target/stamp/stamp.bench.bench-memeq.*
 
+clean-memset:
+	@rm -f target/stamp/stamp.build.bench-memset.*
+	@rm -f target/stamp/stamp.bench.bench-memset.*
+
+
+result-memchr:
+	cat target/result/result.bench-memchr.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memchr.i686-unknown-linux.txt
+	cat target/result/result.bench-memchr.i586-unknown-linux.txt
+	cat target/result/result.bench-memchr.armv7.txt
+
 result-memcmp:
 	cat target/result/result.bench-memcmp.x86_64-unknown-linux.txt
 	cat target/result/result.bench-memcmp.i686-unknown-linux.txt
 	cat target/result/result.bench-memcmp.i586-unknown-linux.txt
 	cat target/result/result.bench-memcmp.armv7.txt
+
+result-memcpy:
+	cat target/result/result.bench-memcpy.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memcpy.i686-unknown-linux.txt
+	cat target/result/result.bench-memcpy.i586-unknown-linux.txt
+	cat target/result/result.bench-memcpy.armv7.txt
 
 result-memeq:
 	cat target/result/result.bench-memeq.x86_64-unknown-linux.txt
@@ -91,4 +116,10 @@ result-memmem:
 	cat target/result/result.bench-memmem.i686-unknown-linux.txt
 	cat target/result/result.bench-memmem.i586-unknown-linux.txt
 	cat target/result/result.bench-memmem.armv7.txt
+
+result-memset:
+	cat target/result/result.bench-memset.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memset.i686-unknown-linux.txt
+	cat target/result/result.bench-memset.i586-unknown-linux.txt
+	cat target/result/result.bench-memset.armv7.txt
 
