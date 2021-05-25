@@ -4,28 +4,28 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  247.010 us |  312.060 us |  628.810 us | 1128.100 us |
-| memx_memcpy             |  334.780 us |  469.310 us |  329.230 us |  472.580 us |
-| memx_memcpy_basic       |  334.620 us |  469.520 us |  328.920 us |  472.950 us |
-| memx_memcpy_libc        |  278.520 us |  391.430 us |  693.380 us | 1243.900 us |
+| std_memcpy              |  129.890 us |  236.980 us |  430.260 us |  408.790 us |
+| memx_memcpy             |  155.740 us |  376.160 us |  159.840 us |  327.690 us |
+| memx_memcpy_basic       |  163.000 us |  416.210 us |  156.710 us |  370.890 us |
+| memx_memcpy_libc        |  151.950 us |  300.930 us |  464.110 us |  441.460 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  352.700 us |  570.680 us |  415.600 us |  743.220 us |
-| memx_memcpy             |  509.690 us |  858.110 us |  374.570 us |  810.130 us |
-| memx_memcpy_basic       |  510.450 us |  856.320 us |  374.760 us |  810.960 us |
-| memx_memcpy_libc        |  389.880 us |  743.440 us |  497.350 us |  898.140 us |
+| std_memcpy              |  119.070 us |  260.440 us |  263.530 us |  314.640 us |
+| memx_memcpy             |  148.850 us |  422.030 us |  162.200 us |  376.220 us |
+| memx_memcpy_basic       |  163.250 us |  345.860 us |  165.430 us |  299.340 us |
+| memx_memcpy_libc        |  170.890 us |  272.880 us |  312.720 us |  362.280 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  230.530 us |  574.980 us |  416.280 us |  741.060 us |
-| memx_memcpy             |  359.440 us |  801.210 us |  373.280 us |  659.100 us |
-| memx_memcpy_basic       |  359.510 us |  802.900 us |  373.340 us |  661.020 us |
-| memx_memcpy_libc        |  325.180 us |  730.420 us |  490.890 us |  887.450 us |
+| std_memcpy              |  116.450 us |  202.510 us |  260.080 us |  315.710 us |
+| memx_memcpy             |  162.100 us |  351.880 us |  162.860 us |  361.650 us |
+| memx_memcpy_basic       |  161.740 us |  352.140 us |  162.820 us |  363.630 us |
+| memx_memcpy_libc        |  166.510 us |  234.560 us |  321.070 us |  367.840 us |
 
   4. armv7-linux-androideabi:
 

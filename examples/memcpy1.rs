@@ -3,5 +3,5 @@ fn main() {
     let src: Vec<u8> = vec![b'A', b'B', b'C'];
     let dst_sl = dst.as_mut_slice();
     let src_sl = src.as_slice();
-    let _ = memx::memcpy(dst_sl, src_sl, src_sl.len());
+    let _ = memx::memcpy(dst_sl, src_sl);
 }

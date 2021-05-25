@@ -212,7 +212,7 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {
     let mut i = 0;
     loop {
         i += 1;
-        if i > 50 {
+        if i > 30 {
             break;
         }
         if i % 2 == 0 {
@@ -222,10 +222,8 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {
         }
     }
     //let match_cnt = 10200;
-    (
-        v,
-        "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE".as_bytes(),
-    )
+    let match_s = "EEEEEEEEEEEEEEEEEEEEEEEEEEE".as_bytes(); // 27 bytes
+    (v, match_s)
 }
 
 pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, &'static [u8]) {
@@ -240,7 +238,7 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, &'static [u8]) {
     let mut i = 0;
     loop {
         i += 1;
-        if i > 90 {
+        if i > 36 {
             break;
         }
         if i % 2 == 0 {
@@ -250,7 +248,8 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, &'static [u8]) {
         }
     }
     //let match_cnt = 10170;
-    (v, "いいいいいいいいいいいいいいい".as_bytes())
+    let match_s = "いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい".as_bytes(); // 99 bytes
+    (v, match_s)
 }
 
 pub fn create_data_set_en_1() -> Vec<Vec<u8>> {
