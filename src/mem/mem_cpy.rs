@@ -2,14 +2,29 @@ use super::super::RangeError;
 
 #[inline(always)]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    #[cfg(target_pointer_width = "128")]
-    let r = _start_cpy_128(dst, src);
-    #[cfg(target_pointer_width = "64")]
-    let r = _start_cpy_64(dst, src);
-    #[cfg(target_pointer_width = "32")]
-    let r = _start_cpy_32(dst, src);
-    #[cfg(target_pointer_width = "16")]
-    let r = _start_cpy_16(dst, src);
+    #[cfg(target_arch = "arm")]
+    let r = {
+        // measures to prevent bus errors
+        #[cfg(target_pointer_width = "32")]
+        let r = _start_cpy_32_no_unroll(dst, src);
+        #[cfg(target_pointer_width = "16")]
+        let r = _start_cpy_1(dst, src);
+        //
+        r
+    };
+    #[cfg(not(target_arch = "arm"))]
+    let r = {
+        #[cfg(target_pointer_width = "128")]
+        let r = _start_cpy_128(dst, src);
+        #[cfg(target_pointer_width = "64")]
+        let r = _start_cpy_64(dst, src);
+        #[cfg(target_pointer_width = "32")]
+        let r = _start_cpy_32(dst, src);
+        #[cfg(target_pointer_width = "16")]
+        let r = _start_cpy_16(dst, src);
+        //
+        r
+    };
     //
     r
 }
@@ -352,6 +367,51 @@ fn _start_cpy_16(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         }
     }
     Ok(())
+}
+
+#[inline(always)]
+fn _start_cpy_1(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    let dst_len = dst.len();
+    let src_len = src.len();
+    if dst_len < src_len {
+        return Err(RangeError);
+    }
+    let mut dst_ptr = dst.as_mut_ptr();
+    let mut src_ptr = src.as_ptr();
+    let end_ptr = unsafe { dst_ptr.add(src_len) };
+    while dst_ptr < end_ptr {
+        unsafe {
+            *dst_ptr = *src_ptr;
+        }
+        dst_ptr = unsafe { dst_ptr.add(1) };
+        src_ptr = unsafe { src_ptr.add(1) };
+    }
+    Ok(())
+}
+
+#[cfg(target_pointer_width = "32")]
+#[inline(always)]
+fn _start_cpy_32_no_unroll(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    let dst_len = dst.len();
+    let src_len = src.len();
+    if dst_len < src_len {
+        return Err(RangeError);
+    }
+    let mut a_ptr = dst.as_mut_ptr();
+    let mut b_ptr = src.as_ptr();
+    let end_ptr = unsafe { b_ptr.add(src_len) };
+    //
+    {
+        let loop_size = 4;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        while b_ptr <= end_ptr_4 {
+            _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 3 bytes.
+    _memcpy_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
 /*

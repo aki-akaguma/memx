@@ -30,13 +30,16 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
 }
 
 pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
     let r = arch::x86::_memcpy_impl(dst, src);
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
     let r = mem::_memcpy_impl(dst, src);
-    /*
-    let r = mem::_memcpy_impl(dst, src);
-    */
     //
     r
 }

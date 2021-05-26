@@ -31,10 +31,10 @@
 
 |         `name`          |  `andr:en`  |  `andr:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              | 3101.600 us | 3957.600 us | 1427.000 us | 2278.100 us |
-| memx_memcpy             | 1058.100 us | 1634.200 us |  854.870 us | 1491.200 us |
-| memx_memcpy_basic       |  829.260 us | 1523.000 us |  961.300 us | 1630.600 us |
-| memx_memcpy_libc        | 2298.400 us | 4107.700 us | 1561.700 us | 2536.300 us |
+| std_memcpy              | 2248.000 us | 3332.300 us | 1176.000 us | 1340.500 us |
+| memx_memcpy             |  481.950 us | 1110.100 us |  306.910 us |  802.230 us |
+| memx_memcpy_basic       |  339.900 us |  833.760 us |  356.480 us | 1065.700 us |
+| memx_memcpy_libc        | 1132.100 us | 3350.100 us | 1039.600 us | 1472.300 us |
 
 
 - compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
