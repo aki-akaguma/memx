@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* tune memcpy
+* "fix memcpy() on armv7
+
 0.1.4 (2021-05-22)
 =====
 
