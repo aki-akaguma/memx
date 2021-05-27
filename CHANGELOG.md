@@ -5,6 +5,7 @@ Unreleased changes. Release notes have not yet been written.
 * tune memcpy
 * "fix memcpy() on armv7
 * tune memset(), using alignment address
+* bug fix: mem::mem_set::_start_set_64(), mem::mem_set::_start_set_32()
 
 0.1.4 (2021-05-22)
 =====
