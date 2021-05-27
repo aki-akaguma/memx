@@ -273,38 +273,40 @@ pub(crate) fn _start_set_64(buf: &mut [u8], c: u8, n: usize) -> Result<(), Range
     let end_ptr = unsafe { a_ptr.add(n) };
     //
     let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
-    a_ptr = _align_8(a_ptr, cc);
-    {
-        let unroll = 8;
-        let loop_size = 8;
-        let end_ptr_8_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while a_ptr <= end_ptr_8_8 {
-            for i in 0..unroll {
-                let aa_ptr = unsafe { a_ptr.add(i) } as *mut u64;
-                unsafe { *aa_ptr = cc };
+    if n >= 8 {
+        a_ptr = _align_8(a_ptr, cc);
+        {
+            let unroll = 8;
+            let loop_size = 8;
+            let end_ptr_8_8 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while a_ptr <= end_ptr_8_8 {
+                for i in 0..unroll {
+                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut u64;
+                    unsafe { *aa_ptr = cc };
+                }
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
             }
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
         }
-    }
-    {
-        let unroll = 4;
-        let loop_size = 8;
-        let end_ptr_8_4 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while a_ptr <= end_ptr_8_4 {
-            for i in 0..unroll {
-                let aa_ptr = unsafe { a_ptr.add(i) } as *mut u64;
-                unsafe { *aa_ptr = cc };
+        {
+            let unroll = 4;
+            let loop_size = 8;
+            let end_ptr_8_4 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while a_ptr <= end_ptr_8_4 {
+                for i in 0..unroll {
+                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut u64;
+                    unsafe { *aa_ptr = cc };
+                }
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
             }
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
         }
-    }
-    {
-        let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        while a_ptr <= end_ptr_8 {
-            let aa_ptr = a_ptr as *mut u64;
-            unsafe { *aa_ptr = cc };
-            a_ptr = unsafe { a_ptr.add(loop_size) };
+        {
+            let loop_size = 8;
+            let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+            while a_ptr <= end_ptr_8 {
+                let aa_ptr = a_ptr as *mut u64;
+                unsafe { *aa_ptr = cc };
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+            }
         }
     }
     // the remaining data is the max: 7 bytes.
@@ -386,39 +388,45 @@ fn _start_set_32(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     let end_ptr = unsafe { a_ptr.add(n) };
     //
     let cc: u32 = c as u32 * 0x0101_0101_u32;
-    a_ptr = _align_4(a_ptr, cc as u64);
-    //
-    {
-        let unroll = 8;
-        let loop_size = 4;
-        let end_ptr_4_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while a_ptr <= end_ptr_4_8 {
-            for i in 0..unroll {
-                let aa_ptr = unsafe { a_ptr.add(i) } as *mut u32;
-                unsafe { *aa_ptr = cc };
-            }
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+    if n >= 4 {
+        if n >= 8 {
+            a_ptr = _align_8(a_ptr, cc as u64);
+        } else {
+            a_ptr = _align_4(a_ptr, cc as u64);
         }
-    }
-    {
-        let unroll = 4;
-        let loop_size = 4;
-        let end_ptr_4_4 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while a_ptr <= end_ptr_4_4 {
-            for i in 0..unroll {
-                let aa_ptr = unsafe { a_ptr.add(i) } as *mut u32;
-                unsafe { *aa_ptr = cc };
+        //
+        {
+            let unroll = 8;
+            let loop_size = 4;
+            let end_ptr_4_8 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while a_ptr <= end_ptr_4_8 {
+                for i in 0..unroll {
+                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut u32;
+                    unsafe { *aa_ptr = cc };
+                }
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
             }
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
         }
-    }
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        while a_ptr <= end_ptr_4 {
-            let aa_ptr = a_ptr as *mut u32;
-            unsafe { *aa_ptr = cc };
-            a_ptr = unsafe { a_ptr.add(loop_size) };
+        {
+            let unroll = 4;
+            let loop_size = 4;
+            let end_ptr_4_4 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while a_ptr <= end_ptr_4_4 {
+                for i in 0..unroll {
+                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut u32;
+                    unsafe { *aa_ptr = cc };
+                }
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+            }
+        }
+        {
+            let loop_size = 4;
+            let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+            while a_ptr <= end_ptr_4 {
+                let aa_ptr = a_ptr as *mut u32;
+                unsafe { *aa_ptr = cc };
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+            }
         }
     }
     // the remaining data is the max: 3 bytes.
