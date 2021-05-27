@@ -57,14 +57,16 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
     let r = arch::x86::_memset_impl(buf, c, n);
-    //
-    #[cfg(target_arch = "arm")]
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
     let r = mem::_memset_impl(buf, c, n);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "arm")))]
-    let r = libc::_memset_impl(buf, c, n);
     //
     r
 }

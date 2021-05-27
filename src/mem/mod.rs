@@ -23,6 +23,10 @@ pub(crate) use mem_mem::_memmem_impl;
 
 mod mem_set;
 pub(crate) use mem_set::_memset_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_set::_memset_remaining_15_bytes_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_set::_start_set_64;
 
 use super::RangeError;
 use std::cmp::Ordering;
