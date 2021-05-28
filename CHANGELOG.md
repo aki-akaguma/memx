@@ -2,10 +2,14 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
-* tune memcpy
+0.1.5 (2021-05-28)
+=====
+
+* tune memcpy()
 * "fix memcpy() on armv7
 * tune memset(), using alignment address
 * bug fix: mem::mem_set::_start_set_64(), mem::mem_set::_start_set_32()
+* tune x86_cpy::_memcpy_impl()
 
 0.1.4 (2021-05-22)
 =====
