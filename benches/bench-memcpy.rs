@@ -1,17 +1,26 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+// ref.) https://en.wikipedia.org/wiki/Memory_ordering
+fn memory_barrier(_arg: &mut [Vec<u8>]) {
+    #[cfg(target_feature = "sse2")]
+    {
+        #[cfg(target_arch = "x86")]
+        use std::arch::x86 as mmx;
+        #[cfg(target_arch = "x86_64")]
+        use std::arch::x86_64 as mmx;
 
-#[cfg(target_feature = "sse2")]
-fn memory_fence() {
-    #[cfg(target_arch = "x86")]
-    use std::arch::x86 as mmx;
-    #[cfg(target_arch = "x86_64")]
-    use std::arch::x86_64 as mmx;
-
-    unsafe { mmx::_mm_mfence() };
+        unsafe { mmx::_mm_mfence() };
+    }
+    /*
+    #[cfg(target_arch = "arm")]
+    {
+        unsafe { core::arch::arm::__dmb(_arg) };
+    }
+    #[cfg(target_arch = "aarch64")]
+    {
+        unsafe { core::arch::aarch64::__dmb(_arg) };
+    }
+    */
 }
-
-#[cfg(not(target_feature = "sse2"))]
-fn memory_fence() {}
 
 #[inline(never)]
 fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
@@ -70,30 +79,30 @@ fn criterion_benchmark(c: &mut Criterion) {
     process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
-    memory_fence();
+    memory_barrier(&mut v);
     //
     c.bench_function("std_memcpy", |b| {
         b.iter(|| {
             process_std_memcpy(black_box(&mut v), black_box(pat_bytes));
-            memory_fence();
+            memory_barrier(&mut v);
         })
     });
     c.bench_function("memx_memcpy", |b| {
         b.iter(|| {
             process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
-            memory_fence();
+            memory_barrier(&mut v);
         })
     });
     c.bench_function("memx_memcpy_basic", |b| {
         b.iter(|| {
             process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
-            memory_fence();
+            memory_barrier(&mut v);
         })
     });
     c.bench_function("memx_memcpy_libc", |b| {
         b.iter(|| {
             process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
-            memory_fence();
+            memory_barrier(&mut v);
         })
     });
 }

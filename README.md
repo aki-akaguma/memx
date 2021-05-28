@@ -9,6 +9,8 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 ## Todo
 
 - [ ] Support the zero overhead trait.
+- [x] Support more fast routine on armv7-android
+- [x] Support more fast routine on x86_64
 
 ## Benchmark results
 
@@ -18,7 +20,6 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 - [`memeq()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memeq.md)
 - [`memmem()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memmem.md)
 - [`memset()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md)
-
 
 ## Changelogs
 
