@@ -2,6 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.6 (2021-05-29)
+=====
+
+* bug fix: compilable rust 1.41.1
+
 0.1.5 (2021-05-28)
 =====
 

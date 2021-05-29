@@ -71,6 +71,11 @@ pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     r
 }
 
+#[inline(always)]
+pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
+    (ptr as usize) - (origin as usize)
+}
+
 /*
  * Refer.
  *   https://mmi.hatenablog.com/entry/2017/07/27/230005

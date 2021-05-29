@@ -1,3 +1,5 @@
+use crate::plus_offset_from;
+
 #[allow(non_camel_case_types)]
 type c_int = i32;
 
@@ -16,6 +18,6 @@ pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     if r_ptr.is_null() {
         None
     } else {
-        Some(unsafe { r_ptr.offset_from(buf_ptr) } as usize)
+        Some(plus_offset_from(r_ptr, buf_ptr))
     }
 }

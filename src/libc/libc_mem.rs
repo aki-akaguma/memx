@@ -1,3 +1,5 @@
+use crate::plus_offset_from;
+
 #[allow(non_camel_case_types)]
 type size_t = usize;
 
@@ -20,6 +22,6 @@ pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if r_ptr.is_null() {
         None
     } else {
-        Some(unsafe { r_ptr.offset_from(hay_ptr) } as usize)
+        Some(plus_offset_from(r_ptr, hay_ptr))
     }
 }

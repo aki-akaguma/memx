@@ -26,7 +26,11 @@ fn memory_barrier(_arg: &mut [Vec<u8>]) {
 #[inline(never)]
 fn process_std_memset(texts: &mut [Vec<u8>], pat_u8: u8) {
     for i in 0..texts.len() {
-        texts[i].fill(pat_u8);
+        //texts[i].fill(pat_u8);
+        // the follow routine is for the rust 1.41.1
+        for el in texts[i].iter_mut() {
+            *el = pat_u8;
+        }
     }
 }
 
