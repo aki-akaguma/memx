@@ -4,10 +4,10 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  130.080 us |  236.550 us |  429.860 us |  409.530 us |
-| memx_memcpy             |  159.490 us |  230.870 us |  168.480 us |  182.720 us |
-| memx_memcpy_basic       |  162.870 us |  419.290 us |  157.150 us |  372.260 us |
-| memx_memcpy_libc        |  152.200 us |  299.160 us |  465.240 us |  442.500 us |
+| std_memcpy              |  130.140 us |  236.640 us |  431.950 us |  412.870 us |
+| memx_memcpy             |  162.770 us |  237.490 us |  162.850 us |  236.770 us |
+| memx_memcpy_basic       |  164.710 us |  416.670 us |  162.600 us |  413.730 us |
+| memx_memcpy_libc        |  152.820 us |  298.230 us |  463.060 us |  442.380 us |
 
   2. i686-unknown-linux-:
 

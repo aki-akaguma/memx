@@ -1,3 +1,5 @@
+use crate::plus_offset_from;
+
 #[inline(always)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(target_pointer_width = "128")]
@@ -365,7 +367,7 @@ fn _chr_c16(buf_ptr: *const u8, c8: u128, start_ptr: *const u8) -> Option<usize>
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0 {
         Some(
-            unsafe { buf_ptr.offset_from(start_ptr) } as usize
+            plus_offset_from(buf_ptr, start_ptr)
                 + (bits.trailing_zeros() / 8) as usize,
         )
     } else {
@@ -385,7 +387,7 @@ fn _chr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0 {
         Some(
-            unsafe { buf_ptr.offset_from(start_ptr) } as usize
+            plus_offset_from(buf_ptr, start_ptr)
                 + (bits.trailing_zeros() / 8) as usize,
         )
     } else {
@@ -405,7 +407,7 @@ fn _chr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0 {
         Some(
-            unsafe { buf_ptr.offset_from(start_ptr) } as usize
+            plus_offset_from(buf_ptr, start_ptr)
                 + (bits.trailing_zeros() / 8) as usize,
         )
     } else {
@@ -425,7 +427,7 @@ fn _chr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0 {
         Some(
-            unsafe { buf_ptr.offset_from(start_ptr) } as usize
+            plus_offset_from(buf_ptr, start_ptr)
                 + (bits.trailing_zeros() / 8) as usize,
         )
     } else {
@@ -438,7 +440,7 @@ fn _chr_c1(buf_ptr: *const u8, c1: u8, start_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac == c1 {
-        Some(unsafe { buf_ptr.offset_from(start_ptr) } as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr))
     } else {
         None
     }

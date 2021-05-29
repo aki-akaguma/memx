@@ -1,3 +1,4 @@
+use crate::plus_offset_from;
 use crate::mem as basic;
 
 #[cfg(target_arch = "x86")]
@@ -140,7 +141,7 @@ pub unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
         buf_ptr = buf_ptr.add(loop_size);
     }
     //
-    let next_idx = buf_ptr.offset_from(start_ptr) as usize;
+    let next_idx = plus_offset_from(buf_ptr, start_ptr);
     let r = _memchr_sse2(&buf[next_idx..], c);
     if let Some(pos) = r {
         Some(pos + next_idx)
@@ -161,7 +162,7 @@ unsafe fn _chr_c16_uu(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8)
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
     let mask = _mm_movemask_epi8(mm_eq);
     if mask != 0 {
-        Some(buf_ptr.offset_from(start_ptr) as usize + mask.trailing_zeros() as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + mask.trailing_zeros() as usize)
     } else {
         None
     }
@@ -174,7 +175,7 @@ unsafe fn _chr_c16_aa(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8)
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
     let mask = _mm_movemask_epi8(mm_eq);
     if mask != 0 {
-        Some(buf_ptr.offset_from(start_ptr) as usize + mask.trailing_zeros() as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + mask.trailing_zeros() as usize)
     } else {
         None
     }
@@ -196,7 +197,7 @@ unsafe fn _check_c32_uu(
     let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
     let mask = _mm256_movemask_epi8(mm_eq);
     if mask != 0 {
-        Some(buf_ptr.offset_from(start_ptr) as usize + mask.trailing_zeros() as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + mask.trailing_zeros() as usize)
     } else {
         None
     }
