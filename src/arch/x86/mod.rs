@@ -7,7 +7,13 @@ mod x86_chr;
 pub(crate) use x86_chr::_memchr_impl;
 
 mod x86_cmp;
-//pub(crate) use x86_cmp::_memcmp_impl;
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    any(target_feature = "sse2", target_feature = "avx")
+))]
+#[allow(unused_imports)]
+pub(crate) use x86_cmp::_memcmp_impl;
 
 mod x86_cpy;
 
@@ -21,7 +27,12 @@ mod x86_eq;
 //pub(crate) use x86_eq::_memeq_impl;
 
 mod x86_mem;
-//pub(crate) use x86_mem::_memmem_impl;
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    any(target_feature = "sse2", target_feature = "avx")
+))]
+pub(crate) use x86_mem::_memmem_impl;
 
 mod x86_set;
 

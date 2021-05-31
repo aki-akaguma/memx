@@ -2,6 +2,13 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.7 (2021-05-31)
+=====
+
+* add test to memchr(), memcmp(), memeq(), memmem()
+* bug fix: attempt to subtract with overflow on x86_chr::_memchr_sse2_impl()
+* tune memcmp()
+
 0.1.6 (2021-05-29)
 =====
 

@@ -24,6 +24,21 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
 }
 
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
+    /*
+     * why is sse2 slower ?
+     * 
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memcmp_impl(a, b);
+    //
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    let r = mem::_memcmp_impl(a, b);
+    */
     let r = mem::_memcmp_impl(a, b);
     //
     r
@@ -51,6 +66,15 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
 }
 
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memmem_impl(haystack, needle);
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
     let r = mem::_memmem_impl(haystack, needle);
     //
     r
