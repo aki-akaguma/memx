@@ -1,4 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
 // ref.) https://en.wikipedia.org/wiki/Memory_ordering
 fn memory_barrier(_arg: &mut [Vec<u8>]) {
     #[cfg(target_feature = "sse2")]

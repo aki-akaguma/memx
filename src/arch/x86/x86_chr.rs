@@ -84,7 +84,7 @@ fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     if buf_len >= 16 {
         let cc: __m128i = unsafe { _c16_value(c) };
         {
-            let remaining_align = 0x10 - (buf_ptr as usize) & 0x0F;
+            let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
             let loop_size = 16;
             _unroll_one_chr_16_uu!(buf_ptr, cc, start_ptr, loop_size, 0);
             //

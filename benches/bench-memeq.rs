@@ -1,5 +1,28 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
+// ref.) https://en.wikipedia.org/wiki/Memory_ordering
+fn memory_barrier(_arg: &Vec<&str>) {
+    #[cfg(target_feature = "sse2")]
+    {
+        #[cfg(target_arch = "x86")]
+        use std::arch::x86 as mmx;
+        #[cfg(target_arch = "x86_64")]
+        use std::arch::x86_64 as mmx;
+
+        unsafe { mmx::_mm_mfence() };
+    }
+    /*
+    #[cfg(target_arch = "arm")]
+    {
+        unsafe { core::arch::arm::__dmb(_arg) };
+    }
+    #[cfg(target_arch = "aarch64")]
+    {
+        unsafe { core::arch::aarch64::__dmb(_arg) };
+    }
+    */
+}
+
 #[inline(never)]
 fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
@@ -83,25 +106,30 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
+    memory_barrier(&vv);
     //
     c.bench_function("std_memeq", |b| {
         b.iter(|| {
             let _r = process_std_memeq(black_box(&vv), black_box(pat_string_s));
+            memory_barrier(&vv);
         })
     });
     c.bench_function("memx_memeq", |b| {
         b.iter(|| {
             let _r = process_memx_memeq(black_box(&vv), black_box(&pat_string));
+            memory_barrier(&vv);
         })
     });
     c.bench_function("memx_memeq_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
+            memory_barrier(&vv);
         })
     });
     c.bench_function("memx_memeq_libc", |b| {
         b.iter(|| {
             let _r = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
+            memory_barrier(&vv);
         })
     });
 }
