@@ -11,6 +11,7 @@ memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()
 - [ ] Support the zero overhead trait.
 - [x] Support more fast routine on armv7-android
 - [x] Support more fast routine on x86_64
+- [x] Support #!\[no_std\]
 
 ## Benchmark results
 

@@ -21,6 +21,11 @@ pub(crate) use mem_eq::_memeq_impl;
 mod mem_mem;
 pub(crate) use mem_mem::_memmem_impl;
 
+mod mem_rchr;
+pub(crate) use mem_rchr::_memrchr_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
+
 mod mem_set;
 pub(crate) use mem_set::_memset_impl;
 #[allow(unused_imports)]
@@ -29,7 +34,7 @@ pub(crate) use mem_set::_memset_remaining_15_bytes_impl;
 pub(crate) use mem_set::_start_set_64;
 
 use super::RangeError;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memchr_impl(buf, c)
@@ -51,6 +56,9 @@ pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     crate::mem::_memmem_impl(haystack, needle)
 }
 
+pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
+    crate::mem::_memrchr_impl(buf, c)
+}
 pub fn memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     crate::mem::_memset_impl(buf, c, n)
 }

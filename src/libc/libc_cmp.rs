@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 #[allow(non_camel_case_types)]
 type c_int = i32;

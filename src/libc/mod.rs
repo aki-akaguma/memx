@@ -13,11 +13,14 @@ pub(crate) use libc_eq::_memeq_impl;
 mod libc_mem;
 pub(crate) use libc_mem::_memmem_impl;
 
+mod libc_rchr;
+pub(crate) use libc_rchr::_memrchr_impl;
+
 mod libc_set;
 pub(crate) use libc_set::_memset_impl;
 
 use super::RangeError;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 pub fn memchr_libc(buf: &[u8], c: u8) -> Option<usize> {
     crate::libc::_memchr_impl(buf, c)
@@ -37,6 +40,10 @@ pub fn memeq_libc(a: &[u8], b: &[u8]) -> bool {
 
 pub fn memmem_libc(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     crate::libc::_memmem_impl(haystack, needle)
+}
+
+pub fn memrchr_libc(buf: &[u8], c: u8) -> Option<usize> {
+    crate::libc::_memrchr_impl(buf, c)
 }
 
 pub fn memset_libc(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {

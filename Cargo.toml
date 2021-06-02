@@ -1,6 +1,6 @@
 [package]
 name = "memx"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["aki <aki.akaguma@hotmail.com>"]
 edition = "2018"
 description = "memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()"
@@ -11,7 +11,8 @@ readme = "README.md"
 repository = "https://github.com/aki-akaguma/memx"
 
 [features]
-default = []
+default = ["std"]
+std = []
 cmp_bytes = []
 
 [dependencies]
@@ -48,6 +49,11 @@ harness = false
 [[bench]]
 name = "bench-memmem"
 path = "benches/bench-memmem.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrchr"
+path = "benches/bench-memrchr.rs"
 harness = false
 
 [[bench]]
