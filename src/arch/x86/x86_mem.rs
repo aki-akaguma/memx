@@ -53,7 +53,6 @@ fn _memmem_sse2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     None
 }
 
-
 #[inline(always)]
 fn _memmem_avx_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();

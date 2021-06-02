@@ -26,6 +26,9 @@ pub(crate) use mem_rchr::_memrchr_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
 
+mod mem_rmem;
+pub(crate) use mem_rmem::_memrmem_impl;
+
 mod mem_set;
 pub(crate) use mem_set::_memset_impl;
 #[allow(unused_imports)]
@@ -59,6 +62,12 @@ pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memrchr_impl(buf, c)
 }
+
+
+pub fn memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    crate::mem::_memrmem_impl(haystack, needle)
+}
+
 pub fn memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
     crate::mem::_memset_impl(buf, c, n)
 }

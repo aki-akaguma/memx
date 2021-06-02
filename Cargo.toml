@@ -57,6 +57,11 @@ path = "benches/bench-memrchr.rs"
 harness = false
 
 [[bench]]
+name = "bench-memrmem"
+path = "benches/bench-memrmem.rs"
+harness = false
+
+[[bench]]
 name = "bench-memset"
 path = "benches/bench-memset.rs"
 harness = false

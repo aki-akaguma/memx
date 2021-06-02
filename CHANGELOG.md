@@ -2,6 +2,12 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.9 (2021-06-03)
+=====
+
+* add iter::memchr_iter(), iter::memrchr_iter()
+* add memrmem(), iter::memmem_iter(), iter::memrmem_iter()
+
 0.1.8 (2021-06-02)
 =====
 

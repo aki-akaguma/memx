@@ -1,7 +1,7 @@
 mod test_std_memmem {
     fn test_memmem(buf: &[u8], pat_bytes: &[u8]) -> Option<usize> {
-        for i in 0..=(buf.len()-pat_bytes.len()) {
-            if &buf[i..(i+pat_bytes.len())] == pat_bytes {
+        for i in 0..=(buf.len() - pat_bytes.len()) {
+            if &buf[i..(i + pat_bytes.len())] == pat_bytes {
                 return Some(i);
             }
         }

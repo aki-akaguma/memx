@@ -11,7 +11,7 @@ mod test_memx_memcmp {
         let pat_1 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'9'];
         let pat_2 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'0'];
         //
-        let r = test_memcmp(&buf_0[0..(buf_0.len()-1)], &pat_1[0..(pat_1.len()-1)]);
+        let r = test_memcmp(&buf_0[0..(buf_0.len() - 1)], &pat_1[0..(pat_1.len() - 1)]);
         assert_eq!(r, Ordering::Equal);
         let r = test_memcmp(&buf_0, &pat_1);
         assert_eq!(r, Ordering::Less);

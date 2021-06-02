@@ -113,7 +113,7 @@ fn _start_chr_128(buf: &[u8], c: u8) -> Option<usize> {
 pub(crate) fn _memrchr_remaining_15_bytes_impl(
     buf_ptr_cur: *const u8,
     c: u8,
-    start_ptr: *const u8
+    start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
     let cc: u64 = _c8_value(c);
@@ -207,7 +207,7 @@ fn _start_chr_64(buf: &[u8], c: u8) -> Option<usize> {
 pub(crate) fn _memrchr_remaining_7_bytes_impl(
     buf_ptr_cur: *const u8,
     c: u8,
-    start_ptr: *const u8
+    start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
     let cc: u32 = _c4_value(c);
@@ -291,7 +291,7 @@ fn _start_chr_32(buf: &[u8], c: u8) -> Option<usize> {
 pub(crate) fn _memrchr_remaining_3_bytes_impl(
     buf_ptr_cur: *const u8,
     c: u8,
-    start_ptr: *const u8
+    start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
     let cc: u16 = _c2_value(c);
@@ -384,8 +384,9 @@ fn _chr_c16(buf_ptr: *const u8, c8: u128, start_ptr: *const u8) -> Option<usize>
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0 {
         Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + 16 - 1 - ((bits as u128).leading_zeros() / 8) as usize,
+            plus_offset_from(buf_ptr, start_ptr) + 16
+                - 1
+                - ((bits as u128).leading_zeros() / 8) as usize,
         )
     } else {
         None
@@ -404,8 +405,9 @@ fn _chr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0 {
         Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + 8 - 1 - ((bits as u64).leading_zeros() / 8) as usize,
+            plus_offset_from(buf_ptr, start_ptr) + 8
+                - 1
+                - ((bits as u64).leading_zeros() / 8) as usize,
         )
     } else {
         None
@@ -424,8 +426,9 @@ fn _chr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0 {
         Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + 4 - 1 - ((bits as u32).leading_zeros() / 8) as usize,
+            plus_offset_from(buf_ptr, start_ptr) + 4
+                - 1
+                - ((bits as u32).leading_zeros() / 8) as usize,
         )
     } else {
         None
@@ -444,8 +447,9 @@ fn _chr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0 {
         Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + 2 - 1 - ((bits as u16).leading_zeros() / 8) as usize,
+            plus_offset_from(buf_ptr, start_ptr) + 2
+                - 1
+                - ((bits as u16).leading_zeros() / 8) as usize,
         )
     } else {
         None

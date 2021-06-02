@@ -121,7 +121,6 @@ fn _cpy_small(
     (a_ptr, b_ptr)
 }
 
-
 #[inline(always)]
 fn _cpy_medium(
     dst_ptr: *mut u8,
@@ -290,7 +289,6 @@ fn _cpy_unroll_16x8(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
     unsafe { _mm_store_si128(aa6_ptr, mm_b6) };
     unsafe { _mm_store_si128(aa7_ptr, mm_b7) };
 }
-
 
 #[inline(always)]
 fn _cpy_unroll_16x6(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
