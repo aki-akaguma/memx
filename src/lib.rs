@@ -1,6 +1,7 @@
 use core::cmp::Ordering;
 
 pub mod arch;
+pub mod iter;
 pub mod libc;
 pub mod mem;
 
@@ -42,7 +43,7 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     /*
      * why is sse2 slower ?
-     * 
+     *
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
         any(target_feature = "sse2", target_feature = "avx")
@@ -92,6 +93,21 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         not(any(target_feature = "sse2", target_feature = "avx"))
     ))]
     let r = mem::_memmem_impl(haystack, needle);
+    //
+    r
+}
+
+pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memrmem_impl(haystack, needle);
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    let r = mem::_memrmem_impl(haystack, needle);
     //
     r
 }

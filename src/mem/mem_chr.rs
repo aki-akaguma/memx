@@ -366,10 +366,7 @@ fn _chr_c16(buf_ptr: *const u8, c8: u128, start_ptr: *const u8) -> Option<usize>
         & !v
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0 {
-        Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + (bits.trailing_zeros() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -386,10 +383,7 @@ fn _chr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
     let v = unsafe { *aa_ptr } ^ c8;
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0 {
-        Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + (bits.trailing_zeros() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -406,10 +400,7 @@ fn _chr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
     let v = unsafe { *aa_ptr } ^ c4;
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0 {
-        Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + (bits.trailing_zeros() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -426,10 +417,7 @@ fn _chr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
     let v = unsafe { *aa_ptr } ^ c2;
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0 {
-        Some(
-            plus_offset_from(buf_ptr, start_ptr)
-                + (bits.trailing_zeros() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }

@@ -8,8 +8,8 @@ use core::arch::x86_64 as mmx;
 
 use mmx::__m128i;
 //use mmx::_mm_load_si128;
-use mmx::_mm_loadu_si128;
 use mmx::_mm_cmpeq_epi8;
+use mmx::_mm_loadu_si128;
 use mmx::_mm_movemask_epi8;
 //use mmx::_mm_prefetch;
 //use mmx::_MM_HINT_T1;
@@ -32,7 +32,6 @@ pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
 fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
     basic::_memcmp_impl(a, b)
 }
-
 
 macro_rules! _unroll_one_cmp_16 {
     ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
@@ -186,7 +185,7 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
             }
         }
         /*
-        */
+         */
         {
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
@@ -340,7 +339,6 @@ fn _cmp_bytes_2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         Ordering::Equal
     }
 }
-
 
 #[inline(always)]
 fn _eq_unroll_16x8(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Ordering {

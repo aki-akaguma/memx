@@ -11,7 +11,8 @@ ADB_BBOX = /data/data/org.galexander.busybox/files
 #BENCH_NM = bench-memcpy
 #BENCH_NM = bench-memeq
 #BENCH_NM = bench-memmem
-BENCH_NM = bench-memrchr
+#BENCH_NM = bench-memrchr
+BENCH_NM = bench-memrmem
 #BENCH_NM = bench-memset
 
 BENCH_FNM = $(subst -,_,$(BENCH_NM))

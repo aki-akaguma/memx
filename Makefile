@@ -1,5 +1,6 @@
 
-bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memset
+#bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset
+bench_nms = bench-memrmem
 
 target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 
@@ -79,12 +80,16 @@ clean-memeq:
 	@rm -f target/stamp/stamp.bench.bench-memeq.*
 
 clean-memmem:
-	@rm -f target/stamp/stamp.build.bench-memeq.*
-	@rm -f target/stamp/stamp.bench.bench-memeq.*
+	@rm -f target/stamp/stamp.build.bench-memmem.*
+	@rm -f target/stamp/stamp.bench.bench-memmem.*
 
 clean-memrchr:
 	@rm -f target/stamp/stamp.build.bench-memrchr.*
 	@rm -f target/stamp/stamp.bench.bench-memrchr.*
+
+clean-memrmem:
+	@rm -f target/stamp/stamp.build.bench-memrmem.*
+	@rm -f target/stamp/stamp.bench.bench-memrmem.*
 
 clean-memset:
 	@rm -f target/stamp/stamp.build.bench-memset.*
@@ -126,6 +131,12 @@ result-memrchr:
 	cat target/result/result.bench-memrchr.i686-unknown-linux.txt
 	cat target/result/result.bench-memrchr.i586-unknown-linux.txt
 	cat target/result/result.bench-memrchr.armv7.txt
+
+result-memrmem:
+	cat target/result/result.bench-memrmem.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memrmem.i686-unknown-linux.txt
+	cat target/result/result.bench-memrmem.i586-unknown-linux.txt
+	cat target/result/result.bench-memrmem.armv7.txt
 
 result-memset:
 	cat target/result/result.bench-memset.x86_64-unknown-linux.txt
