@@ -2,6 +2,12 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.8 (2021-06-02)
+=====
+
+* add support #!\[no_std\]
+* add memrchr()
+
 0.1.7 (2021-05-31)
 =====
 

@@ -2,9 +2,9 @@ use crate::mem as basic;
 use crate::RangeError;
 
 #[cfg(target_arch = "x86")]
-use std::arch::x86 as mmx;
+use core::arch::x86 as mmx;
 #[cfg(target_arch = "x86_64")]
-use std::arch::x86_64 as mmx;
+use core::arch::x86_64 as mmx;
 
 use mmx::__m128i;
 use mmx::_mm_loadu_si128;

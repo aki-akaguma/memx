@@ -1,16 +1,18 @@
 use crate::mem as basic;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 #[cfg(target_arch = "x86")]
-use std::arch::x86 as mmx;
+use core::arch::x86 as mmx;
 #[cfg(target_arch = "x86_64")]
-use std::arch::x86_64 as mmx;
+use core::arch::x86_64 as mmx;
 
 use mmx::__m128i;
 //use mmx::_mm_load_si128;
 use mmx::_mm_loadu_si128;
 use mmx::_mm_cmpeq_epi8;
 use mmx::_mm_movemask_epi8;
+//use mmx::_mm_prefetch;
+//use mmx::_MM_HINT_T1;
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
@@ -119,6 +121,9 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { b_ptr.add(min_len) };
     //
+    //unsafe { _mm_prefetch(a_ptr as *const i8, _MM_HINT_T1) };
+    //unsafe { _mm_prefetch(b_ptr as *const i8, _MM_HINT_T1) };
+    //
     if min_len >= 16 {
         if min_len <= 32 {
             let a0_ptr = a_ptr;
@@ -137,7 +142,7 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
             let mask0 = unsafe { _mm_movemask_epi8(mm_eq0) };
             //
             if mask0 != 0xffff {
-                return _cmp_bytes_16(a0_ptr, b0_ptr);
+                return _cmp_bytes_16_mask(mask0, a0_ptr, b0_ptr);
             }
             //
             if min_len > 16 {
@@ -147,10 +152,10 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
                 let mask1 = unsafe { _mm_movemask_epi8(mm_eq1) };
                 //
                 if mask1 != 0xffff {
-                    return _cmp_bytes_16(a1_ptr, b1_ptr);
+                    return _cmp_bytes_16_mask(mask1, a1_ptr, b1_ptr);
                 }
             }
-            return Ordering::Equal;
+            return a_len.cmp(&b_len);
         }
         {
             let unroll = 4;
@@ -167,6 +172,22 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
             }
         }
         {
+            let unroll = 2;
+            let loop_size = 16;
+            let end_ptr_16_2 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_2 {
+                let r = _eq_unroll_16x2(a_ptr, b_ptr, loop_size);
+                if r != Ordering::Equal {
+                    return r;
+                }
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        /*
+        */
+        {
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             while b_ptr <= end_ptr_16 {
@@ -179,7 +200,7 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
                 let mask0 = unsafe { _mm_movemask_epi8(mm_eq0) };
                 //
                 if mask0 != 0xffff {
-                    return _cmp_bytes_16(a_ptr, b_ptr);
+                    return _cmp_bytes_16_mask(mask0, a_ptr, b_ptr);
                 }
                 //
                 a_ptr = unsafe { a_ptr.add(loop_size) };
@@ -227,6 +248,21 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
     }
     //
     a_len.cmp(&b_len)
+}
+
+#[inline(always)]
+fn _cmp_bytes_16_mask(mask: i32, a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
+    if mask != 0xffff {
+        let bits = !mask;
+        let pos = bits.trailing_zeros() as usize;
+        let aa_ptr = unsafe { a_ptr.add(pos) };
+        let bb_ptr = unsafe { b_ptr.add(pos) };
+        let aac = unsafe { *aa_ptr };
+        let bbc = unsafe { *bb_ptr };
+        return aac.cmp(&bbc);
+    } else {
+        Ordering::Equal
+    }
 }
 
 #[inline(always)]
@@ -360,28 +396,28 @@ fn _eq_unroll_16x8(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Orde
     let mask7 = unsafe { _mm_movemask_epi8(mm_eq7) };
     //
     if mask0 != 0xffff {
-        return _cmp_bytes_16(aa0_ptr as *const u8, bb0_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask0, aa0_ptr as *const u8, bb0_ptr as *const u8);
     }
     if mask1 != 0xffff {
-        return _cmp_bytes_16(aa1_ptr as *const u8, bb1_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask1, aa1_ptr as *const u8, bb1_ptr as *const u8);
     }
     if mask2 != 0xffff {
-        return _cmp_bytes_16(aa2_ptr as *const u8, bb2_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask2, aa2_ptr as *const u8, bb2_ptr as *const u8);
     }
     if mask3 != 0xffff {
-        return _cmp_bytes_16(aa3_ptr as *const u8, bb3_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask3, aa3_ptr as *const u8, bb3_ptr as *const u8);
     }
     if mask4 != 0xffff {
-        return _cmp_bytes_16(aa4_ptr as *const u8, bb4_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask4, aa4_ptr as *const u8, bb4_ptr as *const u8);
     }
     if mask5 != 0xffff {
-        return _cmp_bytes_16(aa5_ptr as *const u8, bb5_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask5, aa5_ptr as *const u8, bb5_ptr as *const u8);
     }
     if mask6 != 0xffff {
-        return _cmp_bytes_16(aa6_ptr as *const u8, bb6_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask6, aa6_ptr as *const u8, bb6_ptr as *const u8);
     }
     if mask7 != 0xffff {
-        return _cmp_bytes_16(aa7_ptr as *const u8, bb7_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask7, aa7_ptr as *const u8, bb7_ptr as *const u8);
     }
     //
     Ordering::Equal
@@ -417,16 +453,16 @@ fn _eq_unroll_16x4(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Orde
     let mask3 = unsafe { _mm_movemask_epi8(mm_eq3) };
     //
     if mask0 != 0xffff {
-        return _cmp_bytes_16(aa0_ptr as *const u8, bb0_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask0, aa0_ptr as *const u8, bb0_ptr as *const u8);
     }
     if mask1 != 0xffff {
-        return _cmp_bytes_16(aa1_ptr as *const u8, bb1_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask1, aa1_ptr as *const u8, bb1_ptr as *const u8);
     }
     if mask2 != 0xffff {
-        return _cmp_bytes_16(aa2_ptr as *const u8, bb2_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask2, aa2_ptr as *const u8, bb2_ptr as *const u8);
     }
     if mask3 != 0xffff {
-        return _cmp_bytes_16(aa3_ptr as *const u8, bb3_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask3, aa3_ptr as *const u8, bb3_ptr as *const u8);
     }
     //
     Ordering::Equal
@@ -450,10 +486,10 @@ fn _eq_unroll_16x2(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Orde
     let mask1 = unsafe { _mm_movemask_epi8(mm_eq1) };
     //
     if mask0 != 0xffff {
-        return _cmp_bytes_16(aa0_ptr as *const u8, bb0_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask0, aa0_ptr as *const u8, bb0_ptr as *const u8);
     }
     if mask1 != 0xffff {
-        return _cmp_bytes_16(aa1_ptr as *const u8, bb1_ptr as *const u8);
+        return _cmp_bytes_16_mask(mask1, aa1_ptr as *const u8, bb1_ptr as *const u8);
     }
     //
     Ordering::Equal

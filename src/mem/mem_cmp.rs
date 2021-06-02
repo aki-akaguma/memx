@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
 #[inline(always)]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
