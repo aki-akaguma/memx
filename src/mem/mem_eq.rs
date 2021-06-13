@@ -1,5 +1,11 @@
 #[inline(always)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
+    if a.len() == 0 && b.len() == 0 {
+        return true;
+    }
+    if a.len() == 0 || b.len() == 0 {
+        return false;
+    }
     #[cfg(target_pointer_width = "128")]
     let r = _start_eq_128(a, b);
     #[cfg(target_pointer_width = "64")]

@@ -2,6 +2,9 @@ use crate::plus_offset_from;
 
 #[inline(always)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    if buf.len() == 0 {
+        return None;
+    }
     #[cfg(target_pointer_width = "128")]
     let r = _start_chr_128(buf, c);
     #[cfg(target_pointer_width = "64")]

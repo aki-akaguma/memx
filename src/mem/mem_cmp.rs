@@ -2,6 +2,12 @@ use core::cmp::Ordering;
 
 #[inline(always)]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
+    if a.len() == 0 && b.len() == 0 {
+        return Ordering::Equal;
+    }
+    if a.len() == 0 || b.len() == 0 {
+        return a.len().cmp(&b.len());
+    }
     #[cfg(target_pointer_width = "128")]
     let r = _start_cmp_128(a, b);
     #[cfg(target_pointer_width = "64")]

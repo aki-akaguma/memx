@@ -1,5 +1,8 @@
 mod test_std_memmem {
     fn test_memmem(buf: &[u8], pat_bytes: &[u8]) -> Option<usize> {
+        if buf.len() < pat_bytes.len() {
+            return None;
+        }
         for i in 0..=(buf.len() - pat_bytes.len()) {
             if &buf[i..(i + pat_bytes.len())] == pat_bytes {
                 return Some(i);
@@ -8,6 +11,19 @@ mod test_std_memmem {
         None
     }
     //
+    #[test]
+    fn test00() {
+        let buf_0 = vec![];
+        let pat_1 = vec![];
+        let pat_2 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'0'];
+        //
+        let r = test_memmem(&buf_0, &pat_1);
+        assert_eq!(r, Some(0));
+        let r = test_memmem(&buf_0, &pat_2);
+        assert_eq!(r, None);
+        let r = test_memmem(&pat_2, &pat_1);
+        assert_eq!(r, Some(0));
+    }
     #[test]
     fn test01() {
         let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];

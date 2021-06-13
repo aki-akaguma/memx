@@ -1,2 +1,5 @@
 [alias]
 xtask = "run --package xtask --offline --"
+
+[build]
+rustflags = "-C llvm-args=--disable-memop-opt"

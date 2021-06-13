@@ -52,6 +52,9 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     if dst_len < src_len {
         return Err(RangeError);
     }
+    if src_len == 0 {
+        return Ok(());
+    }
     let mut a_ptr = dst.as_mut_ptr();
     let mut b_ptr = src.as_ptr();
     let end_ptr = unsafe { b_ptr.add(src_len) };

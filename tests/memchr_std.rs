@@ -4,6 +4,13 @@ mod test_std_memchr {
     }
     //
     #[test]
+    fn test00() {
+        let buf = vec![];
+        //
+        let r = test_memchr(&buf, b'G');
+        assert_eq!(r, None);
+    }
+    #[test]
     fn test01() {
         let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];
         //

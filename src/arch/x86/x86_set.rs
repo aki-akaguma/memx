@@ -50,6 +50,9 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> 
     if buf_len < n {
         return Err(RangeError);
     }
+    if n == 0 {
+        return Ok(());
+    }
     //
     let mut a_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { a_ptr.add(n) };
