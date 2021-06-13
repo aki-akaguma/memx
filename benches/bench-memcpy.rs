@@ -1,27 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-// ref.) https://en.wikipedia.org/wiki/Memory_ordering
-fn memory_barrier(_arg: &mut [Vec<u8>]) {
-    #[cfg(target_feature = "sse2")]
-    {
-        #[cfg(target_arch = "x86")]
-        use std::arch::x86 as mmx;
-        #[cfg(target_arch = "x86_64")]
-        use std::arch::x86_64 as mmx;
-
-        unsafe { mmx::_mm_mfence() };
-    }
-    /*
-    #[cfg(target_arch = "arm")]
-    {
-        unsafe { core::arch::arm::__dmb(_arg) };
-    }
-    #[cfg(target_arch = "aarch64")]
-    {
-        unsafe { core::arch::aarch64::__dmb(_arg) };
-    }
-    */
-}
+mod barrier;
+use barrier::memory_barrier;
 
 #[inline(never)]
 fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
@@ -31,6 +11,35 @@ fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
             line_bytes[i..(i + pat_len)].copy_from_slice(pat_bytes);
+        }
+    }
+}
+
+#[inline(never)]
+fn process_libc_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
+    // original libc function
+    extern {
+        fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8;
+    }
+    #[inline(always)]
+    fn _x_libc_memcpy(dest: &mut [u8], src: &[u8]) -> bool {
+        let dest_ptr = dest.as_mut_ptr();
+        let src_ptr = src.as_ptr();
+        let dest_len = dest.len();
+        let src_len = src.len();
+        if dest_len < src_len {
+            return false;
+        }
+        let _r = unsafe { memcpy(dest_ptr, src_ptr, src_len) };
+        true
+    }
+    //
+    let pat_len = pat_bytes.len();
+    for i in 0..texts.len() {
+        let line_bytes = &mut texts[i];
+        let line_len = line_bytes.len();
+        for i in 0..(line_len - pat_len) {
+            let _r = _x_libc_memcpy(&mut line_bytes[i..], pat_bytes);
         }
     }
 }
@@ -59,6 +68,7 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
 }
 
+/*
 #[inline(never)]
 fn process_memx_memcpy_libc(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     let pat_len = pat_bytes.len();
@@ -70,6 +80,7 @@ fn process_memx_memcpy_libc(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         }
     }
 }
+*/
 
 mod create_data;
 
@@ -77,14 +88,21 @@ fn criterion_benchmark(c: &mut Criterion) {
     let (mut v, pat_bytes) = create_data::create_data_cpy();
     //
     process_std_memcpy(black_box(&mut v), black_box(pat_bytes));
+    process_libc_memcpy(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
-    process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
+    //process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
     memory_barrier(&mut v);
     //
     c.bench_function("std_memcpy", |b| {
         b.iter(|| {
             process_std_memcpy(black_box(&mut v), black_box(pat_bytes));
+            memory_barrier(&mut v);
+        })
+    });
+    c.bench_function("libc_memcpy", |b| {
+        b.iter(|| {
+            process_libc_memcpy(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
         })
     });
@@ -100,12 +118,14 @@ fn criterion_benchmark(c: &mut Criterion) {
             memory_barrier(&mut v);
         })
     });
+    /*
     c.bench_function("memx_memcpy_libc", |b| {
         b.iter(|| {
             process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
         })
     });
+    */
 }
 
 criterion_group! {

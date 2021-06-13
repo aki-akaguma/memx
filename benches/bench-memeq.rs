@@ -1,27 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-// ref.) https://en.wikipedia.org/wiki/Memory_ordering
-fn memory_barrier(_arg: &Vec<&str>) {
-    #[cfg(target_feature = "sse2")]
-    {
-        #[cfg(target_arch = "x86")]
-        use std::arch::x86 as mmx;
-        #[cfg(target_arch = "x86_64")]
-        use std::arch::x86_64 as mmx;
-
-        unsafe { mmx::_mm_mfence() };
-    }
-    /*
-    #[cfg(target_arch = "arm")]
-    {
-        unsafe { core::arch::arm::__dmb(_arg) };
-    }
-    #[cfg(target_arch = "aarch64")]
-    {
-        unsafe { core::arch::aarch64::__dmb(_arg) };
-    }
-    */
-}
+mod barrier;
+use barrier::memory_barrier;
 
 #[inline(never)]
 fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
@@ -33,6 +13,44 @@ fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
             if &line_bytes[i..(i + pat_len)] == pat_bytes {
+                found += 1;
+            }
+        }
+    }
+    found
+}
+
+#[inline(never)]
+fn process_libc_memeq(texts: &[&str], pattern: &str) -> usize {
+    // original libc function
+    extern {
+        fn bcmp(cx: *const u8, ct: *const u8, n: usize) -> i32;
+    }
+    #[inline(always)]
+    fn _x_libc_memeq(a: &[u8], b: &[u8]) -> bool {
+        let cx = a.as_ptr();
+        let ct = b.as_ptr();
+        let a_len = a.len();
+        let b_len = b.len();
+        if a_len != b_len {
+            return false;
+        }
+        let r = unsafe { bcmp(cx, ct, a_len) };
+        if r == 0 {
+            true
+        } else {
+            false
+        }
+    }
+    //
+    let pat_bytes = pattern.as_bytes();
+    let pat_len = pat_bytes.len();
+    let mut found: usize = 0;
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        for i in 0..(line_len - pat_len) {
+            if _x_libc_memeq(&line_bytes[i..(i + pat_len)], pat_bytes) {
                 found += 1;
             }
         }
@@ -74,6 +92,7 @@ fn process_memx_memeq_basic(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
+/*
 #[inline(never)]
 fn process_memx_memeq_libc(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
@@ -90,6 +109,7 @@ fn process_memx_memeq_libc(texts: &[&str], pattern: &str) -> usize {
     }
     found
 }
+*/
 
 mod create_data;
 
@@ -104,13 +124,21 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
+    /*
     let n = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
+    */
     memory_barrier(&vv);
     //
     c.bench_function("std_memeq", |b| {
         b.iter(|| {
             let _r = process_std_memeq(black_box(&vv), black_box(pat_string_s));
+            memory_barrier(&vv);
+        })
+    });
+    c.bench_function("libc_memeq", |b| {
+        b.iter(|| {
+            let _r = process_libc_memeq(black_box(&vv), black_box(&pat_string));
             memory_barrier(&vv);
         })
     });
@@ -126,12 +154,14 @@ fn criterion_benchmark(c: &mut Criterion) {
             memory_barrier(&vv);
         })
     });
+    /*
     c.bench_function("memx_memeq_libc", |b| {
         b.iter(|| {
             let _r = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
             memory_barrier(&vv);
         })
     });
+    */
 }
 
 criterion_group! {

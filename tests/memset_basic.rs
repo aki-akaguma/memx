@@ -1,4 +1,4 @@
-mod test_memx_mem_memset {
+mod test_memx_memset_basic {
     fn test_memset(dst: &mut [u8], byte: u8, n: usize) {
         let r = memx::mem::memset_basic(dst, byte, n);
         assert_eq!(r.is_ok(), true);

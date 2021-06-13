@@ -1,4 +1,4 @@
-mod test_memx_mem_memrchr {
+mod test_memx_memrchr_basic {
     fn test_memrchr(buf: &[u8], byte: u8) -> Option<usize> {
         memx::mem::memrchr_basic(buf, byte)
     }

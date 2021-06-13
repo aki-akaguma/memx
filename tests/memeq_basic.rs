@@ -1,4 +1,4 @@
-mod test_memx_mem_memeq {
+mod test_memx_memeq_basic {
     //
     fn test_memeq(buf: &[u8], pat_bytes: &[u8]) -> bool {
         memx::mem::memeq_basic(buf, pat_bytes)

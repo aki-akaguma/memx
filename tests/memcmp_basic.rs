@@ -1,4 +1,4 @@
-mod test_memx_memcmp {
+mod test_memx_memcmp_basic {
     use std::cmp::Ordering;
     //
     fn test_memcmp(buf: &[u8], pat_bytes: &[u8]) -> Ordering {
