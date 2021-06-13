@@ -7,12 +7,15 @@ ADB_BBOX = /data/data/org.galexander.busybox/files
 #BENCH_STR = --bench=bench-memcmp --bench=bench-memeq
 
 #BENCH_NM = bench-memchr
+BENCH_NM = bench-memrchr
+
 #BENCH_NM = bench-memcmp
-#BENCH_NM = bench-memcpy
 #BENCH_NM = bench-memeq
+
 #BENCH_NM = bench-memmem
-#BENCH_NM = bench-memrchr
-BENCH_NM = bench-memrmem
+#BENCH_NM = bench-memrmem
+
+#BENCH_NM = bench-memcpy
 #BENCH_NM = bench-memset
 
 BENCH_FNM = $(subst -,_,$(BENCH_NM))
@@ -58,12 +61,12 @@ bench-musl: bench.en.1-musl bench.ja.1-musl
 
 target/stamp.bench-build-gnu: bench-build-gnu
 bench-build-gnu:
-	cargo bench --no-run --target=$(TARGET_GNU)
+	cargo bench $(BENCH_STR) --no-run --target=$(TARGET_GNU)
 	@touch target/stamp.bench-build-gnu
 
 target/stamp.bench-build-musl: bench-build-musl
 bench-build-musl:
-	cargo bench --no-run --target=$(TARGET_MUSL)
+	cargo bench $(BENCH_STR) --no-run --target=$(TARGET_MUSL)
 	@touch target/stamp.bench-build-musl
 
 bench-clean:

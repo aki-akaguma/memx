@@ -2,6 +2,8 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* rename memx_mem_memXXX to memx_memXXX_basic
+
 0.1.9 (2021-06-03)
 =====
 

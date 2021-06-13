@@ -1,4 +1,4 @@
-mod test_memx_mem_memcpy {
+mod test_memx_memcpy_basic {
     fn test_memcpy(dst: &mut [u8], src: &[u8]) {
         let r = memx::mem::memcpy_basic(dst, src);
         assert_eq!(r.is_ok(), true);

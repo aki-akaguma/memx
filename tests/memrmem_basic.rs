@@ -1,4 +1,4 @@
-mod test_memx_mem_memrmem {
+mod test_memx_memrmem_basic {
     fn test_memrmem(buf: &[u8], pat_bytes: &[u8]) -> Option<usize> {
         memx::mem::memrmem_basic(buf, pat_bytes)
     }
