@@ -6,6 +6,19 @@ mod test_memx_memcmp {
     }
     //
     #[test]
+    fn test00() {
+        let buf_0 = vec![];
+        let pat_1 = vec![];
+        let pat_2 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'0'];
+        //
+        let r = test_memcmp(&buf_0, &pat_1);
+        assert_eq!(r, Ordering::Equal);
+        let r = test_memcmp(&buf_0, &pat_2);
+        assert_eq!(r, Ordering::Less);
+        let r = test_memcmp(&pat_2, &pat_1);
+        assert_eq!(r, Ordering::Greater);
+    }
+    #[test]
     fn test01() {
         let buf_0 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'5'];
         let pat_1 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'9'];

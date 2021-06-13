@@ -2,6 +2,9 @@ use super::super::RangeError;
 
 #[inline(always)]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    if src.len() == 0 {
+        return Ok(());
+    }
     #[cfg(target_arch = "arm")]
     let r = {
         // measures to prevent bus errors

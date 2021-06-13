@@ -75,6 +75,9 @@ macro_rules! _unroll_one_chr_16_aa {
 
 #[inline(always)]
 fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
+    if buf.len() == 0 {
+        return None;
+    }
     //
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();

@@ -2,6 +2,9 @@ use super::super::RangeError;
 
 #[inline(always)]
 pub fn _memset_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+    if n == 0 {
+        return Ok(());
+    }
     #[cfg(target_pointer_width = "128")]
     let r = _start_set_64(buf, c, n);
     #[cfg(target_pointer_width = "64")]

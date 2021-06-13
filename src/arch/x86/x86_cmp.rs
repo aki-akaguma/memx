@@ -112,6 +112,12 @@ pub unsafe fn _memcmp_avx(a: &[u8], b: &[u8]) -> Ordering {
 
 #[inline(always)]
 fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
+    if a.len() == 0 && b.len() == 0 {
+        return Ordering::Equal;
+    }
+    if a.len() == 0 || b.len() == 0 {
+        return a.len().cmp(&b.len());
+    }
     //
     let a_len = a.len();
     let b_len = b.len();

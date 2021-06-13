@@ -5,6 +5,9 @@ pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if hay_len < nee_len {
         return None;
     }
+    if nee_len == 0 {
+        return Some(0);
+    }
     let nee_last_idx = nee_len - 1;
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = nee_last_idx;
