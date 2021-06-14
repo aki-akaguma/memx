@@ -20,6 +20,7 @@ fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
+#[cfg(not(target_os = "android"))]
 #[inline(never)]
 fn process_libc_memeq(texts: &[&str], pattern: &str) -> usize {
     // original libc function
@@ -120,6 +121,11 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     let n = process_std_memeq(black_box(&vv), black_box(pat_string_s));
     assert_eq!(n, match_cnt);
+    #[cfg(not(target_os = "android"))]
+    {
+        let n = process_libc_memeq(black_box(&vv), black_box(pat_string_s));
+        assert_eq!(n, match_cnt);
+    }
     let n = process_memx_memeq(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
     let n = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
@@ -136,6 +142,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             memory_barrier(&vv);
         })
     });
+    #[cfg(not(target_os = "android"))]
     c.bench_function("libc_memeq", |b| {
         b.iter(|| {
             let _r = process_libc_memeq(black_box(&vv), black_box(&pat_string));

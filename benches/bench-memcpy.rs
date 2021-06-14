@@ -68,6 +68,19 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
 }
 
+#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[inline(never)]
+fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
+    let pat_len = pat_bytes.len();
+    for i in 0..texts.len() {
+        let line_bytes = &mut texts[i];
+        let line_len = line_bytes.len();
+        for i in 0..(line_len - pat_len) {
+            let _ = unsafe { memx::arch::x86::_memcpy_sse2(&mut line_bytes[i..], pat_bytes) };
+        }
+    }
+}
+
 /*
 #[inline(never)]
 fn process_memx_memcpy_libc(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
@@ -91,6 +104,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     process_libc_memcpy(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
     process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    process_memx_memcpy_sse2(black_box(&mut v), black_box(pat_bytes));
     //process_memx_memcpy_libc(black_box(&mut v), black_box(pat_bytes));
     memory_barrier(&mut v);
     //
@@ -115,6 +130,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("memx_memcpy_basic", |b| {
         b.iter(|| {
             process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
+            memory_barrier(&mut v);
+        })
+    });
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    c.bench_function("memx_memcpy_sse2", |b| {
+        b.iter(|| {
+            process_memx_memcpy_sse2(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
         })
     });

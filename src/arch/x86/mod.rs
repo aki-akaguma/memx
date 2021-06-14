@@ -61,11 +61,23 @@ pub(crate) use x86_set::_memset_impl;
 pub use x86_chr::_memchr_avx;
 pub use x86_chr::_memchr_sse2;
 
+pub use x86_cmp::_memcmp_avx;
+pub use x86_cmp::_memcmp_sse2;
+
 pub use x86_cpy::_memcpy_avx;
 pub use x86_cpy::_memcpy_sse2;
 
+//pub use x86_eq::_memeq_avx;
+//pub use x86_eq::_memeq_sse2;
+
+//pub use x86_mem::_memmem_avx;
+//pub use x86_mem::_memmem_sse2;
+
 pub use x86_rchr::_memrchr_avx;
 pub use x86_rchr::_memrchr_sse2;
+
+//pub use x86_rmem::_memrmem_avx;
+//pub use x86_rmrm::_memrmem_sse2;
 
 pub use x86_set::_memset_avx;
 pub use x86_set::_memset_sse2;

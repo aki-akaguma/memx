@@ -4,37 +4,36 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  167.850 us |  168.090 us |  257.350 us |  343.470 us |
-| memx_memeq              |  110.980 us |  105.270 us |  109.690 us |  104.320 us |
-| memx_memeq_basic        |  112.690 us |  105.210 us |  111.390 us |  104.260 us |
-| memx_memeq_libc         |  201.790 us |  188.950 us |  289.160 us |  394.210 us |
+| std_memeq               |  166.730 us |  165.540 us |  337.640 us |  357.740 us |
+| libc_memeq              |  167.430 us |  164.790 us |  341.970 us |  361.600 us |
+| memx_memeq              |  119.620 us |  112.780 us |  117.980 us |  111.010 us |
+| memx_memeq_basic        |  119.570 us |  112.110 us |  118.320 us |  110.950 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  169.070 us |  197.240 us |  359.320 us |  519.610 us |
-| memx_memeq              |  163.060 us |  151.060 us |  167.030 us |  153.910 us |
-| memx_memeq_basic        |  161.680 us |  151.100 us |  166.060 us |  153.910 us |
-| memx_memeq_libc         |  220.290 us |  236.890 us |  424.980 us |  580.920 us |
+| std_memeq               |  176.280 us |  197.800 us |  374.720 us |  517.150 us |
+| libc_memeq              |  175.160 us |  196.360 us |  365.530 us |  517.270 us |
+| memx_memeq              |  166.310 us |  159.390 us |  172.200 us |  160.770 us |
+| memx_memeq_basic        |  157.430 us |  163.590 us |  168.580 us |  158.330 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  168.670 us |  193.420 us |  336.970 us |  511.170 us |
-| memx_memeq              |  193.980 us |  149.850 us |  163.520 us |  152.600 us |
-| memx_memeq_basic        |  193.970 us |  149.930 us |  160.700 us |  152.800 us |
-| memx_memeq_libc         |  206.490 us |  240.370 us |  416.780 us |  579.240 us |
+| std_memeq               |  167.610 us |  195.070 us |  375.680 us |  517.930 us |
+| libc_memeq              |  169.310 us |  194.880 us |  376.310 us |  517.700 us |
+| memx_memeq              |  157.170 us |  164.520 us |  207.090 us |  160.710 us |
+| memx_memeq_basic        |  165.150 us |  155.170 us |  174.560 us |  164.410 us |
 
   4. armv7-linux-androideabi:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  944.360 us |  908.180 us | 1307.900 us | 1257.000 us |
-| memx_memeq              |  504.520 us |  492.920 us |  620.440 us |  444.600 us |
-| memx_memeq_basic        |  476.000 us |  515.120 us |  616.620 us |  444.550 us |
-| memx_memeq_libc         | 1122.700 us | 1066.900 us |  966.330 us | 1307.600 us |
+| std_memeq               | 1699.700 us | 1183.700 us | 1550.800 us | 1538.500 us |
+| memx_memeq              |  621.950 us |  634.840 us |  660.690 us |  562.120 us |
+| memx_memeq_basic        |  649.480 us |  626.200 us |  675.230 us |  567.540 us |
 
 
 - compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
