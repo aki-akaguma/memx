@@ -2,7 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.10 (2021-06-14)
+=====
+
 * rename memx_mem_memXXX to memx_memXXX_basic
+* update bench results
 
 0.1.9 (2021-06-03)
 =====
