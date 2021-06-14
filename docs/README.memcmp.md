@@ -4,37 +4,39 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  157.450 us |  166.340 us |  250.680 us |  342.930 us |
-| memx_memcmp             |  128.740 us |  127.730 us |  127.670 us |  126.380 us |
-| memx_memcmp_basic       |  128.390 us |  127.770 us |  126.970 us |  126.390 us |
-| memx_memcmp_libc        |  213.270 us |  205.330 us |  315.380 us |  376.260 us |
+| std_memcmp              |  157.960 us |  167.430 us |  335.020 us |  350.780 us |
+| libc_memcmp             |  176.670 us |  179.070 us |  338.900 us |  356.950 us |
+| memx_memcmp             |  134.170 us |  133.800 us |  132.810 us |  132.290 us |
+| memx_memcmp_basic       |  135.010 us |  133.710 us |  132.460 us |  132.340 us |
+| memx_memcmp_sse2        |  133.990 us |  172.160 us |  132.040 us |  170.570 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  180.930 us |  261.080 us |  337.890 us |  476.190 us |
-| memx_memcmp             |  184.660 us |  212.390 us |  182.910 us |  211.960 us |
-| memx_memcmp_basic       |  183.920 us |  211.370 us |  182.000 us |  211.570 us |
-| memx_memcmp_libc        |  240.580 us |  254.490 us |  384.130 us |  552.220 us |
+| std_memcmp              |  192.510 us |  201.060 us |  327.400 us |  479.060 us |
+| libc_memcmp             |  182.590 us |  213.710 us |  302.210 us |  485.930 us |
+| memx_memcmp             |  192.280 us |  219.670 us |  178.640 us |  212.710 us |
+| memx_memcmp_basic       |  187.780 us |  212.980 us |  180.980 us |  215.940 us |
+| memx_memcmp_sse2        |  169.920 us |  206.950 us |  210.300 us |  221.380 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  162.920 us |  201.330 us |  336.400 us |  477.480 us |
-| memx_memcmp             |  177.560 us |  205.840 us |  182.490 us |  208.060 us |
-| memx_memcmp_basic       |  176.580 us |  205.850 us |  179.620 us |  202.480 us |
-| memx_memcmp_libc        |  236.070 us |  258.070 us |  396.420 us |  545.100 us |
+| std_memcmp              |  164.420 us |  204.190 us |  329.840 us |  476.200 us |
+| libc_memcmp             |  182.860 us |  206.390 us |  330.710 us |  485.520 us |
+| memx_memcmp             |  191.730 us |  213.620 us |  180.950 us |  208.590 us |
+| memx_memcmp_basic       |  190.560 us |  214.720 us |  178.870 us |  209.070 us |
 
   4. armv7-linux-androideabi:
 
 |         `name`          |  `andr:en`  |  `andr:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  966.760 us |  914.480 us | 1039.400 us | 1451.700 us |
-| memx_memcmp             |  498.820 us |  548.790 us |  512.230 us |  537.870 us |
-| memx_memcmp_basic       |  492.300 us |  543.620 us |  505.660 us |  525.700 us |
-| memx_memcmp_libc        | 1199.700 us | 1139.700 us | 1115.500 us | 1526.500 us |
+| std_memcmp              | 1401.200 us | 1113.700 us | 1275.200 us | 1516.500 us |
+| libc_memcmp             | 1206.400 us | 1172.900 us | 1171.000 us | 1543.700 us |
+| memx_memcmp             |  625.920 us |  676.380 us |  785.140 us |  683.550 us |
+| memx_memcmp_basic       |  611.750 us |  706.160 us |  653.590 us |  666.110 us |
 
 
 - compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)

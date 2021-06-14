@@ -1,6 +1,6 @@
 
-#bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset
-bench_nms = bench-memrmem
+bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset
+#bench_nms = bench-memrmem
 
 target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 

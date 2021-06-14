@@ -23,6 +23,7 @@ fn process_std_memrmem(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
+#[cfg(target_arch = "x86_64")]
 #[inline(never)]
 fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
     // debian support: apt install publib-dev
@@ -143,8 +144,11 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     let n = process_std_memrmem(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
-    let n = process_libc_memrmem(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n, match_cnt);
+    #[cfg(target_arch = "x86_64")]
+    {
+        let n = process_libc_memrmem(black_box(&vv), black_box(&pat_string));
+        assert_eq!(n, match_cnt);
+    }
     let n = process_memchr_memrmem(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
     let n = process_memx_memrmem(black_box(&vv), black_box(&pat_string));
@@ -159,6 +163,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             memory_barrier(&vv);
         })
     });
+    #[cfg(target_arch = "x86_64")]
     c.bench_function("libc_memrmem", |b| {
         b.iter(|| {
             let _r = process_libc_memrmem(black_box(&vv), black_box(&pat_string));

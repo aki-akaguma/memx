@@ -55,6 +55,16 @@ fn process_memx_memset_basic(texts: &mut [Vec<u8>], pat_u8: u8) {
     }
 }
 
+#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[inline(never)]
+fn process_memx_memset_sse2(texts: &mut [Vec<u8>], pat_u8: u8) {
+    for i in 0..texts.len() {
+        let line_bytes = &mut texts[i];
+        let line_len = line_bytes.len();
+        let _ = unsafe { memx::arch::x86::_memset_sse2(&mut *line_bytes, pat_u8, line_len) };
+    }
+}
+
 /*
 #[inline(never)]
 fn process_memx_memset_libc(texts: &mut [Vec<u8>], pat_u8: u8) {
@@ -76,6 +86,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     process_libc_memset(black_box(&mut v), black_box(pat_u8));
     process_memx_memset(black_box(&mut v), black_box(pat_u8));
     process_memx_memset_basic(black_box(&mut v), black_box(pat_u8));
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    process_memx_memset_sse2(black_box(&mut v), black_box(pat_u8));
     //process_memx_memset_libc(black_box(&mut v), black_box(pat_u8));
     //
     c.bench_function("std_memset", |b| {
@@ -99,6 +111,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("memx_memset_basic", |b| {
         b.iter(|| {
             process_memx_memset_basic(black_box(&mut v), black_box(pat_u8));
+            memory_barrier(&mut v);
+        })
+    });
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    c.bench_function("memx_memset_sse2", |b| {
+        b.iter(|| {
+            process_memx_memset_sse2(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
         })
     });

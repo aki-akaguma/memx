@@ -4,36 +4,43 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |  514.700 us |  277.620 us |  525.830 us |  237.260 us |
-| memx_memrchr            |  263.110 us |  107.010 us |  259.810 us |   83.782 us |
-| memx_memrchr_basic      |  330.900 us |  102.660 us |  263.330 us |  103.200 us |
-| memx_memrchr_libc       |  266.860 us |   84.854 us |  608.250 us |  288.650 us |
-| memchr_memrchr          |  331.550 us |   70.906 us |  224.240 us |   71.196 us |
+| std_memrchr             |  502.940 us |  243.050 us |  509.130 us |  231.610 us |
+| libc_memrchr            |  217.110 us |   73.817 us |  554.900 us |  269.910 us |
+| memchr_memrchr          |  223.130 us |   70.205 us |  221.280 us |   69.621 us |
+| memx_memrchr            |  266.480 us |   83.816 us |  264.410 us |   83.123 us |
+| memx_memrchr_basic      |  266.820 us |  104.750 us |  264.970 us |  104.730 us |
+| memx_memrchr_sse2       |  266.110 us |   83.503 us |  262.150 us |   82.797 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |  394.770 us |  201.620 us |  400.980 us |  201.450 us |
-| memx_memrchr            |  297.450 us |   87.943 us |  299.870 us |   86.482 us |
-| memx_memrchr_basic      |  290.270 us |  126.260 us |  308.190 us |  130.590 us |
-| memx_memrchr_libc       |  334.040 us |  102.950 us |  654.960 us |  235.820 us |
-| memchr_memrchr          |  575.510 us |  220.570 us |  558.810 us |  213.730 us |
+| std_memrchr             |  276.000 us |  199.920 us |  398.520 us |  201.210 us |
+| libc_memrchr            |  234.730 us |   77.082 us |  539.700 us |  216.280 us |
+| memchr_memrchr          |  553.740 us |  213.880 us |  547.610 us |  211.840 us |
+| memx_memrchr            |  373.390 us |  107.110 us |  401.700 us |  114.970 us |
+| memx_memrchr_basic      |  300.910 us |  125.380 us |  325.980 us |  138.210 us |
+| memx_memrchr_sse2       |  307.460 us |   89.040 us |  320.720 us |   92.805 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |  416.480 us |  198.590 us |  387.710 us |  194.460 us |
-| memx_memrchr            |  286.790 us |  126.610 us |  316.880 us |  136.680 us |
-| memx_memrchr_basic      |  297.630 us |  127.590 us |  321.880 us |  138.910 us |
-| memx_memrchr_libc       |  326.570 us |  101.990 us |  684.830 us |  243.660 us |
-| memchr_memrchr          |  514.320 us |  203.430 us |  531.580 us |  200.630 us |
+| std_memrchr             |  414.870 us |  197.680 us |  295.240 us |  202.240 us |
+| libc_memrchr            |  234.880 us |   77.747 us |  608.850 us |  212.540 us |
+| memchr_memrchr          |  520.250 us |  196.770 us |  509.230 us |  199.230 us |
+| memx_memrchr            |  293.240 us |  125.740 us |  330.080 us |  143.590 us |
+| memx_memrchr_basic      |  296.340 us |  127.530 us |  320.770 us |  137.420 us |
 
   4. armv7-linux-androideabi:
 
 |         `name`          |  `andr:en`  |  `andr:ja`  |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
+| std_memrchr             | 1739.600 us |  941.630 us | 1498.100 us |  843.520 us |
+| libc_memrchr            | 1736.600 us | 1037.000 us | 1525.500 us | 1170.300 us |
+| memchr_memrchr          | 1411.300 us |  659.830 us | 1475.600 us |  667.510 us |
+| memx_memrchr            | 1027.100 us |  529.770 us | 1088.300 us |  496.660 us |
+| memx_memrchr_basic      | 1023.500 us |  545.150 us | 1090.600 us |  490.000 us |
 
 - compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
 - `us` is micro seconds

@@ -119,6 +119,27 @@ fn process_memx_memrchr_basic(texts: &[&str], pat_byte: u8) -> usize {
     found
 }
 
+#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[inline(never)]
+fn process_memx_memrchr_sse2(texts: &[&str], pat_byte: u8) -> usize {
+    let mut found: usize = 0;
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = unsafe { memx::arch::x86::_memrchr_sse2(&line_bytes[..curr_idx], pat_byte) };
+            if let Some(pos) = r {
+                found += 1;
+                curr_idx = pos;
+            } else {
+                break;
+            }
+        }
+    }
+    found
+}
+
 /*
 #[inline(never)]
 fn process_memx_memrchr_libc(texts: &[&str], pat_byte: u8) -> usize {
@@ -157,6 +178,11 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memrchr_basic(black_box(&vv), black_box(pat_byte));
     assert_eq!(n, match_cnt);
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    {
+        let n = process_memx_memrchr_sse2(black_box(&vv), black_box(pat_byte));
+        assert_eq!(n, match_cnt);
+    }
     //let n = process_memx_memrchr_libc(black_box(&vv), black_box(pat_byte));
     //assert_eq!(n, match_cnt);
     memory_barrier(&vv);
@@ -188,6 +214,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("memx_memrchr_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memrchr_basic(black_box(&vv), black_box(pat_byte));
+            memory_barrier(&vv);
+        })
+    });
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    c.bench_function("memx_memrchr_sse2", |b| {
+        b.iter(|| {
+            let _r = process_memx_memrchr_sse2(black_box(&vv), black_box(pat_byte));
             memory_barrier(&vv);
         })
     });
