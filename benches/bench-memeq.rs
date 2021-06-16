@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 mod barrier;
-use barrier::memory_barrier;
+use barrier::cache_line_flush;
 
 #[inline(never)]
 fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
@@ -93,24 +93,13 @@ fn process_memx_memeq_basic(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
-/*
 #[inline(never)]
-fn process_memx_memeq_libc(texts: &[&str], pattern: &str) -> usize {
-    let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
-    let mut found: usize = 0;
-    for line in texts {
-        let line_bytes = line.as_bytes();
-        let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if memx::libc::memeq_libc(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                found += 1;
-            }
-        }
+fn cache_flush(texts: &[&str], pattern: &str) {
+    for i in 0..texts.len() {
+        cache_line_flush(texts[i].as_bytes());
     }
-    found
+    cache_line_flush(pattern.as_bytes());
 }
-*/
 
 mod create_data;
 
@@ -130,45 +119,33 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
-    /*
-    let n = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n, match_cnt);
-    */
-    memory_barrier(&vv);
+    cache_flush(&vv, &pat_string);
     //
     c.bench_function("std_memeq", |b| {
         b.iter(|| {
             let _r = process_std_memeq(black_box(&vv), black_box(pat_string_s));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     #[cfg(not(target_os = "android"))]
     c.bench_function("libc_memeq", |b| {
         b.iter(|| {
             let _r = process_libc_memeq(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memeq", |b| {
         b.iter(|| {
             let _r = process_memx_memeq(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memeq_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
-    /*
-    c.bench_function("memx_memeq_libc", |b| {
-        b.iter(|| {
-            let _r = process_memx_memeq_libc(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
-        })
-    });
-    */
 }
 
 criterion_group! {

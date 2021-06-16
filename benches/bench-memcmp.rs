@@ -2,7 +2,7 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use std::cmp::Ordering;
 
 mod barrier;
-use barrier::memory_barrier;
+use barrier::cache_line_flush;
 
 #[inline(never)]
 fn process_std_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
@@ -142,29 +142,13 @@ fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usi
     (found_eq, found_le, found_gr)
 }
 
-/*
 #[inline(never)]
-fn process_memx_memcmp_libc(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
-    let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
-    let mut found_eq: usize = 0;
-    let mut found_le: usize = 0;
-    let mut found_gr: usize = 0;
-    for line in texts {
-        let line_bytes = line.as_bytes();
-        let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            let r = memx::libc::memcmp_libc(&line_bytes[i..(i + pat_len)], pat_bytes);
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
-            }
-        }
+fn cache_flush(texts: &[&str], pattern: &str) {
+    for i in 0..texts.len() {
+        cache_line_flush(texts[i].as_bytes());
     }
-    (found_eq, found_le, found_gr)
+    cache_line_flush(pattern.as_bytes());
 }
-*/
 
 mod create_data;
 
@@ -196,53 +180,39 @@ fn criterion_benchmark(c: &mut Criterion) {
         assert_eq!(n_le, less_cnt);
         assert_eq!(n_gr, greater_count);
     }
-    /*
-    let (n_eq, n_le, n_gr) = process_memx_memcmp_libc(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n_eq, match_cnt);
-    assert_eq!(n_le, less_cnt);
-    assert_eq!(n_gr, greater_count);
-    */
-    memory_barrier(&vv);
+    cache_flush(&vv, &pat_string);
     //
     c.bench_function("std_memcmp", |b| {
         b.iter(|| {
             let _r = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("libc_memcmp", |b| {
         b.iter(|| {
             let _r = process_libc_memcmp(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memcmp", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memcmp_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_basic(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     c.bench_function("memx_memcmp_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
-    /*
-    c.bench_function("memx_memcmp_libc", |b| {
-        b.iter(|| {
-            let _r = process_memx_memcmp_libc(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
-        })
-    });
-    */
 }
 
 criterion_group! {

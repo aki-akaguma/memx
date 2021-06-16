@@ -4,11 +4,11 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  157.960 us |  167.430 us |  335.020 us |  350.780 us |
-| libc_memcmp             |  176.670 us |  179.070 us |  338.900 us |  356.950 us |
-| memx_memcmp             |  134.170 us |  133.800 us |  132.810 us |  132.290 us |
-| memx_memcmp_basic       |  135.010 us |  133.710 us |  132.460 us |  132.340 us |
-| memx_memcmp_sse2        |  133.990 us |  172.160 us |  132.040 us |  170.570 us |
+| std_memcmp              |  164.650 us |  246.800 us |  346.560 us |  363.650 us |
+| libc_memcmp             |  188.180 us |  193.100 us |  352.110 us |  369.490 us |
+| memx_memcmp             |  149.570 us |  146.230 us |  146.820 us |  144.240 us |
+| memx_memcmp_basic       |  145.430 us |  156.900 us |  145.440 us |  144.410 us |
+| memx_memcmp_sse2        |  143.010 us |  183.020 us |  140.970 us |  182.180 us |
 
   2. i686-unknown-linux-:
 

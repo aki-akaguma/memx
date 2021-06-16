@@ -4,11 +4,11 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.738 us |    3.800 us |    1.468 us |    3.334 us |
-| libc_memset             |    1.726 us |    3.739 us |    1.442 us |    3.186 us |
-| memx_memset             |    1.139 us |    2.333 us |    1.181 us |    2.567 us |
-| memx_memset_basic       |    1.395 us |    2.933 us |    1.432 us |    3.098 us |
-| memx_memset_sse2        |    1.171 us |    2.379 us |    1.189 us |    2.625 us |
+| std_memset              |   17.522 us |   30.862 us |   16.229 us |   28.453 us |
+| libc_memset             |   17.459 us |   29.653 us |   16.040 us |   27.476 us |
+| memx_memset             |   15.113 us |   26.221 us |   14.488 us |   25.729 us |
+| memx_memset_basic       |   14.667 us |   25.799 us |   14.228 us |   25.799 us |
+| memx_memset_sse2        |   14.699 us |   26.154 us |   14.210 us |   25.369 us |
 
   2. i686-unknown-linux-:
 

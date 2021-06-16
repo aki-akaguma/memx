@@ -4,29 +4,31 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |  585.130 us |  903.110 us |  617.810 us |  909.770 us |
-| libc_memrmem            | 1504.300 us | 1558.400 us |  604.980 us |  648.610 us |
-| memchr_memrmem          |  769.770 us |  750.020 us |  758.980 us |  757.300 us |
-| memx_memrmem            |  143.060 us |  143.690 us |  141.740 us |  141.660 us |
-| memx_memrmem_basic      |  128.340 us |  128.350 us |  126.140 us |  126.020 us |
+| std_memrmem             |  671.070 us |  885.280 us |  680.500 us |  889.690 us |
+| libc_memrmem            | 1755.700 us | 1832.300 us |  788.300 us |  868.110 us |
+| memchr_memrmem          |  791.940 us |  805.810 us |  802.150 us |  802.870 us |
+| memx_memrmem            |  287.300 us |  287.340 us |  289.780 us |  289.980 us |
+| memx_memrmem_basic      |  277.600 us |  278.590 us |  282.610 us |  286.810 us |
+| memx_memrmem_sse2       |  291.240 us |  286.860 us |  296.580 us |  288.740 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |  888.060 us | 1035.100 us |  931.730 us | 1048.100 us |
-| memchr_memrmem          |  953.280 us |  961.110 us |  963.390 us |  943.960 us |
-| memx_memrmem            |  150.780 us |  150.700 us |  168.700 us |  167.490 us |
-| memx_memrmem_basic      |  129.820 us |  129.940 us |  131.440 us |  132.910 us |
+| std_memrmem             |  907.570 us | 1049.200 us |  804.720 us | 1038.300 us |
+| memchr_memrmem          |  972.120 us |  975.760 us |  995.980 us |  970.510 us |
+| memx_memrmem            |  164.970 us |  166.970 us |  177.630 us |  176.850 us |
+| memx_memrmem_basic      |  135.250 us |  127.360 us |  139.570 us |  136.090 us |
+| memx_memrmem_sse2       |  160.110 us |  163.300 us |  168.300 us |  166.920 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |  895.380 us |  968.770 us |  935.150 us |  963.800 us |
-| memchr_memrmem          | 1051.000 us | 1600.800 us | 1045.800 us | 1564.600 us |
-| memx_memrmem            |  134.450 us |  134.530 us |  132.990 us |  134.490 us |
-| memx_memrmem_basic      |  133.340 us |  133.430 us |  135.110 us |  135.710 us |
+| std_memrmem             |  907.680 us |  999.080 us |  956.720 us |  968.020 us |
+| memchr_memrmem          | 1076.300 us | 1627.100 us | 1065.700 us | 1610.100 us |
+| memx_memrmem            |  146.340 us |  132.110 us |  144.960 us |  141.750 us |
+| memx_memrmem_basic      |  146.830 us |  130.710 us |  144.430 us |  140.740 us |
 
   4. armv7-linux-androideabi:
 

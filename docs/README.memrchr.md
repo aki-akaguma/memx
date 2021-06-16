@@ -4,12 +4,12 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |  502.940 us |  243.050 us |  509.130 us |  231.610 us |
-| libc_memrchr            |  217.110 us |   73.817 us |  554.900 us |  269.910 us |
-| memchr_memrchr          |  223.130 us |   70.205 us |  221.280 us |   69.621 us |
-| memx_memrchr            |  266.480 us |   83.816 us |  264.410 us |   83.123 us |
-| memx_memrchr_basic      |  266.820 us |  104.750 us |  264.970 us |  104.730 us |
-| memx_memrchr_sse2       |  266.110 us |   83.503 us |  262.150 us |   82.797 us |
+| std_memrchr             |  670.620 us |  383.100 us |  654.610 us |  371.280 us |
+| libc_memrchr            |  432.310 us |  260.550 us |  676.470 us |  405.750 us |
+| memchr_memrchr          |  428.700 us |  274.280 us |  426.520 us |  269.510 us |
+| memx_memrchr            |  461.000 us |  287.400 us |  473.650 us |  295.010 us |
+| memx_memrchr_basic      |  446.750 us |  290.320 us |  444.060 us |  305.120 us |
+| memx_memrchr_sse2       |  460.920 us |  286.990 us |  467.890 us |  290.920 us |
 
   2. i686-unknown-linux-:
 

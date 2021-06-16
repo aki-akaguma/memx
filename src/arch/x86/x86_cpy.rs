@@ -59,10 +59,11 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     let mut b_ptr = src.as_ptr();
     let end_ptr = unsafe { b_ptr.add(src_len) };
     //
-    if src_len >= 16 {
-        let (aa_ptr, bb_ptr) = if src_len < 32 {
-            _cpy_small(a_ptr, b_ptr, src_len, end_ptr)
-        } else if src_len < 128 {
+    if src_len < 64 {
+        return _cpy_small(a_ptr, b_ptr, end_ptr)
+    }
+    {
+        let (aa_ptr, bb_ptr) = if src_len < 128 {
             _cpy_medium(a_ptr, b_ptr, src_len, end_ptr)
         } else {
             _cpy_large(a_ptr, b_ptr, src_len, end_ptr)
@@ -74,56 +75,32 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     basic::_memcpy_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
+//#[inline(never)]
 #[inline(always)]
 fn _cpy_small(
     dst_ptr: *mut u8,
     src_ptr: *const u8,
-    src_len: usize,
     end_ptr: *const u8,
-) -> (*mut u8, *const u8) {
+) -> Result<(), RangeError>  {
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
-    let remaining_len = {
-        let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
-        if remaining_align < 16 {
-            _cpy_tiny_0_15(a_ptr, b_ptr, remaining_align);
-            //
-            a_ptr = unsafe { a_ptr.add(remaining_align) };
-            b_ptr = unsafe { b_ptr.add(remaining_align) };
-            src_len - remaining_align
-        } else {
-            src_len
-        }
-    };
-    /*
-    if remaining_len >= 16 * 2 {
-        let unroll = 2;
-        let loop_size = 16;
-        let end_ptr_16_2 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_2 {
-            _cpy_unroll_16x2(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    */
-    if remaining_len >= 16 {
-        let loop_size = 16;
-        let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_16 {
-            let aa_ptr = a_ptr as *mut __m128i;
-            let bb_ptr = b_ptr as *mut __m128i;
-            let mm_b = unsafe { _mm_loadu_si128(bb_ptr) };
-            unsafe { _mm_store_si128(aa_ptr, mm_b) };
+    {
+        let loop_size = 8;
+        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+        while b_ptr <= end_ptr_8 {
+            let aa_ptr = a_ptr as *mut u64;
+            let bb_ptr = b_ptr as *const u64;
+            unsafe { *aa_ptr = *bb_ptr };
             //
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    (a_ptr, b_ptr)
+    // the remaining data is the max: 7 bytes.
+    basic::_memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
+//#[inline(never)]
 #[inline(always)]
 fn _cpy_medium(
     dst_ptr: *mut u8,
@@ -145,58 +122,61 @@ fn _cpy_medium(
             src_len
         }
     };
-    if remaining_len >= 16 * 6 {
-        let unroll = 6;
-        let loop_size = 16;
-        let end_ptr_16_6 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_6 {
-            _cpy_unroll_16x6(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    if remaining_len >= 16 * 4 {
-        let unroll = 4;
-        let loop_size = 16;
-        let end_ptr_16_4 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_4 {
-            _cpy_unroll_16x4(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    /*
-    if remaining_len >= 16 * 2 {
-        let unroll = 2;
-        let loop_size = 16;
-        let end_ptr_16_2 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_2 {
-            _cpy_unroll_16x2(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    */
     if remaining_len >= 16 {
-        let loop_size = 16;
-        let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_16 {
-            let aa_ptr = a_ptr as *mut __m128i;
-            let bb_ptr = b_ptr as *mut __m128i;
-            let mm_b = unsafe { _mm_loadu_si128(bb_ptr) };
-            unsafe { _mm_store_si128(aa_ptr, mm_b) };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
+        if remaining_len >= 16 * 6 {
+            let unroll = 6;
+            let loop_size = 16;
+            let end_ptr_16_6 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_6 {
+                _cpy_unroll_16x6(a_ptr, b_ptr, loop_size);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        if remaining_len >= 16 * 4 {
+            let unroll = 4;
+            let loop_size = 16;
+            let end_ptr_16_4 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_4 {
+                _cpy_unroll_16x4(a_ptr, b_ptr, loop_size);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        /*
+        if remaining_len >= 16 * 2 {
+            let unroll = 2;
+            let loop_size = 16;
+            let end_ptr_16_2 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_2 {
+                _cpy_unroll_16x2(a_ptr, b_ptr, loop_size);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        */
+        if remaining_len >= 16 {
+            let loop_size = 16;
+            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
+            while b_ptr <= end_ptr_16 {
+                let aa_ptr = a_ptr as *mut __m128i;
+                let bb_ptr = b_ptr as *mut __m128i;
+                let mm_b = unsafe { _mm_loadu_si128(bb_ptr) };
+                unsafe { _mm_store_si128(aa_ptr, mm_b) };
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+                b_ptr = unsafe { b_ptr.add(loop_size) };
+            }
         }
     }
     (a_ptr, b_ptr)
 }
 
 #[inline(never)]
+//#[inline(always)]
 fn _cpy_large(
     dst_ptr: *mut u8,
     src_ptr: *const u8,
@@ -217,39 +197,41 @@ fn _cpy_large(
             src_len
         }
     };
-    if remaining_len >= 16 * 8 {
-        let unroll = 8;
-        let loop_size = 16;
-        let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_8 {
-            _cpy_unroll_16x8(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    if remaining_len >= 16 * 4 {
-        let unroll = 4;
-        let loop_size = 16;
-        let end_ptr_16_4 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_4 {
-            _cpy_unroll_16x4(a_ptr, b_ptr, loop_size);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
     if remaining_len >= 16 {
-        let loop_size = 16;
-        let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_16 {
-            let aa_ptr = a_ptr as *mut __m128i;
-            let bb_ptr = b_ptr as *mut __m128i;
-            let mm_b = unsafe { _mm_loadu_si128(bb_ptr) };
-            unsafe { _mm_store_si128(aa_ptr, mm_b) };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
+        if remaining_len >= 16 * 8 {
+            let unroll = 8;
+            let loop_size = 16;
+            let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_8 {
+                _cpy_unroll_16x8(a_ptr, b_ptr, loop_size);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        if remaining_len >= 16 * 4 {
+            let unroll = 4;
+            let loop_size = 16;
+            let end_ptr_16_4 = unsafe { end_ptr.sub(loop_size * unroll) };
+            while b_ptr <= end_ptr_16_4 {
+                _cpy_unroll_16x4(a_ptr, b_ptr, loop_size);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+        if remaining_len >= 16 {
+            let loop_size = 16;
+            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
+            while b_ptr <= end_ptr_16 {
+                let aa_ptr = a_ptr as *mut __m128i;
+                let bb_ptr = b_ptr as *mut __m128i;
+                let mm_b = unsafe { _mm_loadu_si128(bb_ptr) };
+                unsafe { _mm_store_si128(aa_ptr, mm_b) };
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+                b_ptr = unsafe { b_ptr.add(loop_size) };
+            }
         }
     }
     (a_ptr, b_ptr)
@@ -359,6 +341,7 @@ fn _cpy_unroll_16x2(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
     unsafe { _mm_store_si128(aa1_ptr, mm_b1) };
 }
 
+/**/
 #[inline(always)]
 fn _cpy_tiny_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
     match len {
@@ -425,10 +408,10 @@ fn _cpy_tiny_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
         }
     }
 }
-
+/**/
 /*
 #[inline(always)]
-fn _cpy_remaining_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
+fn _cpy_tiny_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
     match len {
         0 => {}
         1 => _copy_1_bytes(dst_ptr, src_ptr),
@@ -495,24 +478,38 @@ fn _cpy_remaining_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
 }
 */
 
+#[inline(always)]
 fn _copy_8_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let a_ptr = dst_ptr as *mut u64;
     let b_ptr = src_ptr as *const u64;
     unsafe { *a_ptr = *b_ptr };
 }
 
+#[inline(always)]
 fn _copy_4_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let a_ptr = dst_ptr as *mut u32;
     let b_ptr = src_ptr as *const u32;
     unsafe { *a_ptr = *b_ptr };
 }
 
+#[inline(always)]
 fn _copy_2_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let a_ptr = dst_ptr as *mut u16;
     let b_ptr = src_ptr as *const u16;
     unsafe { *a_ptr = *b_ptr };
+    /*
+    */
+    /*
+    let a_ptr = dst_ptr as *mut u8;
+    let b_ptr = src_ptr as *const u8;
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { dst_ptr.add(1) };
+    let b_ptr = unsafe { src_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    */
 }
 
+#[inline(always)]
 fn _copy_1_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let a_ptr = dst_ptr as *mut u8;
     let b_ptr = src_ptr as *const u8;

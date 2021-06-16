@@ -1,20 +1,19 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 mod barrier;
-use barrier::memory_barrier;
+use barrier::cache_line_flush;
 
 #[inline(never)]
 fn process_std_memrmem(texts: &[&str], pattern: &str) -> usize {
-    let pat_len = pattern.len();
     let mut found: usize = 0;
     for line in texts {
         let line_len = line.len();
-        let mut curr_idx = 0;
-        while curr_idx < line_len {
-            let r = line[curr_idx..].rfind(pattern);
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = line[..curr_idx].rfind(pattern);
             if let Some(pos) = r {
                 found += 1;
-                curr_idx = curr_idx + pos + pat_len;
+                curr_idx = pos;
             } else {
                 break;
             }
@@ -50,17 +49,16 @@ fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
     }
     //
     let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        let mut curr_idx = 0;
-        while curr_idx < line_len {
-            let r = _x_libc_memrmem(&line_bytes[curr_idx..], pat_bytes);
+        let mut curr_idx = line_len;
+        while curr_idx > 0  {
+            let r = _x_libc_memrmem(&line_bytes[..curr_idx], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
-                curr_idx = curr_idx + pos + pat_len;
+                curr_idx = pos;
             } else {
                 break;
             }
@@ -72,17 +70,16 @@ fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
 #[inline(never)]
 fn process_memchr_memrmem(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        let mut curr_idx = 0;
-        while curr_idx < line_len {
-            let r = memchr::memmem::rfind(&line_bytes[curr_idx..], pat_bytes);
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = memchr::memmem::rfind(&line_bytes[..curr_idx], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
-                curr_idx = curr_idx + pos + pat_len;
+                curr_idx = pos;
             } else {
                 break;
             }
@@ -94,17 +91,16 @@ fn process_memchr_memrmem(texts: &[&str], pattern: &str) -> usize {
 #[inline(never)]
 fn process_memx_memrmem(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        let mut curr_idx = 0;
-        while curr_idx < line_len {
-            let r = memx::memrmem(&line_bytes[curr_idx..], pat_bytes);
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = memx::memrmem(&line_bytes[..curr_idx], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
-                curr_idx = curr_idx + pos + pat_len;
+                curr_idx = pos;
             } else {
                 break;
             }
@@ -116,23 +112,52 @@ fn process_memx_memrmem(texts: &[&str], pattern: &str) -> usize {
 #[inline(never)]
 fn process_memx_memrmem_basic(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
-    let pat_len = pat_bytes.len();
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        let mut curr_idx = 0;
-        while curr_idx < line_len {
-            let r = memx::mem::memrmem_basic(&line_bytes[curr_idx..], pat_bytes);
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = memx::mem::memrmem_basic(&line_bytes[..curr_idx], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
-                curr_idx = curr_idx + pos + pat_len;
+                curr_idx = pos;
             } else {
                 break;
             }
         }
     }
     found
+}
+
+#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[inline(never)]
+fn process_memx_memrmem_sse2(texts: &[&str], pattern: &str) -> usize {
+    let pat_bytes = pattern.as_bytes();
+    let mut found: usize = 0;
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        let mut curr_idx = line_len;
+        while curr_idx > 0 {
+            let r = unsafe { memx::arch::x86::_memrmem_sse2(&line_bytes[..curr_idx], pat_bytes) };
+            if let Some(pos) = r {
+                found += 1;
+                curr_idx = pos;
+            } else {
+                break;
+            }
+        }
+    }
+    found
+}
+
+#[inline(never)]
+fn cache_flush(texts: &[&str], pattern: &str) {
+    for i in 0..texts.len() {
+        cache_line_flush(texts[i].as_bytes());
+    }
+    cache_line_flush(pattern.as_bytes());
 }
 
 mod create_data;
@@ -155,37 +180,49 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memrmem_basic(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
-    memory_barrier(&vv);
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    {
+        let n = process_memx_memrmem_sse2(black_box(&vv), black_box(&pat_string));
+        assert_eq!(n, match_cnt);
+    }
+    cache_flush(&vv, &pat_string);
     //
     c.bench_function("std_memrmem", |b| {
         b.iter(|| {
             let _r = process_std_memrmem(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     #[cfg(target_arch = "x86_64")]
     c.bench_function("libc_memrmem", |b| {
         b.iter(|| {
             let _r = process_libc_memrmem(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memchr_memrmem", |b| {
         b.iter(|| {
             let _r = process_memchr_memrmem(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memrmem", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
         })
     });
     c.bench_function("memx_memrmem_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem_basic(black_box(&vv), black_box(&pat_string));
-            memory_barrier(&vv);
+            cache_flush(&vv, &pat_string);
+        })
+    });
+    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    c.bench_function("memx_memrmem_sse2", |b| {
+        b.iter(|| {
+            let _r = process_memx_memrmem_sse2(black_box(&vv), black_box(&pat_string));
+            cache_flush(&vv, &pat_string);
         })
     });
 }

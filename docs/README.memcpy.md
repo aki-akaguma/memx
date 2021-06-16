@@ -4,30 +4,30 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |   87.447 us |  194.190 us |  428.600 us |  408.600 us |
-| libc_memcpy             |   79.030 us |  190.210 us |  426.620 us |  405.900 us |
-| memx_memcpy             |  138.240 us |  187.750 us |  151.110 us |  196.720 us |
-| memx_memcpy_basic       |  117.740 us |  371.440 us |  117.290 us |  368.380 us |
-| memx_memcpy_sse2        |  129.610 us |  191.230 us |  126.420 us |  196.730 us |
+| std_memcpy              |  145.820 us |  273.960 us |  453.490 us |  443.580 us |
+| libc_memcpy             |  140.720 us |  268.470 us |  453.900 us |  433.390 us |
+| memx_memcpy             |  186.760 us |  282.520 us |  185.570 us |  287.860 us |
+| memx_memcpy_basic       |  174.260 us |  338.830 us |  173.130 us |  337.150 us |
+| memx_memcpy_sse2        |  181.280 us |  269.290 us |  181.720 us |  264.560 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  116.090 us |  207.410 us |  263.800 us |  335.080 us |
-| libc_memcpy             |  115.320 us |  205.510 us |  258.200 us |  329.000 us |
-| memx_memcpy             |  178.810 us |  247.960 us |  246.520 us |  335.170 us |
-| memx_memcpy_basic       |  144.690 us |  270.970 us |  217.620 us |  252.560 us |
-| memx_memcpy_sse2        |  139.190 us |  197.000 us |  187.940 us |  273.270 us |
+| std_memcpy              |  202.610 us |  282.070 us |  271.270 us |  362.360 us |
+| libc_memcpy             |  165.260 us |  275.070 us |  275.760 us |  352.220 us |
+| memx_memcpy             |  264.650 us |  319.310 us |  241.200 us |  355.510 us |
+| memx_memcpy_basic       |  213.510 us |  334.820 us |  169.520 us |  361.720 us |
+| memx_memcpy_sse2        |  227.370 us |  274.080 us |  160.830 us |  289.830 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |  114.420 us |  204.230 us |  260.540 us |  314.100 us |
-| libc_memcpy             |  112.660 us |  200.080 us |  257.900 us |  310.810 us |
-| memx_memcpy             |  150.720 us |  340.450 us |  164.230 us |  349.840 us |
-| memx_memcpy_basic       |  151.440 us |  341.010 us |  164.980 us |  350.120 us |
+| std_memcpy              |  135.370 us |  244.600 us |  278.310 us |  325.310 us |
+| libc_memcpy             |  123.640 us |  239.190 us |  278.190 us |  329.890 us |
+| memx_memcpy             |  169.680 us |  358.780 us |  166.260 us |  369.920 us |
+| memx_memcpy_basic       |  171.780 us |  358.330 us |  165.460 us |  364.710 us |
 
   4. armv7-linux-androideabi:
 
