@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* fine tune memcpy()
+* add \_mm\_clflush() into benches
+
 0.1.10 (2021-06-14)
 =====
 

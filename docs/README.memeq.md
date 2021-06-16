@@ -4,10 +4,10 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |  166.730 us |  165.540 us |  337.640 us |  357.740 us |
-| libc_memeq              |  167.430 us |  164.790 us |  341.970 us |  361.600 us |
-| memx_memeq              |  119.620 us |  112.780 us |  117.980 us |  111.010 us |
-| memx_memeq_basic        |  119.570 us |  112.110 us |  118.320 us |  110.950 us |
+| std_memeq               |  174.300 us |  173.050 us |  349.450 us |  368.890 us |
+| libc_memeq              |  174.330 us |  172.600 us |  345.290 us |  365.230 us |
+| memx_memeq              |  125.530 us |  119.870 us |  124.480 us |  119.100 us |
+| memx_memeq_basic        |  125.800 us |  120.070 us |  124.150 us |  118.880 us |
 
   2. i686-unknown-linux-:
 

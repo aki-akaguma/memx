@@ -222,7 +222,7 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {
         }
     }
     //let match_cnt = 10200;
-    let match_s = "EEEEEEEEEEEEEEEEEEEEEEEEEEE".as_bytes(); // 27 bytes
+    let match_s = "E1234567890123456789012345E".as_bytes(); // 27 bytes
     (v, match_s)
 }
 
