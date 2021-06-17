@@ -190,39 +190,38 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("std_memrmem", |b| {
         b.iter(|| {
             let _r = process_std_memrmem(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     #[cfg(target_arch = "x86_64")]
     c.bench_function("libc_memrmem", |b| {
         b.iter(|| {
             let _r = process_libc_memrmem(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memchr_memrmem", |b| {
         b.iter(|| {
             let _r = process_memchr_memrmem(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memrmem", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memrmem_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem_basic(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     c.bench_function("memx_memrmem_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem_sse2(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
 }

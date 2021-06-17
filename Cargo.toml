@@ -1,6 +1,6 @@
 [package]
 name = "memx"
-version = "0.1.10"
+version = "0.1.11"
 authors = ["aki <aki.akaguma@hotmail.com>"]
 edition = "2018"
 description = "memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()"
@@ -20,6 +20,7 @@ cmp_bytes = []
 [dev-dependencies]
 criterion = "0.3"
 memchr = "2.4"
+clf = "0.1"
 
 [workspace]
 members = [

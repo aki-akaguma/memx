@@ -91,36 +91,35 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             process_std_memset(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
-            cache_flush(&v);
         })
     });
+    cache_flush(&v);
     c.bench_function("libc_memset", |b| {
         b.iter(|| {
             process_libc_memset(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
-            cache_flush(&v);
         })
     });
+    cache_flush(&v);
     c.bench_function("memx_memset", |b| {
         b.iter(|| {
             process_memx_memset(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
-            cache_flush(&v);
         })
     });
+    cache_flush(&v);
     c.bench_function("memx_memset_basic", |b| {
         b.iter(|| {
             process_memx_memset_basic(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
-            cache_flush(&v);
         })
     });
+    cache_flush(&v);
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     c.bench_function("memx_memset_sse2", |b| {
         b.iter(|| {
             process_memx_memset_sse2(black_box(&mut v), black_box(pat_u8));
             memory_barrier(&mut v);
-            cache_flush(&v);
         })
     });
 }
