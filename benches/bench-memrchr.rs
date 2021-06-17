@@ -173,38 +173,37 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("std_memrchr", |b| {
         b.iter(|| {
             let _r = process_std_memrchr(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
+    cache_flush(&vv);
     c.bench_function("libc_memrchr", |b| {
         b.iter(|| {
             let _r = process_libc_memrchr(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
+    cache_flush(&vv);
     c.bench_function("memchr_memrchr", |b| {
         b.iter(|| {
             let _r = process_memchr_memrchr(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
+    cache_flush(&vv);
     c.bench_function("memx_memrchr", |b| {
         b.iter(|| {
             let _r = process_memx_memrchr(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
+    cache_flush(&vv);
     c.bench_function("memx_memrchr_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memrchr_basic(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
+    cache_flush(&vv);
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     c.bench_function("memx_memrchr_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memrchr_sse2(black_box(&vv), black_box(pat_byte));
-            cache_flush(&vv);
         })
     });
 }

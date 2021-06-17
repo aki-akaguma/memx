@@ -2,8 +2,14 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
-* fine tune memcpy()
-* add \_mm\_clflush() into benches
+* remove unnesesary `mod libc`
+* refresh benchmark results
+
+0.1.11 (2021-06-17)
+=====
+
+* add clf::cache_line_flush_with_slice() into benches
+* fine tune memcpy() ... etc
 
 0.1.10 (2021-06-14)
 =====

@@ -24,6 +24,8 @@ pub fn memory_barrier<T>(_arg: T) {
 }
 
 pub fn cache_line_flush(_arg: &[u8]) {
+    clf::cache_line_flush_with_slice(_arg);
+    /*
     #[cfg(target_feature = "sse2")]
     {
         #[cfg(target_arch = "x86")]
@@ -57,4 +59,5 @@ pub fn cache_line_flush(_arg: &[u8]) {
         }
         */
     }
+    */
 }

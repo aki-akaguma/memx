@@ -2,7 +2,6 @@ use core::cmp::Ordering;
 
 pub mod arch;
 pub mod iter;
-//pub mod libc;
 pub mod mem;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]

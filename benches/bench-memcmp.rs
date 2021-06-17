@@ -185,32 +185,31 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("std_memcmp", |b| {
         b.iter(|| {
             let _r = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("libc_memcmp", |b| {
         b.iter(|| {
             let _r = process_libc_memcmp(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memcmp", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memcmp_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_basic(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     c.bench_function("memx_memcmp_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
 }

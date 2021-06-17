@@ -140,37 +140,36 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             process_std_memcpy(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
-            cache_flush(&v, pat_bytes);
         })
     });
+    cache_flush(&v, pat_bytes);
     c.bench_function("libc_memcpy", |b| {
         b.iter(|| {
             process_libc_memcpy(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
-            cache_flush(&v, pat_bytes);
         })
     });
+    cache_flush(&v, pat_bytes);
     c.bench_function("memx_memcpy", |b| {
         b.iter(|| {
             process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
-            cache_flush(&v, pat_bytes);
         })
     });
+    cache_flush(&v, pat_bytes);
     c.bench_function("memx_memcpy_basic", |b| {
         b.iter(|| {
             process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
             memory_barrier(&mut v);
-            cache_flush(&v, pat_bytes);
         })
     });
+    cache_flush(&v, pat_bytes);
     #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
     {
         c.bench_function("memx_memcpy_sse2", |b| {
             b.iter(|| {
                 process_memx_memcpy_sse2(black_box(&mut v), black_box(pat_bytes));
                 memory_barrier(&mut v);
-                cache_flush(&v, pat_bytes);
             })
         });
     }

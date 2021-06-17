@@ -124,26 +124,25 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("std_memeq", |b| {
         b.iter(|| {
             let _r = process_std_memeq(black_box(&vv), black_box(pat_string_s));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     #[cfg(not(target_os = "android"))]
     c.bench_function("libc_memeq", |b| {
         b.iter(|| {
             let _r = process_libc_memeq(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memeq", |b| {
         b.iter(|| {
             let _r = process_memx_memeq(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
+    cache_flush(&vv, &pat_string);
     c.bench_function("memx_memeq_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memeq_basic(black_box(&vv), black_box(&pat_string));
-            cache_flush(&vv, &pat_string);
         })
     });
 }
