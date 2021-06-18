@@ -63,11 +63,10 @@ pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memrchr_impl(buf, c)
 }
 
-
 pub fn memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     crate::mem::_memrmem_impl(haystack, needle)
 }
 
-pub fn memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    crate::mem::_memset_impl(buf, c, n)
+pub fn memset_basic(buf: &mut [u8], c: u8) {
+    crate::mem::_memset_impl(buf, c)
 }

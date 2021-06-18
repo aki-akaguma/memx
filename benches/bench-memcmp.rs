@@ -29,7 +29,7 @@ fn process_std_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
 #[inline(never)]
 fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     // original libc function
-    extern {
+    extern "C" {
         fn memcmp(cx: *const u8, ct: *const u8, n: usize) -> i32;
     }
     #[inline(always)]
@@ -119,7 +119,10 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
     (found_eq, found_le, found_gr)
 }
 
-#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
 #[inline(never)]
 fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     let pat_bytes = pattern.as_bytes();
@@ -131,7 +134,8 @@ fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usi
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = unsafe { memx::arch::x86::_memcmp_sse2(&line_bytes[i..(i + pat_len)], pat_bytes) };
+            let r =
+                unsafe { memx::arch::x86::_memcmp_sse2(&line_bytes[i..(i + pat_len)], pat_bytes) };
             match r {
                 Ordering::Equal => found_eq += 1,
                 Ordering::Less => found_le += 1,
@@ -173,7 +177,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n_eq, match_cnt);
     assert_eq!(n_le, less_cnt);
     assert_eq!(n_gr, greater_count);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         let (n_eq, n_le, n_gr) = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
         assert_eq!(n_eq, match_cnt);
@@ -206,7 +213,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
     cache_flush(&vv, &pat_string);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     c.bench_function("memx_memcmp_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));

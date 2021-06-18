@@ -26,8 +26,13 @@ fn process_std_memmem(texts: &[&str], pattern: &str) -> usize {
 #[inline(never)]
 fn process_libc_memmem(texts: &[&str], pattern: &str) -> usize {
     // original libc function
-    extern {
-        fn memmem(haystack: *const u8, hay_len: usize, needle: *const u8, nee_len: usize) -> *const u8;
+    extern "C" {
+        fn memmem(
+            haystack: *const u8,
+            hay_len: usize,
+            needle: *const u8,
+            nee_len: usize,
+        ) -> *const u8;
     }
     #[inline(always)]
     fn _x_libc_memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
@@ -40,7 +45,7 @@ fn process_libc_memmem(texts: &[&str], pattern: &str) -> usize {
         }
         let r = unsafe { memmem(hay, hay_len, nee, nee_len) };
         if !r.is_null() {
-            Some(r as usize  - hay as usize)
+            Some(r as usize - hay as usize)
         } else {
             None
         }
@@ -132,7 +137,10 @@ fn process_memx_memmem_basic(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
-#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
 #[inline(never)]
 fn process_memx_memmem_sse2(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
@@ -180,7 +188,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memmem_basic(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         let n = process_memx_memmem_sse2(black_box(&vv), black_box(&pat_string));
         assert_eq!(n, match_cnt);
@@ -217,7 +228,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
     cache_flush(&vv, &pat_string);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     c.bench_function("memx_memmem_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memmem_sse2(black_box(&vv), black_box(&pat_string));

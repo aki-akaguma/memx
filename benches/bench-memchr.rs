@@ -26,7 +26,7 @@ fn process_std_memchr(texts: &[&str], pat_byte: u8) -> usize {
 #[inline(never)]
 fn process_libc_memchr(texts: &[&str], pat_byte: u8) -> usize {
     // original libc function
-    extern {
+    extern "C" {
         fn memchr(cx: *const u8, c: i32, n: usize) -> *const u8;
     }
     #[inline(always)]
@@ -119,7 +119,10 @@ fn process_memx_memchr_basic(texts: &[&str], pat_byte: u8) -> usize {
     found
 }
 
-#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
 #[inline(never)]
 fn process_memx_memchr_sse2(texts: &[&str], pat_byte: u8) -> usize {
     let mut found: usize = 0;
@@ -163,7 +166,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memchr_basic(black_box(&vv), black_box(pat_byte));
     assert_eq!(n, match_cnt);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         let n = process_memx_memchr_sse2(black_box(&vv), black_box(pat_byte));
         assert_eq!(n, match_cnt);
@@ -200,7 +206,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
     cache_flush(&vv);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     c.bench_function("memx_memchr_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memchr_sse2(black_box(&vv), black_box(pat_byte));

@@ -24,7 +24,7 @@ fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
 #[inline(never)]
 fn process_libc_memeq(texts: &[&str], pattern: &str) -> usize {
     // original libc function
-    extern {
+    extern "C" {
         fn bcmp(cx: *const u8, ct: *const u8, n: usize) -> i32;
     }
     #[inline(always)]

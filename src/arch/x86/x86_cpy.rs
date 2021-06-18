@@ -60,7 +60,7 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     let end_ptr = unsafe { b_ptr.add(src_len) };
     //
     if src_len < 64 {
-        return _cpy_small(a_ptr, b_ptr, end_ptr)
+        return _cpy_small(a_ptr, b_ptr, end_ptr);
     }
     {
         let (aa_ptr, bb_ptr) = if src_len < 128 {
@@ -77,11 +77,7 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 
 //#[inline(never)]
 #[inline(always)]
-fn _cpy_small(
-    dst_ptr: *mut u8,
-    src_ptr: *const u8,
-    end_ptr: *const u8,
-) -> Result<(), RangeError>  {
+fn _cpy_small(dst_ptr: *mut u8, src_ptr: *const u8, end_ptr: *const u8) -> Result<(), RangeError> {
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
     {
@@ -498,7 +494,7 @@ fn _copy_2_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let b_ptr = src_ptr as *const u16;
     unsafe { *a_ptr = *b_ptr };
     /*
-    */
+     */
     /*
     let a_ptr = dst_ptr as *mut u8;
     let b_ptr = src_ptr as *const u8;

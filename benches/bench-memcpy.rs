@@ -1,8 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 mod barrier;
-use barrier::memory_barrier;
 use barrier::cache_line_flush;
+use barrier::memory_barrier;
 
 #[inline(never)]
 fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
@@ -19,7 +19,7 @@ fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
 #[inline(never)]
 fn process_libc_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     // original libc function
-    extern {
+    extern "C" {
         fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8;
     }
     #[inline(always)]
@@ -69,7 +69,10 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
 }
 
-#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
 #[inline(never)]
 fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     let pat_len = pat_bytes.len();
@@ -90,7 +93,10 @@ fn assert_result(texts: &[Vec<u8>], pat_bytes: &[u8]) {
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
             assert_eq!(line_bytes[j], pat_bytes[0]);
-            assert_eq!(&line_bytes[(line_bytes.len() - pat_bytes.len())..], pat_bytes);
+            assert_eq!(
+                &line_bytes[(line_bytes.len() - pat_bytes.len())..],
+                pat_bytes
+            );
         }
     }
 }
@@ -128,7 +134,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         process_memx_memcpy_basic(black_box(&mut v1), black_box(pat_bytes));
         assert_result(&v1, pat_bytes);
     }
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         let mut v1 = v.clone();
         process_memx_memcpy_sse2(black_box(&mut v1), black_box(pat_bytes));
@@ -164,7 +173,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
     cache_flush(&v, pat_bytes);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         c.bench_function("memx_memcpy_sse2", |b| {
             b.iter(|| {

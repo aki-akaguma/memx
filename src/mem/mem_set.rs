@@ -1,45 +1,32 @@
-use super::super::RangeError;
-
 #[inline(always)]
-pub fn _memset_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    if n == 0 {
-        return Ok(());
+pub fn _memset_impl(buf: &mut [u8], c: u8) {
+    if buf.len() == 0 {
+        return;
     }
     #[cfg(target_pointer_width = "128")]
-    let r = _start_set_64(buf, c, n);
+    _start_set_64(buf, c);
     #[cfg(target_pointer_width = "64")]
-    let r = _start_set_64(buf, c, n);
+    _start_set_64(buf, c);
     #[cfg(target_pointer_width = "32")]
-    let r = _start_set_32(buf, c, n);
+    _start_set_32(buf, c);
     #[cfg(target_pointer_width = "16")]
-    let r = _start_set_1(buf, c, n);
-    //
-    r
+    _start_set_1(buf, c);
 }
 
 #[inline(always)]
-fn _start_set_1(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _start_set_1(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
     while a_ptr < end_ptr {
         unsafe { *a_ptr = c };
         a_ptr = unsafe { a_ptr.add(1) };
     }
-    //
-    Ok(())
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_15_bytes_impl(
-    buf_ptr: *const u8,
-    cc: u64,
-    end_ptr: *const u8,
-) -> Result<(), RangeError> {
+pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
     let mut a_ptr = buf_ptr;
     {
         let loop_size = 8;
@@ -83,8 +70,6 @@ pub(crate) fn _memset_remaining_15_bytes_impl(
             unsafe { *aa_ptr = c };
         }
     }
-    //
-    Ok(())
 }
 
 fn _align_unroll_one_1(a_ptr: *mut u8, cc: u64, offset: usize) {
@@ -266,17 +251,13 @@ fn _align_16(a_ptr: *mut u8, cc: u64) -> *mut u8 {
 }
 
 #[inline(always)]
-pub(crate) fn _start_set_64(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+pub(crate) fn _start_set_64(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
-    //
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
     let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
-    if n >= 8 {
+    if buf_len >= 8 {
         a_ptr = _align_8(a_ptr, cc);
         {
             let unroll = 8;
@@ -317,16 +298,13 @@ pub(crate) fn _start_set_64(buf: &mut [u8], c: u8, n: usize) -> Result<(), Range
 }
 
 #[inline(always)]
-fn _start_set_64_no_unroll(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _start_set_64_no_unroll(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
     let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
-    if n > 7 {
+    if buf_len > 7 {
         let loop_size = 8;
         let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
         while a_ptr <= end_ptr_8 {
@@ -340,11 +318,7 @@ fn _start_set_64_no_unroll(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeE
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_7_bytes_impl(
-    buf_ptr: *const u8,
-    cc: u64,
-    end_ptr: *const u8,
-) -> Result<(), RangeError> {
+pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
     let mut a_ptr = buf_ptr;
     {
         let loop_size = 4;
@@ -377,22 +351,17 @@ pub(crate) fn _memset_remaining_7_bytes_impl(
             unsafe { *aa_ptr = c };
         }
     }
-    //
-    Ok(())
 }
 
 #[inline(always)]
-fn _start_set_32(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _start_set_32(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
     let cc: u32 = c as u32 * 0x0101_0101_u32;
-    if n >= 4 {
-        if n >= 8 {
+    if buf_len >= 4 {
+        if buf_len >= 8 {
             a_ptr = _align_8(a_ptr, cc as u64);
         } else {
             a_ptr = _align_4(a_ptr, cc as u64);
@@ -438,17 +407,14 @@ fn _start_set_32(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
 
 //#[cfg(target_pointer_width = "32")]
 #[inline(always)]
-fn _start_set_32_no_unroll(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _start_set_32_no_unroll(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
     let cc: u32 = c as u32 * 0x0101_0101_u32;
     a_ptr = _align_4(a_ptr, cc as u64);
-    if n > 3 {
+    if buf_len > 3 {
         let loop_size = 4;
         let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
         while a_ptr <= end_ptr_4 {
@@ -462,11 +428,7 @@ fn _start_set_32_no_unroll(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeE
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_3_bytes_impl(
-    buf_ptr: *const u8,
-    cc: u32,
-    end_ptr: *const u8,
-) -> Result<(), RangeError> {
+pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *const u8, cc: u32, end_ptr: *const u8) {
     let mut a_ptr = buf_ptr;
     {
         let loop_size = 2;
@@ -488,7 +450,6 @@ pub(crate) fn _memset_remaining_3_bytes_impl(
             unsafe { *aa_ptr = c };
         }
     }
-    Ok(())
 }
 
 /*

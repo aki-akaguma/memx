@@ -1,12 +1,18 @@
+//!
+//! `memx` minics libc.
+//!
+
 use core::cmp::Ordering;
 
 pub mod arch;
 pub mod iter;
 pub mod mem;
 
+/// used by memcpy()
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
 pub struct RangeError;
 
+/// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == c)`.
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -23,6 +29,7 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
     r
 }
 
+/// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == c)`.
 pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -39,6 +46,7 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
     r
 }
 
+/// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     /*
      * why is sse2 slower ?
@@ -60,27 +68,14 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     r
 }
 
-pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
-    ))]
-    let r = arch::x86::_memcpy_impl(dst, src);
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
-    ))]
-    let r = mem::_memcpy_impl(dst, src);
-    //
-    r
-}
-
+/// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     let r = mem::_memeq_impl(a, b);
     //
     r
 }
 
+/// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)`.
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -96,6 +91,7 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     r
 }
 
+/// This mimics `libc::memrmem()`, same as `(haystack as &str).rfind(needle as &str)`.
 pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -111,19 +107,40 @@ pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     r
 }
 
-pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+/// This mimics `libc::memcpy()`, same as `dst = src`.
+///
+/// The `memcpy()` function copies `src.len()` bytes from the `src` to the `dst`.
+/// The `src` and the `dst` must not overlape.
+/// This function return `Err(RangeError)` if `dst.len() < src.len()`, otherwise return `Ok(())`
+pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
         any(target_feature = "sse2", target_feature = "avx")
     ))]
-    let r = arch::x86::_memset_impl(buf, c, n);
+    let r = arch::x86::_memcpy_impl(dst, src);
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
         not(any(target_feature = "sse2", target_feature = "avx"))
     ))]
-    let r = mem::_memset_impl(buf, c, n);
+    let r = mem::_memcpy_impl(dst, src);
     //
     r
+}
+
+/// This mimics `libc::memset()`, same as `buf.fill(c)`.
+///
+/// The `memset()` function fills `buf` with the `c`.
+pub fn memset(buf: &mut [u8], c: u8) {
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    arch::x86::_memset_impl(buf, c);
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    mem::_memset_impl(buf, c);
 }
 
 #[inline(always)]
