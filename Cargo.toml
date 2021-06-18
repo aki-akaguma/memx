@@ -18,51 +18,9 @@ cmp_bytes = []
 [dependencies]
 
 [dev-dependencies]
-criterion = "0.3"
-memchr = "2.4"
-clf = "0.1"
 
 [workspace]
 members = [
     "xtask",
+    "xbench",
 ]
-
-[[bench]]
-name = "bench-memchr"
-path = "benches/bench-memchr.rs"
-harness = false
-
-[[bench]]
-name = "bench-memcmp"
-path = "benches/bench-memcmp.rs"
-harness = false
-
-[[bench]]
-name = "bench-memcpy"
-path = "benches/bench-memcpy.rs"
-harness = false
-
-[[bench]]
-name = "bench-memeq"
-path = "benches/bench-memeq.rs"
-harness = false
-
-[[bench]]
-name = "bench-memmem"
-path = "benches/bench-memmem.rs"
-harness = false
-
-[[bench]]
-name = "bench-memrchr"
-path = "benches/bench-memrchr.rs"
-harness = false
-
-[[bench]]
-name = "bench-memrmem"
-path = "benches/bench-memrmem.rs"
-harness = false
-
-[[bench]]
-name = "bench-memset"
-path = "benches/bench-memset.rs"
-harness = false
