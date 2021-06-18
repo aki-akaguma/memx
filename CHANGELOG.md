@@ -4,6 +4,10 @@ Unreleased changes. Release notes have not yet been written.
 
 * remove unnesesary `mod libc`
 * refresh benchmark results
+* add doc comments
+* remove the redundancy param: `n: usize`
+  old: `pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError>;`
+  new: `pub fn memset(buf: &mut [u8], c: u8);`
 
 0.1.11 (2021-06-17)
 =====

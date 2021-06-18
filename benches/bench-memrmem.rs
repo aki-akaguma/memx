@@ -28,8 +28,13 @@ fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
     // debian support: apt install publib-dev
     // original libc function
     #[link(name = "pub")]
-    extern {
-        fn memrmem(haystack: *const u8, hay_len: usize, needle: *const u8, nee_len: usize) -> *const u8;
+    extern "C" {
+        fn memrmem(
+            haystack: *const u8,
+            hay_len: usize,
+            needle: *const u8,
+            nee_len: usize,
+        ) -> *const u8;
     }
     #[inline(always)]
     fn _x_libc_memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
@@ -42,7 +47,7 @@ fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
         }
         let r = unsafe { memrmem(hay, hay_len, nee, nee_len) };
         if !r.is_null() {
-            Some(r as usize  - hay as usize)
+            Some(r as usize - hay as usize)
         } else {
             None
         }
@@ -54,7 +59,7 @@ fn process_libc_memrmem(texts: &[&str], pattern: &str) -> usize {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = line_len;
-        while curr_idx > 0  {
+        while curr_idx > 0 {
             let r = _x_libc_memrmem(&line_bytes[..curr_idx], pat_bytes);
             if let Some(pos) = r {
                 found += 1;
@@ -130,7 +135,10 @@ fn process_memx_memrmem_basic(texts: &[&str], pattern: &str) -> usize {
     found
 }
 
-#[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
 #[inline(never)]
 fn process_memx_memrmem_sse2(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
@@ -180,7 +188,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     assert_eq!(n, match_cnt);
     let n = process_memx_memrmem_basic(black_box(&vv), black_box(&pat_string));
     assert_eq!(n, match_cnt);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     {
         let n = process_memx_memrmem_sse2(black_box(&vv), black_box(&pat_string));
         assert_eq!(n, match_cnt);
@@ -218,7 +229,10 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
     cache_flush(&vv, &pat_string);
-    #[cfg(all(any(target_arch = "x86_64", target_arch = "x86"), target_feature = "sse2"))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
     c.bench_function("memx_memrmem_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memrmem_sse2(black_box(&vv), black_box(&pat_string));

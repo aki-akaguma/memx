@@ -1,5 +1,4 @@
 use crate::mem as basic;
-use crate::RangeError;
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;
@@ -18,46 +17,46 @@ use mmx::_mm256_storeu_si256;
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-pub fn _memset_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+pub fn _memset_impl(buf: &mut [u8], c: u8) {
     #[cfg(target_feature = "avx")]
-    let r = unsafe { _memset_avx(buf, c, n) };
+    unsafe {
+        _memset_avx(buf, c)
+    };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    let r = unsafe { _memset_sse2(buf, c, n) };
+    unsafe {
+        _memset_sse2(buf, c)
+    };
     #[cfg(not(any(target_feature = "sse2", target_feature = "avx")))]
-    let r = _memset_basic(buf, c, n);
-    r
+    _memset_basic(buf, c);
 }
 
-fn _memset_basic(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    basic::_memset_impl(buf, c, n)
+fn _memset_basic(buf: &mut [u8], c: u8) {
+    basic::_memset_impl(buf, c)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
-pub unsafe fn _memset_sse2(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    _memset_sse2_impl(buf, c, n)
+pub unsafe fn _memset_sse2(buf: &mut [u8], c: u8) {
+    _memset_sse2_impl(buf, c)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
-pub unsafe fn _memset_avx(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
-    _memset_avx_impl(buf, c, n)
+pub unsafe fn _memset_avx(buf: &mut [u8], c: u8) {
+    _memset_avx_impl(buf, c)
 }
 
 #[inline(always)]
-fn _memset_sse2_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
-    }
-    if n == 0 {
-        return Ok(());
+    if buf_len == 0 {
+        return;
     }
     //
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
-    if n >= 16 {
+    if buf_len >= 16 {
         let mcc: __m128i = unsafe { _mm_set1_epi8(c as i8) };
         {
             let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
@@ -95,16 +94,16 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> 
 }
 
 #[inline(always)]
-fn _memset_avx_impl(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError> {
+fn _memset_avx_impl(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
-    if buf_len < n {
-        return Err(RangeError);
+    if buf_len == 0 {
+        return;
     }
     //
     let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(n) };
+    let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
-    if n >= 32 {
+    if buf_len >= 32 {
         let mcc: __m256i = unsafe { _mm256_set1_epi8(c as i8) };
         {
             let remaining_align = 0x20_usize - ((a_ptr as usize) & 0x1F_usize);

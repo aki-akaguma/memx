@@ -1,7 +1,6 @@
 mod test_memx_memset_basic {
-    fn test_memset(dst: &mut [u8], byte: u8, n: usize) {
-        let r = memx::mem::memset_basic(dst, byte, n);
-        assert_eq!(r.is_ok(), true);
+    fn test_memset(dst: &mut [u8], byte: u8) {
+        memx::mem::memset_basic(dst, byte);
     }
     //
     #[test]
@@ -12,7 +11,7 @@ mod test_memx_memset_basic {
         let mut dst2 = dst.clone();
         let dst_sl = dst2.as_mut_slice();
         //
-        test_memset(dst_sl, src[0], 3);
+        test_memset(&mut dst_sl[0..3], src[0]);
         assert_eq!(&dst2[0..3], &src[0..3]);
     }
     #[test]
@@ -26,7 +25,7 @@ mod test_memx_memset_basic {
             let dst_sl = dst.as_mut_slice();
             let src_sl = src.as_slice();
             //
-            test_memset(dst_sl, src_sl[0], src_sl.len());
+            test_memset(&mut dst_sl[0..src_sl.len()], src_sl[0]);
             assert_eq!(&dst[0..src_sl.len()], src_sl);
             assert_eq!(dst[src_sl.len()], 0);
             assert_eq!(dst[src_sl.len() + 1], 0);
