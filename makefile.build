@@ -61,12 +61,12 @@ bench-musl: bench.en.1-musl bench.ja.1-musl
 
 target/stamp.bench-build-gnu: bench-build-gnu
 bench-build-gnu:
-	cargo bench $(BENCH_STR) --no-run --target=$(TARGET_GNU)
+	cargo xbench $(BENCH_STR) --no-run --target=$(TARGET_GNU)
 	@touch target/stamp.bench-build-gnu
 
 target/stamp.bench-build-musl: bench-build-musl
 bench-build-musl:
-	cargo bench $(BENCH_STR) --no-run --target=$(TARGET_MUSL)
+	cargo xbench $(BENCH_STR) --no-run --target=$(TARGET_MUSL)
 	@touch target/stamp.bench-build-musl
 
 bench-clean:
@@ -83,34 +83,34 @@ report:
 bench.en.1-gnu: target/stamp.bench-build-gnu
 	@rm -fr target/criterion
 	@rm -f z.bench.en.1.log
-	env AKI_TEST_DAT=en.1 $(TSK) cargo bench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.en.1.log
+	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.en.1.log
 
 bench.ja.1-gnu: target/stamp.bench-build-gnu
 	@rm -fr target/criterion
 	@rm -f z.bench.ja.1.log
-	env AKI_TEST_DAT=ja.1 $(TSK) cargo bench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.ja.1.log
+	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.ja.1.log
 
 bench.en.1-musl: target/stamp.bench-build-musl
 	@rm -fr target/criterion
 	@rm -f z.musl.bench.en.1.log
-	env AKI_TEST_DAT=en.1 $(TSK) cargo bench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.en.1.log
+	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.en.1.log
 
 bench.ja.1-musl: target/stamp.bench-build-musl
 	@rm -fr target/criterion
 	@rm -f z.musl.bench.ja.1.log
-	env AKI_TEST_DAT=ja.1 $(TSK) cargo bench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.ja.1.log
+	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.ja.1.log
 
 
 bench-andr: bench.en.1-andr bench.ja.1-andr bench.en.1-musl-andr bench.ja.1-musl-andr
 
 target/stamp.bench-build-arm-andr: bench-build-arm-andr
 bench-build-arm-andr:
-	cargo bench --no-run --target=$(TARGET_ARM_ANDR)
+	cargo xbench --no-run --target=$(TARGET_ARM_ANDR)
 	@touch target/stamp.bench-build-arm-andr
 
 target/stamp.bench-build-arm-musl: bench-build-arm-musl
 bench-build-arm-musl:
-	cargo bench --no-run --target=$(TARGET_ARM_MUSL)
+	cargo xbench --no-run --target=$(TARGET_ARM_MUSL)
 	@touch target/stamp.bench-build-arm-musl
 
 target/$(BENCH_FNM)_andr: target/stamp.bench-build-arm-andr

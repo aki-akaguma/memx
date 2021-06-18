@@ -2,12 +2,15 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* add `rustflags = "-C llvm-args=--disable-memop-opt"` into the `.cargo/config`
 * remove unnesesary `mod libc`
 * refresh benchmark results
 * add doc comments
 * remove the redundancy param: `n: usize`
-  old: `pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError>;`
-  new: `pub fn memset(buf: &mut [u8], c: u8);`
+  - old: `pub fn memset(buf: &mut [u8], c: u8, n: usize) -> Result<(), RangeError>;`
+  - new: `pub fn memset(buf: &mut [u8], c: u8);`
+* move `benches` into `xbench` workspace
+* add `xbench = "bench --package xbench --offline"` into the `.cargo/config`
 
 0.1.11 (2021-06-17)
 =====

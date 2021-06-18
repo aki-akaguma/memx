@@ -1,5 +1,6 @@
 [alias]
 xtask = "run --package xtask --offline --"
+xbench = "bench --package xbench --offline"
 
 [build]
 rustflags = "-C llvm-args=--disable-memop-opt"
