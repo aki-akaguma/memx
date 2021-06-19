@@ -25,53 +25,6 @@ fn _start_set_1(buf: &mut [u8], c: u8) {
     }
 }
 
-#[inline(always)]
-pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
-    let mut a_ptr = buf_ptr;
-    {
-        let loop_size = 8;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_4 {
-            let cc: u64 = cc as u64;
-            let aa_ptr = a_ptr as *mut u64;
-            unsafe { *aa_ptr = cc };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_4 {
-            let cc: u32 = cc as u32;
-            let aa_ptr = a_ptr as *mut u32;
-            unsafe { *aa_ptr = cc };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_2 {
-            let cc: u16 = cc as u16;
-            let aa_ptr = a_ptr as *mut u16;
-            unsafe { *aa_ptr = cc };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_1 {
-            let c: u8 = cc as u8;
-            let aa_ptr = a_ptr as *mut u8;
-            unsafe { *aa_ptr = c };
-        }
-    }
-}
-
 fn _align_unroll_one_1(a_ptr: *mut u8, cc: u64, offset: usize) {
     let aa_ptr = unsafe { a_ptr.add(offset) } as *mut u8;
     unsafe { *aa_ptr = cc as u8 };
@@ -318,42 +271,6 @@ fn _start_set_64_no_unroll(buf: &mut [u8], c: u8) {
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
-    let mut a_ptr = buf_ptr;
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_4 {
-            let cc: u32 = cc as u32;
-            let aa_ptr = a_ptr as *mut u32;
-            unsafe { *aa_ptr = cc };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_2 {
-            let cc: u16 = cc as u16;
-            let aa_ptr = a_ptr as *mut u16;
-            unsafe { *aa_ptr = cc };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_1 {
-            let c: u8 = cc as u8;
-            let aa_ptr = a_ptr as *mut u8;
-            unsafe { *aa_ptr = c };
-        }
-    }
-}
-
-#[inline(always)]
 fn _start_set_32(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
     let mut a_ptr = buf.as_mut_ptr();
@@ -425,6 +342,42 @@ fn _start_set_32_no_unroll(buf: &mut [u8], c: u8) {
     }
     // the remaining data is the max: 3 bytes.
     _memset_remaining_3_bytes_impl(a_ptr, cc, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
+    let mut a_ptr = buf_ptr;
+    {
+        let loop_size = 8;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        if a_ptr <= end_ptr_4 {
+            let cc: u64 = cc as u64;
+            let aa_ptr = a_ptr as *mut u64;
+            unsafe { *aa_ptr = cc };
+            //
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 7 bytes.
+    _memset_remaining_7_bytes_impl(a_ptr, cc, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *const u8, cc: u64, end_ptr: *const u8) {
+    let mut a_ptr = buf_ptr;
+    {
+        let loop_size = 4;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        if a_ptr <= end_ptr_4 {
+            let cc: u32 = cc as u32;
+            let aa_ptr = a_ptr as *mut u32;
+            unsafe { *aa_ptr = cc };
+            //
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 3 bytes.
+    _memset_remaining_3_bytes_impl(a_ptr, cc as u32, end_ptr)
 }
 
 #[inline(always)]

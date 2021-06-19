@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.12 (2021-06-19)
+=====
+
 * add `rustflags = "-C llvm-args=--disable-memop-opt"` into the `.cargo/config`
 * remove unnesesary `mod libc`
 * refresh benchmark results

@@ -123,46 +123,8 @@ fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 15 bytes.
-    {
-        let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_8 {
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_4 {
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_2 {
-            _unroll_one_eq_2!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_1 {
-            _unroll_one_eq_1!(a_ptr, b_ptr, loop_size, 0);
-        }
-    }
-    //
-    true
+    // the remaining data is the max: 15 bytes.
+    _memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
 #[cfg(target_pointer_width = "64")]
@@ -205,36 +167,8 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 7 bytes.
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_4 {
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_2 {
-            _unroll_one_eq_2!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_1 {
-            _unroll_one_eq_1!(a_ptr, b_ptr, loop_size, 0);
-        }
-    }
-    //
-    true
+    // the remaining data is the max: 7 bytes.
+    _memeq_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
 #[cfg(target_pointer_width = "32")]
@@ -278,7 +212,62 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 3 bytes.
+    // the remaining data is the max: 3 bytes.
+    _memeq_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
+}
+
+#[inline(always)]
+fn _memeq_remaining_15_bytes_impl(
+    a_ptr: *const u8,
+    b_ptr: *const u8,
+    end_ptr: *const u8,
+) -> bool {
+    let mut a_ptr = a_ptr;
+    let mut b_ptr = b_ptr;
+    {
+        let loop_size = 8;
+        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+        if a_ptr <= end_ptr_8 {
+            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
+            //
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 7 bytes.
+    _memeq_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
+}
+
+#[inline(always)]
+fn _memeq_remaining_7_bytes_impl(
+    a_ptr: *const u8,
+    b_ptr: *const u8,
+    end_ptr: *const u8,
+) -> bool {
+    let mut a_ptr = a_ptr;
+    let mut b_ptr = b_ptr;
+    {
+        let loop_size = 4;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        if a_ptr <= end_ptr_4 {
+            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
+            //
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 3 bytes.
+    _memeq_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
+}
+
+#[inline(always)]
+fn _memeq_remaining_3_bytes_impl(
+    a_ptr: *const u8,
+    b_ptr: *const u8,
+    end_ptr: *const u8,
+) -> bool {
+    let mut a_ptr = a_ptr;
+    let mut b_ptr = b_ptr;
     {
         let loop_size = 2;
         let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
@@ -341,7 +330,7 @@ fn _start_eq_16(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 1 bytes.
+    // the remaining data is the max: 1 bytes.
     {
         let loop_size = 1;
         let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };

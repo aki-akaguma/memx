@@ -76,6 +76,10 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
 }
 
 /// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)`.
+///
+/// This `memmem()` function is implemented using stochastic naive algorithm.
+/// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
+///
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -92,6 +96,10 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 /// This mimics `libc::memrmem()`, same as `(haystack as &str).rfind(needle as &str)`.
+///
+/// This `memrmem()` function is implemented using stochastic naive algorithm.
+/// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
+///
 pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
