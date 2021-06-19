@@ -104,57 +104,7 @@ fn _start_chr_128(buf: &[u8], c: u8) -> Option<usize> {
         }
     }
     // the remaining data is the max: 15 bytes.
-    _memchr_remaining_15_bytes_impl(buf_ptr, c, start_ptr, end_ptr)
-}
-
-#[inline(always)]
-pub(crate) fn _memchr_remaining_15_bytes_impl(
-    buf_ptr: *const u8,
-    c: u8,
-    start_ptr: *const u8,
-    end_ptr: *const u8,
-) -> Option<usize> {
-    let mut buf_ptr = buf_ptr;
-    let cc: u64 = _c8_value(c);
-    {
-        let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_8 {
-            _unroll_one_chr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
-            //
-            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 4;
-        let cc: u32 = cc as u32;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_4 {
-            _unroll_one_chr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
-            //
-            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let cc: u16 = cc as u16;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_2 {
-            _unroll_one_chr_2!(buf_ptr, cc, start_ptr, loop_size, 0);
-            //
-            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let cc: u8 = c;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_1 {
-            _unroll_one_chr_1!(buf_ptr, cc, start_ptr, loop_size, 0);
-        }
-    }
-    //
-    None
+    _memchr_remaining_15_bytes_impl(buf_ptr, cc as u64, start_ptr, end_ptr)
 }
 
 #[cfg(target_pointer_width = "64")]
@@ -193,48 +143,8 @@ fn _start_chr_64(buf: &[u8], c: u8) -> Option<usize> {
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 7 bytes.
-    _memchr_remaining_7_bytes_impl(buf_ptr, c, start_ptr, end_ptr)
-}
-
-#[inline(always)]
-pub(crate) fn _memchr_remaining_7_bytes_impl(
-    buf_ptr: *const u8,
-    c: u8,
-    start_ptr: *const u8,
-    end_ptr: *const u8,
-) -> Option<usize> {
-    let mut buf_ptr = buf_ptr;
-    let cc: u32 = _c4_value(c);
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_4 {
-            _unroll_one_chr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
-            //
-            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 2;
-        let cc: u16 = cc as u16;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_2 {
-            _unroll_one_chr_2!(buf_ptr, cc, start_ptr, loop_size, 0);
-            //
-            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-        }
-    }
-    {
-        let loop_size = 1;
-        let cc: u8 = c;
-        let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_1 {
-            _unroll_one_chr_1!(buf_ptr, cc, start_ptr, loop_size, 0);
-        }
-    }
-    //
-    None
+    // the remaining data is the max: 7 bytes.
+    _memchr_remaining_7_bytes_impl(buf_ptr, cc as u32, start_ptr, end_ptr)
 }
 
 #[cfg(target_pointer_width = "32")]
@@ -273,19 +183,60 @@ fn _start_chr_32(buf: &[u8], c: u8) -> Option<usize> {
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 3 bytes.
-    _memchr_remaining_3_bytes_impl(buf_ptr, c, start_ptr, end_ptr)
+    // the remaining data is the max: 3 bytes.
+    _memchr_remaining_3_bytes_impl(buf_ptr, cc as u16, start_ptr, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memchr_remaining_15_bytes_impl(
+    buf_ptr: *const u8,
+    cc: u64,
+    start_ptr: *const u8,
+    end_ptr: *const u8,
+) -> Option<usize> {
+    let mut buf_ptr = buf_ptr;
+    {
+        let loop_size = 8;
+        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+        if buf_ptr <= end_ptr_8 {
+            _unroll_one_chr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+            //
+            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 7 bytes.
+    _memchr_remaining_7_bytes_impl(buf_ptr, cc as u32, start_ptr, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memchr_remaining_7_bytes_impl(
+    buf_ptr: *const u8,
+    cc: u32,
+    start_ptr: *const u8,
+    end_ptr: *const u8,
+) -> Option<usize> {
+    let mut buf_ptr = buf_ptr;
+    {
+        let loop_size = 4;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        if buf_ptr <= end_ptr_4 {
+            _unroll_one_chr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+            //
+            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 3 bytes.
+    _memchr_remaining_3_bytes_impl(buf_ptr,  cc as u16, start_ptr, end_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _memchr_remaining_3_bytes_impl(
     buf_ptr: *const u8,
-    c: u8,
+    cc: u16,
     start_ptr: *const u8,
     end_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr = buf_ptr;
-    let cc: u16 = _c2_value(c);
     {
         let loop_size = 2;
         let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
@@ -297,7 +248,7 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     }
     {
         let loop_size = 1;
-        let cc: u8 = c;
+        let cc: u8 = cc as u8;
         let end_ptr_1 = unsafe { end_ptr.sub(loop_size) };
         if buf_ptr <= end_ptr_1 {
             _unroll_one_chr_1!(buf_ptr, cc, start_ptr, loop_size, 0);
@@ -343,7 +294,7 @@ fn _start_chr_16(buf: &[u8], c: u8) -> Option<usize> {
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
-    // a rest data is a max: 1 bytes.
+    // the remaining data is the max: 1 bytes.
     {
         let loop_size = 1;
         let cc: u8 = c;

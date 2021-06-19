@@ -135,28 +135,6 @@ fn _start_cpy_128(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     _memcpy_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[inline(always)]
-pub(crate) fn _memcpy_remaining_15_bytes_impl(
-    dst_ptr: *const u8,
-    src_ptr: *const u8,
-    end_ptr: *const u8,
-) -> Result<(), RangeError> {
-    let mut a_ptr = dst_ptr;
-    let mut b_ptr = src_ptr;
-    {
-        let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if b_ptr <= end_ptr_8 {
-            _unroll_one_cpy_8!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    // the remaining data is the max: 7 bytes.
-    _memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
-}
-
 #[cfg(target_pointer_width = "64")]
 #[inline(always)]
 fn _start_cpy_64(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
@@ -197,28 +175,6 @@ fn _start_cpy_64(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     _memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[inline(always)]
-pub(crate) fn _memcpy_remaining_7_bytes_impl(
-    dst_ptr: *const u8,
-    src_ptr: *const u8,
-    end_ptr: *const u8,
-) -> Result<(), RangeError> {
-    let mut a_ptr = dst_ptr;
-    let mut b_ptr = src_ptr;
-    {
-        let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if b_ptr <= end_ptr_4 {
-            _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
-        }
-    }
-    // the remaining data is the max: 3 bytes.
-    _memcpy_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
-}
-
 #[cfg(target_pointer_width = "32")]
 #[inline(always)]
 fn _start_cpy_32(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
@@ -249,6 +205,50 @@ fn _start_cpy_32(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
         while b_ptr <= end_ptr_4 {
             _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 3 bytes.
+    _memcpy_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memcpy_remaining_15_bytes_impl(
+    dst_ptr: *const u8,
+    src_ptr: *const u8,
+    end_ptr: *const u8,
+) -> Result<(), RangeError> {
+    let mut a_ptr = dst_ptr;
+    let mut b_ptr = src_ptr;
+    {
+        let loop_size = 8;
+        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+        if b_ptr <= end_ptr_8 {
+            _unroll_one_cpy_8!(a_ptr, b_ptr, loop_size, 0);
+            //
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
+        }
+    }
+    // the remaining data is the max: 7 bytes.
+    _memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
+}
+
+#[inline(always)]
+pub(crate) fn _memcpy_remaining_7_bytes_impl(
+    dst_ptr: *const u8,
+    src_ptr: *const u8,
+    end_ptr: *const u8,
+) -> Result<(), RangeError> {
+    let mut a_ptr = dst_ptr;
+    let mut b_ptr = src_ptr;
+    {
+        let loop_size = 4;
+        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
+        if b_ptr <= end_ptr_4 {
+            _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
+            //
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
         }

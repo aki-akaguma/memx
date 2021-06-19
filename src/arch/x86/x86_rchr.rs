@@ -128,7 +128,8 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
         }
     }
     //
-    basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, c, start_ptr)
+    let cc = (c as u64) * 0x0101_0101_0101_0101_u64;
+    basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
