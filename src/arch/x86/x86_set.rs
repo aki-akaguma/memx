@@ -36,12 +36,14 @@ fn _memset_basic(buf: &mut [u8], c: u8) {
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memset_sse2(buf: &mut [u8], c: u8) {
     _memset_sse2_impl(buf, c)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memset_avx(buf: &mut [u8], c: u8) {
     _memset_avx_impl(buf, c)
 }

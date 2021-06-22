@@ -1,9 +1,9 @@
 #[inline(always)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    if a.len() == 0 && b.len() == 0 {
+    if a.is_empty() && b.is_empty() {
         return true;
     }
-    if a.len() == 0 || b.len() == 0 {
+    if a.is_empty() || b.is_empty() {
         return false;
     }
     #[cfg(target_pointer_width = "128")]
@@ -217,11 +217,7 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
 }
 
 #[inline(always)]
-fn _memeq_remaining_15_bytes_impl(
-    a_ptr: *const u8,
-    b_ptr: *const u8,
-    end_ptr: *const u8,
-) -> bool {
+fn _memeq_remaining_15_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *const u8) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
     {
@@ -239,11 +235,7 @@ fn _memeq_remaining_15_bytes_impl(
 }
 
 #[inline(always)]
-fn _memeq_remaining_7_bytes_impl(
-    a_ptr: *const u8,
-    b_ptr: *const u8,
-    end_ptr: *const u8,
-) -> bool {
+fn _memeq_remaining_7_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *const u8) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
     {
@@ -261,11 +253,7 @@ fn _memeq_remaining_7_bytes_impl(
 }
 
 #[inline(always)]
-fn _memeq_remaining_3_bytes_impl(
-    a_ptr: *const u8,
-    b_ptr: *const u8,
-    end_ptr: *const u8,
-) -> bool {
+fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *const u8) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
     {

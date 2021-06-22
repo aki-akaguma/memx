@@ -2,7 +2,7 @@ use super::super::RangeError;
 
 #[inline(always)]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    if src.len() == 0 {
+    if src.is_empty() {
         return Ok(());
     }
     #[cfg(target_arch = "arm")]

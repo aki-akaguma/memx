@@ -12,8 +12,8 @@ impl<'a> MemchrIter<'a> {
     #[inline]
     pub fn new(haystack: &[u8], needle: u8) -> MemchrIter {
         MemchrIter {
-            needle: needle,
-            haystack: haystack,
+            needle,
+            haystack,
             position: 0,
         }
     }

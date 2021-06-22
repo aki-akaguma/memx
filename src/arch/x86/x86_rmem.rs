@@ -18,12 +18,14 @@ fn _memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memrmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     _memrmem_sse2_impl(haystack, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
+#[allow(clippy::missing_safety_doc)]
 unsafe fn _memrmem_avx(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     _memrmem_avx_impl(haystack, needle)
 }

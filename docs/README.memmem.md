@@ -4,33 +4,33 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  511.400 us |  453.200 us |  512.010 us |  454.050 us |
-| libc_memmem             |  134.800 us |  121.410 us |  219.500 us |  263.250 us |
-| memchr_memmem           |  186.260 us |  223.420 us |  197.950 us |  223.020 us |
-| memx_memmem             |  104.890 us |  102.480 us |  103.330 us |  103.150 us |
-| memx_memmem_basic       |  106.580 us |  104.250 us |  105.590 us |  106.460 us |
-| memx_memmem_sse2        |  102.550 us |  102.280 us |  102.990 us |  102.950 us |
+| std_memmem              |  513.410 us |  472.390 us |  509.130 us |  447.490 us |
+| libc_memmem             |  131.950 us |  121.220 us |  219.310 us |  273.500 us |
+| memchr_memmem           |  196.830 us |  225.500 us |  195.990 us |  213.690 us |
+| memx_memmem             |  103.520 us |  104.140 us |  102.050 us |  103.850 us |
+| memx_memmem_basic       |  105.840 us |  104.520 us |  105.040 us |  104.540 us |
+| memx_memmem_sse2        |  103.510 us |  103.680 us |  104.710 us |  103.340 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  701.680 us |  559.120 us |  719.210 us |  585.210 us |
-| libc_memmem             |  132.300 us |  120.890 us |  242.860 us |  249.940 us |
-| memchr_memmem           |  479.350 us |  482.440 us |  505.110 us |  505.980 us |
-| memx_memmem             |  110.500 us |  107.390 us |  130.500 us |  123.280 us |
-| memx_memmem_basic       |  119.030 us |  120.500 us |  123.300 us |  118.030 us |
-| memx_memmem_sse2        |  107.440 us |  104.240 us |  121.100 us |  120.450 us |
+| std_memmem              |  689.260 us |  555.490 us |  714.560 us |  583.750 us |
+| libc_memmem             |  131.130 us |  120.530 us |  241.670 us |  252.080 us |
+| memchr_memmem           |  472.230 us |  482.810 us |  503.740 us |  491.810 us |
+| memx_memmem             |  117.360 us |  112.680 us |  128.280 us |  127.470 us |
+| memx_memmem_basic       |  121.310 us |  120.250 us |  133.310 us |  121.630 us |
+| memx_memmem_sse2        |  112.680 us |  109.490 us |  123.990 us |  122.480 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  753.880 us |  593.650 us |  723.660 us |  555.480 us |
-| libc_memmem             |  132.000 us |  122.050 us |  234.000 us |  242.070 us |
-| memchr_memmem           |  505.680 us |  561.220 us |  501.950 us |  557.370 us |
-| memx_memmem             |  126.240 us |  128.140 us |  125.060 us |  119.450 us |
-| memx_memmem_basic       |  125.090 us |  128.140 us |  125.580 us |  119.810 us |
+| std_memmem              |  751.850 us |  601.410 us |  719.720 us |  576.260 us |
+| libc_memmem             |  131.200 us |  120.900 us |  241.750 us |  245.320 us |
+| memchr_memmem           |  502.970 us |  569.400 us |  496.330 us |  564.220 us |
+| memx_memmem             |  127.740 us |  124.620 us |  147.610 us |  129.860 us |
+| memx_memmem_basic       |  123.320 us |  126.560 us |  142.830 us |  123.180 us |
 
   4. armv7-linux-androideabi:
 
@@ -43,7 +43,7 @@
 | memx_memmem_basic       | 2244.100 us | 2122.200 us |  570.210 us |  549.610 us |
 
 
-- compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
+- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 - `us` is micro seconds
 - `:en` is english haystack.
 - `:ja` is japanese haystack.

@@ -9,6 +9,9 @@ ADB_BBOX = /data/data/org.galexander.busybox/files
 BENCH_NM = bench-memchr
 #BENCH_NM = bench-memrchr
 
+#BENCH_NM = bench-memnechr
+#BENCH_NM = bench-memrnechr
+
 #BENCH_NM = bench-memcmp
 #BENCH_NM = bench-memeq
 

@@ -10,8 +10,7 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     let r = unsafe { _memeq_sse2(a, b) };
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
     */
-    let r = _memeq_basic(a, b);
-    r
+    _memeq_basic(a, b)
 }
 
 fn _memeq_basic(a: &[u8], b: &[u8]) -> bool {

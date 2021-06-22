@@ -1,6 +1,6 @@
 #[inline(always)]
 pub fn _memset_impl(buf: &mut [u8], c: u8) {
-    if buf.len() == 0 {
+    if buf.is_empty() {
         return;
     }
     #[cfg(target_pointer_width = "128")]

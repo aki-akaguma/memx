@@ -16,6 +16,14 @@ pub fn create_data_chr() -> (Vec<String>, u8, usize) {
     }
 }
 
+pub fn create_data_nechr() -> (Vec<String>, u8, usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_nechr_ja_1(),
+        _ => create_data_nechr_en_1(),
+    }
+}
+
 pub fn create_data_cmp() -> (Vec<String>, &'static str, usize, usize, usize) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
@@ -142,6 +150,56 @@ pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
         bytes[bytes.len() - 1]
     };
     (v, c, match_cnt)
+}
+
+pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
+    let a1 = "You could not possib "; // 21 bytes
+    let a2 = "            "; // 12 bytes
+    let a3 = " his           "; // 15 bytes
+    let a4 = "                     "; // 21 bytes
+    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 500 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 15000;
+    (v, b' ', match_cnt)
+}
+
+pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
+    let a1 = "吾輩は猫である"; // 21 bytes
+    let a2 = "            "; // 12 bytes
+    let a3 = "      ち      "; // 15 bytes
+    let a4 = "                     "; // 21 bytes
+    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 500 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 5250;
+    (v, b' ', match_cnt)
 }
 
 pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize) {
