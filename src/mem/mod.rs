@@ -21,10 +21,20 @@ pub(crate) use mem_eq::_memeq_impl;
 mod mem_mem;
 pub(crate) use mem_mem::_memmem_impl;
 
+mod mem_nechr;
+pub(crate) use mem_nechr::_memnechr_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_nechr::_memnechr_remaining_15_bytes_impl;
+
 mod mem_rchr;
 pub(crate) use mem_rchr::_memrchr_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
+
+mod mem_rnechr;
+pub(crate) use mem_rnechr::_memrnechr_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_rnechr::_memrnechr_remaining_15_bytes_impl;
 
 mod mem_rmem;
 pub(crate) use mem_rmem::_memrmem_impl;
@@ -59,8 +69,16 @@ pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     crate::mem::_memmem_impl(haystack, needle)
 }
 
+pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
+    crate::mem::_memnechr_impl(buf, c)
+}
+
 pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memrchr_impl(buf, c)
+}
+
+pub fn memrnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
+    crate::mem::_memrnechr_impl(buf, c)
 }
 
 pub fn memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {

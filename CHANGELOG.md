@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* add fn memnechr() and fn memrnechr()
+* clippy and fmt the source codes
+
 0.1.12 (2021-06-19)
 =====
 

@@ -25,8 +25,7 @@ pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
     let r = _memcmp_basic(a, b);
     */
-    let r = unsafe { _memcmp_sse2(a, b) };
-    r
+    unsafe { _memcmp_sse2(a, b) }
 }
 
 fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
@@ -100,22 +99,24 @@ macro_rules! _unroll_one_cmp_1 {
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memcmp_sse2(a: &[u8], b: &[u8]) -> Ordering {
     _memcmp_sse2_impl(a, b)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memcmp_avx(a: &[u8], b: &[u8]) -> Ordering {
     _memcmp_sse2_impl(a, b)
 }
 
 #[inline(always)]
 fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
-    if a.len() == 0 && b.len() == 0 {
+    if a.is_empty() && b.is_empty() {
         return Ordering::Equal;
     }
-    if a.len() == 0 || b.len() == 0 {
+    if a.is_empty() || b.is_empty() {
         return a.len().cmp(&b.len());
     }
     //
@@ -264,7 +265,7 @@ fn _cmp_bytes_16_mask(mask: i32, a_ptr: *const u8, b_ptr: *const u8) -> Ordering
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -283,7 +284,7 @@ fn _cmp_bytes_16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -302,7 +303,7 @@ fn _cmp_bytes_8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -321,7 +322,7 @@ fn _cmp_bytes_4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -340,7 +341,7 @@ fn _cmp_bytes_2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -348,10 +349,10 @@ fn _cmp_bytes_2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _eq_unroll_16x8(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Ordering {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     let aa2_ptr = unsafe { a_ptr.add(loop_size * 2) } as *mut __m128i;
     let bb2_ptr = unsafe { b_ptr.add(loop_size * 2) } as *mut __m128i;
     let aa3_ptr = unsafe { a_ptr.add(loop_size * 3) } as *mut __m128i;
@@ -429,10 +430,10 @@ fn _eq_unroll_16x8(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Orde
 
 #[inline(always)]
 fn _eq_unroll_16x4(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Ordering {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     let aa2_ptr = unsafe { a_ptr.add(loop_size * 2) } as *mut __m128i;
     let bb2_ptr = unsafe { b_ptr.add(loop_size * 2) } as *mut __m128i;
     let aa3_ptr = unsafe { a_ptr.add(loop_size * 3) } as *mut __m128i;
@@ -474,10 +475,10 @@ fn _eq_unroll_16x4(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Orde
 
 #[inline(always)]
 fn _eq_unroll_16x2(a_ptr: *const u8, b_ptr: *const u8, loop_size: usize) -> Ordering {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     //
     let mm_a0 = unsafe { _mm_loadu_si128(aa0_ptr) };
     let mm_a1 = unsafe { _mm_loadu_si128(aa1_ptr) };

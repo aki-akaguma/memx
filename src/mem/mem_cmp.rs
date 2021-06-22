@@ -2,10 +2,10 @@ use core::cmp::Ordering;
 
 #[inline(always)]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
-    if a.len() == 0 && b.len() == 0 {
+    if a.is_empty() && b.is_empty() {
         return Ordering::Equal;
     }
-    if a.len() == 0 || b.len() == 0 {
+    if a.is_empty() || b.is_empty() {
         return a.len().cmp(&b.len());
     }
     #[cfg(target_pointer_width = "128")]
@@ -355,7 +355,7 @@ fn _cmp_bytes_16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -374,7 +374,7 @@ fn _cmp_bytes_8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -393,7 +393,7 @@ fn _cmp_bytes_4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }
@@ -412,7 +412,7 @@ fn _cmp_bytes_2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
         let bb_ptr = unsafe { b_ptr.add(pos) };
         let aac = unsafe { *aa_ptr };
         let bbc = unsafe { *bb_ptr };
-        return aac.cmp(&bbc);
+        aac.cmp(&bbc)
     } else {
         Ordering::Equal
     }

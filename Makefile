@@ -1,6 +1,6 @@
 
-bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset
-#bench_nms = bench-memcmp
+bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
+#bench_nms = bench-memrnechr
 #bench_nms = bench-memset
 
 target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
@@ -127,11 +127,23 @@ result-memmem:
 	cat target/result/result.bench-memmem.i586-unknown-linux.txt
 	cat target/result/result.bench-memmem.armv7.txt
 
+result-memnechr:
+	cat target/result/result.bench-memnechr.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memnechr.i686-unknown-linux.txt
+	cat target/result/result.bench-memnechr.i586-unknown-linux.txt
+	cat target/result/result.bench-memnechr.armv7.txt
+
 result-memrchr:
 	cat target/result/result.bench-memrchr.x86_64-unknown-linux.txt
 	cat target/result/result.bench-memrchr.i686-unknown-linux.txt
 	cat target/result/result.bench-memrchr.i586-unknown-linux.txt
 	cat target/result/result.bench-memrchr.armv7.txt
+
+result-memrnechr:
+	cat target/result/result.bench-memrnechr.x86_64-unknown-linux.txt
+	cat target/result/result.bench-memrnechr.i686-unknown-linux.txt
+	cat target/result/result.bench-memrnechr.i586-unknown-linux.txt
+	cat target/result/result.bench-memrnechr.armv7.txt
 
 result-memrmem:
 	cat target/result/result.bench-memrmem.x86_64-unknown-linux.txt

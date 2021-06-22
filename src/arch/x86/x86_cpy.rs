@@ -35,12 +35,14 @@ fn _memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memcpy_sse2(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     _memcpy_sse2_impl(dst, src)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memcpy_avx(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     _memcpy_sse2_impl(dst, src)
 }
@@ -235,10 +237,10 @@ fn _cpy_large(
 
 #[inline(always)]
 fn _cpy_unroll_16x8(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     let aa2_ptr = unsafe { a_ptr.add(loop_size * 2) } as *mut __m128i;
     let bb2_ptr = unsafe { b_ptr.add(loop_size * 2) } as *mut __m128i;
     let aa3_ptr = unsafe { a_ptr.add(loop_size * 3) } as *mut __m128i;
@@ -273,10 +275,10 @@ fn _cpy_unroll_16x8(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
 
 #[inline(always)]
 fn _cpy_unroll_16x6(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     let aa2_ptr = unsafe { a_ptr.add(loop_size * 2) } as *mut __m128i;
     let bb2_ptr = unsafe { b_ptr.add(loop_size * 2) } as *mut __m128i;
     let aa3_ptr = unsafe { a_ptr.add(loop_size * 3) } as *mut __m128i;
@@ -303,10 +305,10 @@ fn _cpy_unroll_16x6(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
 
 #[inline(always)]
 fn _cpy_unroll_16x4(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     let aa2_ptr = unsafe { a_ptr.add(loop_size * 2) } as *mut __m128i;
     let bb2_ptr = unsafe { b_ptr.add(loop_size * 2) } as *mut __m128i;
     let aa3_ptr = unsafe { a_ptr.add(loop_size * 3) } as *mut __m128i;
@@ -325,10 +327,10 @@ fn _cpy_unroll_16x4(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
 
 #[inline(always)]
 fn _cpy_unroll_16x2(a_ptr: *mut u8, b_ptr: *const u8, loop_size: usize) {
-    let aa0_ptr = unsafe { a_ptr.add(loop_size * 0) } as *mut __m128i;
-    let bb0_ptr = unsafe { b_ptr.add(loop_size * 0) } as *mut __m128i;
-    let aa1_ptr = unsafe { a_ptr.add(loop_size * 1) } as *mut __m128i;
-    let bb1_ptr = unsafe { b_ptr.add(loop_size * 1) } as *mut __m128i;
+    let aa0_ptr = a_ptr as *mut __m128i;
+    let bb0_ptr = b_ptr as *mut __m128i;
+    let aa1_ptr = unsafe { a_ptr.add(loop_size) } as *mut __m128i;
+    let bb1_ptr = unsafe { b_ptr.add(loop_size) } as *mut __m128i;
     //
     let mm_b0 = unsafe { _mm_loadu_si128(bb0_ptr) };
     let mm_b1 = unsafe { _mm_loadu_si128(bb1_ptr) };

@@ -37,8 +37,18 @@ path = "benches/bench-memmem.rs"
 harness = false
 
 [[bench]]
+name = "bench-memnechr"
+path = "benches/bench-memnechr.rs"
+harness = false
+
+[[bench]]
 name = "bench-memrchr"
 path = "benches/bench-memrchr.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrnechr"
+path = "benches/bench-memrnechr.rs"
 harness = false
 
 [[bench]]

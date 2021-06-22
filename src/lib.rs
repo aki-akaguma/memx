@@ -46,6 +46,40 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
     r
 }
 
+/// This is same as `buf.iter().position(|&x| x != c)`, not included libc.
+pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memnechr_impl(buf, c);
+    //
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    let r = mem::_memnechr_impl(buf, c);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x != c)`, not included libc.
+pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memrnechr_impl(buf, c);
+    //
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    let r = mem::_memrnechr_impl(buf, c);
+    //
+    r
+}
+
 /// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     /*
@@ -63,19 +97,16 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     ))]
     let r = mem::_memcmp_impl(a, b);
     */
-    let r = mem::_memcmp_impl(a, b);
     //
-    r
+    mem::_memcmp_impl(a, b)
 }
 
 /// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
-    let r = mem::_memeq_impl(a, b);
-    //
-    r
+    mem::_memeq_impl(a, b)
 }
 
-/// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)`.
+/// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)` or `haystack.windows(needle.len()).position(|window| window == needle)`.
 ///
 /// This `memmem()` function is implemented using stochastic naive algorithm.
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
@@ -95,7 +126,7 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     r
 }
 
-/// This mimics `libc::memrmem()`, same as `(haystack as &str).rfind(needle as &str)`.
+/// This mimics `libc::memrmem()`, same as `(haystack as &str).rfind(needle as &str)` or `haystack.windows(needle.len()).rposition(|window| window == needle)`.
 ///
 /// This `memrmem()` function is implemented using stochastic naive algorithm.
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
@@ -151,11 +182,6 @@ pub fn memset(buf: &mut [u8], c: u8) {
     mem::_memset_impl(buf, c);
 }
 
-#[inline(always)]
-pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
-    (ptr as usize) - (origin as usize)
-}
-
 // ascii stochastics
 pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -164,6 +190,31 @@ pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
     0, 1, 0, 39, 7, 20, 19, 69, 11, 9, 18, 39, 0, 2, 18, 12, 38, 38, 12, 1, 34, 35, 50, 13, 5, 5,
     2, 7, 0, 0, 2, 0, 0, 0,
 ];
+
+#[inline(always)]
+pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
+    (ptr as usize) - (origin as usize)
+}
+
+#[inline(always)]
+pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
+where
+    T: std::ops::Div<Output = T> + std::ops::Mul<Output = T> + From<u8>,
+{
+    /*
+    // a hight bit propagation: bits: 0b_1000_0000
+    let bits = bits | (bits >> 1); // 0b_1100_0000
+    let bits = bits | (bits >> 2); // 0b_1111_0000
+    let bits = bits | (bits >> 4); // 0b_1111_1111
+    */
+    /*
+    // a hight bit propagation:
+    // ------------------------ bits: 0b_0000_0000_1000_0000
+    let bits = bits / 0x80.into(); // 0b_0000_0000_0000_0001
+    let bits = bits * 0xFF.into(); // 0b_0000_0000_1111_1111
+    */
+    (bits / 0x80.into()) * 0xFF.into()
+}
 
 /*
  * Refer.

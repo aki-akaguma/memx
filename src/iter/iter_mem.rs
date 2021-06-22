@@ -12,8 +12,8 @@ impl<'a> MemmemIter<'a> {
     #[inline]
     pub fn new(haystack: &'a [u8], needle: &'a [u8]) -> MemmemIter<'a> {
         MemmemIter {
-            needle: needle,
-            haystack: haystack,
+            needle,
+            haystack,
             position: 0,
         }
     }

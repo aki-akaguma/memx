@@ -21,13 +21,13 @@ use mmx::_mm256_set1_epi8;
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-pub(crate) fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(target_feature = "avx")]
-    let r = unsafe { _memrchr_avx(buf, c) };
+    let r = unsafe { _memrnechr_avx(buf, c) };
     #[cfg(target_feature = "sse2")]
-    let r = unsafe { _memrchr_sse2(buf, c) };
+    let r = unsafe { _memrnechr_sse2(buf, c) };
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
-    let r = _memrchr_basic(buf, c);
+    let r = _memrnechr_basic(buf, c);
     r
     /*
      * <WSID>
@@ -36,38 +36,38 @@ pub(crate) fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
      * </WSID>
      *
     if is_x86_feature_detected!("avx") {
-        unsafe { _memrchr_avx(buf, c) }
+        unsafe { _memrnechr_avx(buf, c) }
     } else {
-        unsafe { _memrchr_sse2(buf, c) }
+        unsafe { _memrnechr_sse2(buf, c) }
     }
     */
 }
 
-fn _memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    basic::_memrchr_impl(buf, c)
+fn _memrnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
+    basic::_memrnechr_impl(buf, c)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
-    _memrchr_sse2_impl(buf, c)
+pub unsafe fn _memrnechr_sse2(buf: &[u8], c: u8) -> Option<usize> {
+    _memrnechr_sse2_impl(buf, c)
 }
 
-macro_rules! _unroll_one_rchr_16_uu {
+macro_rules! _unroll_one_rnechr_16_uu {
     ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r = unsafe { _rchr_c16_uu(aa_ptr, $cc, $start_ptr) };
+        let r = unsafe { _rnechr_c16_uu(aa_ptr, $cc, $start_ptr) };
         if !r.is_none() {
             return r;
         }
     }};
 }
 
-macro_rules! _unroll_one_rchr_16_aa {
+macro_rules! _unroll_one_rnechr_16_aa {
     ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r = unsafe { _rchr_c16_aa(aa_ptr, $cc, $start_ptr) };
+        let r = unsafe { _rnechr_c16_aa(aa_ptr, $cc, $start_ptr) };
         if !r.is_none() {
             return r;
         }
@@ -75,11 +75,11 @@ macro_rules! _unroll_one_rchr_16_aa {
 }
 
 #[inline(always)]
-fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memrnechr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     if buf.is_empty() {
         return None;
     }
-    if buf[buf.len() - 1] == c {
+    if buf[buf.len() - 1] != c {
         return Some(buf.len() - 1);
     }
     //
@@ -93,7 +93,7 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let loop_size = 16;
             let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
             let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
-            _unroll_one_rchr_16_uu!(buf_ptr, cc, start_ptr, loop_size, 0);
+            _unroll_one_rnechr_16_uu!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
         }
@@ -106,14 +106,14 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             if buf_ptr >= min_ptr {
                 while buf_ptr >= min_ptr {
                     buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
                 }
                 buf_ptr_cur = buf_ptr;
             }
@@ -125,7 +125,7 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             if buf_ptr >= min_ptr {
                 while buf_ptr >= min_ptr {
                     buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                    _unroll_one_rnechr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
                 }
                 buf_ptr_cur = buf_ptr;
             }
@@ -133,19 +133,19 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
     //
     let cc = (c as u64) * 0x0101_0101_0101_0101_u64;
-    basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
+    basic::_memrnechr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_avx(buf: &[u8], c: u8) -> Option<usize> {
-    _memrchr_sse2_impl(buf, c)
+pub unsafe fn _memrnechr_avx(buf: &[u8], c: u8) -> Option<usize> {
+    _memrnechr_sse2_impl(buf, c)
 }
 /*
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
-pub unsafe fn _memrchr_avx(buf: &[u8], c: u8) -> Option<usize> {
+pub unsafe fn _memrnechr_avx(buf: &[u8], c: u8) -> Option<usize> {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
@@ -163,7 +163,7 @@ pub unsafe fn _memrchr_avx(buf: &[u8], c: u8) -> Option<usize> {
     }
     //
     let next_idx = plus_offset_from(buf_ptr, start_ptr);
-    let r = _memrchr_sse2(&buf[next_idx..], c);
+    let r = _memrnechr_sse2(&buf[next_idx..], c);
     if let Some(pos) = r {
         Some(pos + next_idx)
     } else {
@@ -178,26 +178,34 @@ unsafe fn _c16_value(c: u8) -> __m128i {
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_uu(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _rnechr_c16_uu(
+    buf_ptr: *const u8,
+    mm_c16: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mask = _mm_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_zeros() as usize)
+    let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
+    if mask != 0xFFFF_u32 {
+        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _rnechr_c16_aa(
+    buf_ptr: *const u8,
+    mm_c16: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mask = _mm_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_zeros() as usize)
+    let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
+    if mask != 0xFFFF_u32 {
+        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
     } else {
         None
     }
@@ -217,9 +225,9 @@ unsafe fn _check_c32_uu(
     //
     let mm_a = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
-    let mask = _mm256_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 32 - 1 - (mask as u32).leading_zeros() as usize)
+    let mask = _mm256_movemask_epi8(mm_eq) as u32;
+    if mask != 0xFFFF_FFFF_u32 {
+        Some(plus_offset_from(buf_ptr, start_ptr) + 32 - 1 - (mask as u32).leading_ones() as usize)
     } else {
         None
     }

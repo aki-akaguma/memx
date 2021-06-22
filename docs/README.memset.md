@@ -4,30 +4,30 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.750 us |    3.798 us |    1.459 us |    3.276 us |
-| libc_memset             |    1.791 us |    3.704 us |    1.437 us |    3.204 us |
-| memx_memset             |    1.179 us |    2.442 us |    1.188 us |    2.554 us |
-| memx_memset_basic       |    1.389 us |    2.914 us |    1.393 us |    3.132 us |
-| memx_memset_sse2        |    1.189 us |    2.414 us |    1.151 us |    2.540 us |
+| std_memset              |    1.766 us |    3.818 us |    1.458 us |    3.266 us |
+| libc_memset             |    1.779 us |    3.777 us |    1.436 us |    3.253 us |
+| memx_memset             |    1.131 us |    2.324 us |    1.133 us |    2.501 us |
+| memx_memset_basic       |    1.391 us |    2.953 us |    1.402 us |    3.125 us |
+| memx_memset_sse2        |    1.165 us |    2.348 us |    1.162 us |    2.515 us |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.117 us |    2.552 us |    2.393 us |    4.429 us |
-| libc_memset             |    1.219 us |    2.571 us |    2.289 us |    4.260 us |
-| memx_memset             |    1.157 us |    2.474 us |    1.135 us |    2.482 us |
-| memx_memset_basic       |    2.751 us |    4.989 us |    2.756 us |    5.040 us |
-| memx_memset_sse2        |    1.128 us |    2.502 us |    1.212 us |    2.421 us |
+| std_memset              |    1.083 us |    2.584 us |    2.258 us |    4.164 us |
+| libc_memset             |    1.211 us |    2.553 us |    2.314 us |    4.228 us |
+| memx_memset             |    1.102 us |    2.517 us |    1.217 us |    2.417 us |
+| memx_memset_basic       |    2.677 us |    4.905 us |    2.778 us |    5.030 us |
+| memx_memset_sse2        |    1.109 us |    2.507 us |    1.220 us |    2.387 us |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.121 us |    2.478 us |    2.339 us |    4.188 us |
-| libc_memset             |    1.220 us |    2.470 us |    2.283 us |    4.188 us |
-| memx_memset             |    2.788 us |    4.933 us |    2.727 us |    5.209 us |
-| memx_memset_basic       |    2.873 us |    5.269 us |    2.842 us |    5.361 us |
+| std_memset              |    1.128 us |    2.549 us |    2.303 us |    4.251 us |
+| libc_memset             |    1.193 us |    2.533 us |    2.295 us |    4.184 us |
+| memx_memset             |    2.846 us |    5.331 us |    2.675 us |    5.077 us |
+| memx_memset_basic       |    2.763 us |    5.267 us |    2.743 us |    5.178 us |
 
   4. armv7-linux-androideabi:
 
@@ -39,7 +39,7 @@
 | memx_memset_basic       |  147.050 us |  261.970 us |    7.665 us |   15.335 us |
 
 
-- compile by rustc 1.52.1 (9bc8c42bb 2021-05-09)
+- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 - `us` is micro seconds
 - `:en` is english haystack.
 - `:ja` is japanese haystack.
