@@ -1,6 +1,13 @@
 mod test_std_memset {
+    #[rustversion::since(1.50)]
     fn test_memset(dst: &mut [u8], byte: u8) {
         dst.fill(byte);
+    }
+    #[rustversion::before(1.50)]
+    fn test_memset(dst: &mut [u8], byte: u8) {
+        for i in 0..dst.len() {
+            dst[i] = byte;
+        }
     }
     //
     #[test]
