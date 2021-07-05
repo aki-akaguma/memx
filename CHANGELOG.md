@@ -5,6 +5,7 @@ Unreleased changes. Release notes have not yet been written.
 * add rustc version check to `build.rs`
 * add rustversion to `dev-dependencies` for test_std_memset::test_memset()
 * rewrite doc
+* update licenses
 
 0.1.13 (2021-06-23)
 =====
