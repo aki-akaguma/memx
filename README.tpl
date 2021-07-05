@@ -1,22 +1,6 @@
-# memx
+# {{crate}}
 
-`memx` minics libc.
-
-This crate is implemented memory functions like libc memcmp(), memchr(),
-memmem(), memcpy(), memset().
-
-### Features
-
-* Rewriting with rust lang.
-* minimum support rustc 1.46.0 (04488afe3 2020-08-24)
-
-### Todo
-
-- [ ] Support the zero overhead trait.
-- [x] Support more fast routine on armv7-android
-- [x] Support more fast routine on x86_64
-- [x] Support #!\[no_std\]
-
+{{readme}}
 
 # Benchmark results
 

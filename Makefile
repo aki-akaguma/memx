@@ -42,7 +42,17 @@ target/stamp/stamp.bench.$(1).armv7:
 endef
 
 
-all:
+all: README.md
+
+README.md: src/lib.rs
+	cargo readme > $@
+
+test:
+	cargo test
+
+clean:
+	@rm -fr target
+
 
 build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.build.$(bnm).$(tbm)))
 
@@ -51,9 +61,6 @@ bench-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/
 build-arm-all: $(foreach bnm,$(bench_nms),target/stamp/stamp.build.$(bnm).armv7)
 
 bench-arm-all: $(foreach bnm,$(bench_nms),target/stamp/stamp.bench.$(bnm).armv7)
-
-clean:
-	@rm -fr target
 
 $(foreach bnm,$(bench_nms),$(eval $(foreach tb,$(target_base),$(eval $(call build-templ,$(bnm),$(tb))))))
 

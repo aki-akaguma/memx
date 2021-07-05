@@ -3,7 +3,7 @@ name = "memx"
 version = "0.1.13"
 authors = ["aki <aki.akaguma@hotmail.com>"]
 edition = "2018"
-description = "memory functions like a libc memcmp(), memchr(), memmem(), memcpy(), memset()"
+description = "memory functions like libc memcmp(), memchr(), memmem(), memcpy(), memset()"
 keywords = ["memcmp", "memchr", "memmem"]
 categories = ["algorithms"]
 license = "MIT OR Apache-2.0"
@@ -15,9 +15,15 @@ default = ["std"]
 std = []
 cmp_bytes = []
 
+has_slice_fill = []
+
 [dependencies]
 
 [dev-dependencies]
+rustversion = "1.0"
+
+[build-dependencies]
+rustc_version = "0.4"
 
 [workspace]
 members = [
