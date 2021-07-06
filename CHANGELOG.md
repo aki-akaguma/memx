@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.14 (2021-07-06)
+=====
+
 * add rustc version check to `build.rs`
 * add rustversion to `dev-dependencies` for test_std_memset::test_memset()
 * rewrite doc
