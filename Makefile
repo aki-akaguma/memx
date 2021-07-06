@@ -50,6 +50,9 @@ README.md: src/lib.rs
 test:
 	cargo test
 
+test-no_std:
+	cargo test --no-default-features
+
 clean:
 	@rm -fr target
 

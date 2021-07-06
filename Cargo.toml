@@ -13,9 +13,6 @@ repository = "https://github.com/aki-akaguma/memx"
 [features]
 default = ["std"]
 std = []
-cmp_bytes = []
-
-has_slice_fill = []
 
 [dependencies]
 
