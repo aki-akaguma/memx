@@ -38,10 +38,8 @@ macro_rules! _unroll_one_cpy_16 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aaa_ptr = aa_ptr as *mut u128;
-        let bbb_ptr = bb_ptr as *const u128;
-        unsafe {
-            *aaa_ptr = *bbb_ptr;
-        }
+        let bbc = unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(bb_ptr, 16)) };
+        unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
 }
 
@@ -51,10 +49,8 @@ macro_rules! _unroll_one_cpy_8 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aaa_ptr = aa_ptr as *mut u64;
-        let bbb_ptr = bb_ptr as *const u64;
-        unsafe {
-            *aaa_ptr = *bbb_ptr;
-        }
+        let bbc = unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(bb_ptr, 8)) };
+        unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
 }
 
@@ -64,10 +60,8 @@ macro_rules! _unroll_one_cpy_4 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aaa_ptr = aa_ptr as *mut u32;
-        let bbb_ptr = bb_ptr as *const u32;
-        unsafe {
-            *aaa_ptr = *bbb_ptr;
-        }
+        let bbc = unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(bb_ptr, 4)) };
+        unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
 }
 
@@ -77,10 +71,8 @@ macro_rules! _unroll_one_cpy_2 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aaa_ptr = aa_ptr as *mut u16;
-        let bbb_ptr = bb_ptr as *const u16;
-        unsafe {
-            *aaa_ptr = *bbb_ptr;
-        }
+        let bbc = unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(bb_ptr, 2)) };
+        unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
 }
 
@@ -112,8 +104,7 @@ fn _start_cpy_128(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     {
         let unroll = 8;
         let loop_size = 16;
-        let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_16_8 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= (loop_size * unroll) as isize {
             for i in 0..unroll {
                 _unroll_one_cpy_16!(a_ptr, b_ptr, loop_size, i);
             }
@@ -124,8 +115,7 @@ fn _start_cpy_128(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     }
     {
         let loop_size = 16;
-        let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_16 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_16!(a_ptr, b_ptr, loop_size, 0);
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
@@ -164,8 +154,7 @@ fn _start_cpy_64(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     */
     {
         let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_8 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_8!(a_ptr, b_ptr, loop_size, 0);
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
@@ -190,8 +179,7 @@ fn _start_cpy_32(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     {
         let unroll = 8;
         let loop_size = 4;
-        let end_ptr_4_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_4_8 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= (loop_size * unroll) as isize {
             for i in 0..unroll {
                 _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, i);
             }
@@ -202,8 +190,7 @@ fn _start_cpy_32(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     }
     {
         let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_4 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
@@ -223,8 +210,7 @@ pub(crate) fn _memcpy_remaining_15_bytes_impl(
     let mut b_ptr = src_ptr;
     {
         let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if b_ptr <= end_ptr_8 {
+        if unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_8!(a_ptr, b_ptr, loop_size, 0);
             //
             a_ptr = unsafe { a_ptr.add(loop_size) };
@@ -245,8 +231,7 @@ pub(crate) fn _memcpy_remaining_7_bytes_impl(
     let mut b_ptr = src_ptr;
     {
         let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if b_ptr <= end_ptr_4 {
+        if unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
             //
             a_ptr = unsafe { a_ptr.add(loop_size) };
@@ -321,8 +306,7 @@ fn _start_cpy_16(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     {
         let unroll = 8;
         let loop_size = 2;
-        let end_ptr_2_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while b_ptr <= end_ptr_2_8 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= (loop_size * unroll) as isize {
             for i in 0..unroll {
                 _unroll_one_cpy_2!(a_ptr, b_ptr, loop_size, i);
             }
@@ -333,8 +317,7 @@ fn _start_cpy_16(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     }
     {
         let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_2 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_2!(a_ptr, b_ptr, loop_size, 0);
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
@@ -385,8 +368,7 @@ fn _start_cpy_32_no_unroll(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError>
     //
     {
         let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_4 {
+        while unsafe { end_ptr.offset_from(b_ptr) } >= loop_size as isize {
             _unroll_one_cpy_4!(a_ptr, b_ptr, loop_size, 0);
             a_ptr = unsafe { a_ptr.add(loop_size) };
             b_ptr = unsafe { b_ptr.add(loop_size) };
