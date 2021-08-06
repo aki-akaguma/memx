@@ -2,6 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.15 (2021-08-06)
+=====
+
+* fix bug: errors on `cargo miri test`
+
 0.1.14 (2021-07-06)
 =====
 

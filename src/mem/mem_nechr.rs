@@ -83,8 +83,7 @@ fn _start_nechr_128(buf: &[u8], c: u8) -> Option<usize> {
     {
         let unroll = 8;
         let loop_size = 16;
-        let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while buf_ptr <= end_ptr_16_8 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
             _unroll_one_nechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
             _unroll_one_nechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
             _unroll_one_nechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
@@ -99,8 +98,7 @@ fn _start_nechr_128(buf: &[u8], c: u8) -> Option<usize> {
     }
     {
         let loop_size = 16;
-        let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-        while buf_ptr <= end_ptr_16 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -123,8 +121,7 @@ fn _start_nechr_64(buf: &[u8], c: u8) -> Option<usize> {
     {
         let unroll = 8;
         let loop_size = 8;
-        let end_ptr_8_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while buf_ptr <= end_ptr_8_8 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
             _unroll_one_nechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
             _unroll_one_nechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
             _unroll_one_nechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
@@ -139,8 +136,7 @@ fn _start_nechr_64(buf: &[u8], c: u8) -> Option<usize> {
     }
     {
         let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        while buf_ptr <= end_ptr_8 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -163,8 +159,7 @@ fn _start_nechr_32(buf: &[u8], c: u8) -> Option<usize> {
     {
         let unroll = 8;
         let loop_size = 4;
-        let end_ptr_4_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while buf_ptr <= end_ptr_4_8 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
             _unroll_one_nechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
             _unroll_one_nechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
             _unroll_one_nechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
@@ -179,8 +174,7 @@ fn _start_nechr_32(buf: &[u8], c: u8) -> Option<usize> {
     }
     {
         let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        while buf_ptr <= end_ptr_4 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -200,8 +194,7 @@ pub(crate) fn _memnechr_remaining_15_bytes_impl(
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_8 {
+        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -221,8 +214,7 @@ pub(crate) fn _memnechr_remaining_7_bytes_impl(
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 4;
-        let end_ptr_4 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_4 {
+        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -242,8 +234,7 @@ pub(crate) fn _memnechr_remaining_3_bytes_impl(
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        if buf_ptr <= end_ptr_2 {
+        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_2!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -274,8 +265,7 @@ fn _start_nechr_16(buf: &[u8], c: u8) -> Option<usize> {
     {
         let unroll = 8;
         let loop_size = 2;
-        let end_ptr_2_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-        while buf_ptr <= end_ptr_2_8 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
             _unroll_one_nechr_2!(buf_ptr, cc, start_ptr, loop_size, 0);
             _unroll_one_nechr_2!(buf_ptr, cc, start_ptr, loop_size, 1);
             _unroll_one_nechr_2!(buf_ptr, cc, start_ptr, loop_size, 2);
@@ -290,8 +280,7 @@ fn _start_nechr_16(buf: &[u8], c: u8) -> Option<usize> {
     }
     {
         let loop_size = 2;
-        let end_ptr_2 = unsafe { end_ptr.sub(loop_size) };
-        while buf_ptr <= end_ptr_2 {
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             _unroll_one_nechr_2!(buf_ptr, cc, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size) };
@@ -317,8 +306,11 @@ fn _c16_value(c: u8) -> u128 {
 
 #[inline(always)]
 fn _nechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u128;
-    let v = unsafe { *aa_ptr } ^ c16;
+    let v0 = unsafe {
+        let slice = std::slice::from_raw_parts(buf_ptr, 16);
+        crate::utils::_read_a_native_endian_u128(slice)
+    };
+    let v = v0 ^ c16;
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_0101_0101_0101_0101_u128)
         & !v
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
@@ -336,8 +328,11 @@ fn _c8_value(c: u8) -> u64 {
 
 #[inline(always)]
 fn _nechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u64;
-    let v = unsafe { *aa_ptr } ^ c8;
+    let v0 = unsafe {
+        let slice = std::slice::from_raw_parts(buf_ptr, 8);
+        crate::utils::_read_a_native_endian_u64(slice)
+    };
+    let v = v0 ^ c8;
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0x8080_8080_8080_8080_u64 {
         let bits = propagate_a_high_bit(bits);
@@ -353,8 +348,11 @@ fn _c4_value(c: u8) -> u32 {
 
 #[inline(always)]
 fn _nechr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u32;
-    let v = unsafe { *aa_ptr } ^ c4;
+    let v0 = unsafe {
+        let slice = std::slice::from_raw_parts(buf_ptr, 4);
+        crate::utils::_read_a_native_endian_u32(slice)
+    };
+    let v = v0 ^ c4;
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0x8080_8080_u32 {
         let bits = propagate_a_high_bit(bits);
@@ -370,8 +368,11 @@ fn _c2_value(c: u8) -> u16 {
 
 #[inline(always)]
 fn _nechr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u16;
-    let v = unsafe { *aa_ptr } ^ c2;
+    let v0 = unsafe {
+        let slice = std::slice::from_raw_parts(buf_ptr, 2);
+        crate::utils::_read_a_native_endian_u16(slice)
+    };
+    let v = v0 ^ c2;
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0x8080_u16 {
         let bits = propagate_a_high_bit(bits);

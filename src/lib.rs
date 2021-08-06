@@ -16,6 +16,22 @@ memmem(), memcpy(), memset().
 - [x] Support more fast routine on x86_64
 - [x] Support #!\[no_std\]
 
+
+## Support status of miri :: rustc 1.56.0-nightly (a6ece5615 2021-08-03)
+
+Ok lists:
+
+- cargo miri test --target=i586-unknown-linux-gnu
+- cargo miri test --target=aarch64-unknown-linux-gnu
+- cargo miri test --target=armv7-unknown-linux-gnueabihf
+
+Failed lists:
+
+- cargo miri test --target=x86_64-unknown-linux-gnu
+- cargo miri test --target=i686-unknown-linux-gnu
+
+miri error: `unimplemented intrinsic: simd_eq`
+
 */
 
 use core::cmp::Ordering;
@@ -23,6 +39,7 @@ use core::cmp::Ordering;
 pub mod arch;
 pub mod iter;
 pub mod mem;
+mod utils;
 
 /// used by memcpy()
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
