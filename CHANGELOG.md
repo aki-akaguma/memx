@@ -2,6 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.16 (2021-09-10)
+=====
+
+* update crates: anyhow(1.0.43), libc(0.2.101)
+
 0.1.15 (2021-08-06)
 =====
 
