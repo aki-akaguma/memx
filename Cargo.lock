@@ -92,9 +92,9 @@ dependencies = [
 
 [[package]]
 name = "clf"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4b3cab5eee72dd6a60c41c69bedbcb787ed9f8a5a1f661adf42f3fe733bff45"
+checksum = "301ff581138a35118af426bc1433f83dc77b49295e9f5c00c2cb3d171fd4d5c0"
 dependencies = [
  "cc",
 ]
@@ -284,7 +284,7 @@ dependencies = [
 
 [[package]]
 name = "memx"
-version = "0.1.16"
+version = "0.1.17"
 dependencies = [
  "rustc_version",
  "rustversion",
