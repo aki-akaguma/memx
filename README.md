@@ -5,20 +5,19 @@
 This crate is implemented memory functions like libc memcmp(), memchr(),
 memmem(), memcpy(), memset().
 
-### Features
+## Features
 
-* Rewriting with rust lang.
-* minimum support rustc 1.46.0 (04488afe3 2020-08-24)
+- Rewriting with rust lang.
+- minimum support rustc 1.46.0 (04488afe3 2020-08-24)
 
-### Todo
+## Todo
 
 - [ ] Support the zero overhead trait.
 - [x] Support more fast routine on armv7-android
 - [x] Support more fast routine on x86_64
 - [x] Support #!\[no_std\]
 
-
-### Support status of miri :: rustc 1.56.0-nightly (a6ece5615 2021-08-03)
+## Support status of miri :: rustc 1.56.0-nightly (a6ece5615 2021-08-03)
 
 Ok lists:
 

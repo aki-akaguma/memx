@@ -2,6 +2,12 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.18 (2021-11-14)
+=====
+
+* update crates: clf(0.1.3)
+* update crates: anyhow(1.0.45), cc(1.0.72)
+
 0.1.17 (2021-09-10)
 =====
 
