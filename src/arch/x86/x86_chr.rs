@@ -24,7 +24,7 @@ use mmx::_mm256_set1_epi8;
 pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(target_feature = "avx")]
     let r = unsafe { _memchr_avx(buf, c) };
-    #[cfg(target_feature = "sse2")]
+    #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
     let r = unsafe { _memchr_sse2(buf, c) };
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
     let r = _memchr_basic(buf, c);
