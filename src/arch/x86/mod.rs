@@ -87,7 +87,7 @@ pub use x86_cpy::_memcpy_sse2;
 //pub use x86_eq::_memeq_sse2;
 
 //pub use x86_mem::_memmem_avx;
-pub use x86_mem::_memmem_sse2;
+//pub use x86_mem::_memmem_sse2;
 
 pub use x86_nechr::_memnechr_avx;
 pub use x86_nechr::_memnechr_sse2;
@@ -99,7 +99,7 @@ pub use x86_rnechr::_memrnechr_avx;
 pub use x86_rnechr::_memrnechr_sse2;
 
 //pub use x86_rmem::_memrmem_avx;
-pub use x86_rmem::_memrmem_sse2;
+//pub use x86_rmem::_memrmem_sse2;
 
 pub use x86_set::_memset_avx;
 pub use x86_set::_memset_sse2;

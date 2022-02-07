@@ -2,6 +2,11 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.19 (2022-02-07)
+=====
+
+* bug fix: some bugs on `avx`
+
 0.1.18 (2021-11-14)
 =====
 
