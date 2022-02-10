@@ -242,9 +242,8 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     }
     {
         let loop_size = 1;
-        let cc: u8 = cc as u8;
         if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-            _unroll_one_chr_1!(buf_ptr, cc, start_ptr, loop_size, 0);
+            _unroll_one_chr_1!(buf_ptr, cc as u8, start_ptr, loop_size, 0);
         }
     }
     //
