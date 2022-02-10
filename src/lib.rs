@@ -111,6 +111,44 @@ pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
     r
 }
 
+/// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
+pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    /*
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memchr_double_impl(buf, c);
+    //
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    */
+    let r = mem::_memchr_double_impl(buf, c1, c2);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2)`.
+pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    /*
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        any(target_feature = "sse2", target_feature = "avx")
+    ))]
+    let r = arch::x86::_memrchr_double_impl(buf, c1, c2);
+    //
+    #[cfg(any(
+        not(any(target_arch = "x86_64", target_arch = "x86",)),
+        not(any(target_feature = "sse2", target_feature = "avx"))
+    ))]
+    */
+    let r = mem::_memrchr_double_impl(buf, c1, c2);
+    //
+    r
+}
+
 /// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     /*

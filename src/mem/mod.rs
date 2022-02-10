@@ -3,6 +3,11 @@ pub(crate) use mem_chr::_memchr_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_chr::_memchr_remaining_15_bytes_impl;
 
+mod mem_chr_double;
+pub(crate) use mem_chr_double::_memchr_double_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_chr_double::_memchr_double_remaining_15_bytes_impl;
+
 mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
 
@@ -31,6 +36,11 @@ pub(crate) use mem_rchr::_memrchr_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
 
+mod mem_rchr_double;
+pub(crate) use mem_rchr_double::_memrchr_double_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_double::_memrchr_double_remaining_15_bytes_impl;
+
 mod mem_rnechr;
 pub(crate) use mem_rnechr::_memrnechr_impl;
 #[allow(unused_imports)]
@@ -51,6 +61,10 @@ use core::cmp::Ordering;
 
 pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memchr_impl(buf, c)
+}
+
+pub fn memchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    crate::mem::_memchr_double_impl(buf, c1, c2)
 }
 
 pub fn memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
@@ -75,6 +89,10 @@ pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
 
 pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memrchr_impl(buf, c)
+}
+
+pub fn memrchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    crate::mem::_memrchr_double_impl(buf, c1, c2)
 }
 
 pub fn memrnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
