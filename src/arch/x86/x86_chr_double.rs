@@ -21,13 +21,13 @@ use mmx::_mm256_set1_epi8;
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(target_feature = "avx")]
-    let r = unsafe { _memchr_avx(buf, c) };
+    let r = unsafe { _memchr_double_avx(buf, c1, c2) };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    let r = unsafe { _memchr_sse2(buf, c) };
+    let r = unsafe { _memchr_double_sse2(buf, c1, c2) };
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
-    let r = _memchr_basic(buf, c);
+    let r = _memchr_double_basic(buf, c1, c2);
     r
     /*
      * <WSID>
@@ -43,43 +43,65 @@ pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     */
 }
 
-fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    basic::_memchr_impl(buf, c)
+fn _memchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    basic::_memchr_double_impl(buf, c1, c2)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
-    _memchr_sse2_impl(buf, c)
+pub unsafe fn _memchr_double_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    _memchr_double_sse2_impl(buf, c1, c2)
 }
 
 macro_rules! _unroll_one_chr_16_uu {
-    ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r = unsafe { _chr_c16_uu(aa_ptr, $cc, $start_ptr) };
-        if !r.is_none() {
-            return r;
+        let r1 = unsafe { _chr_c16_uu(aa_ptr, $cc1, $start_ptr) };
+        let r2 = unsafe { _chr_c16_uu(aa_ptr, $cc2, $start_ptr) };
+        if !r1.is_none() && r2.is_none() {
+            return r1;
+        } else if r1.is_none() && !r2.is_none() {
+            return r2;
+        } else if !r1.is_none() && !r2.is_none() {
+            let idx1 = r1.map(|a| a).unwrap();
+            let idx2 = r2.map(|a| a).unwrap();
+            if idx1 < idx2 {
+                return Some(idx1);
+            } else {
+                return Some(idx2);
+            }
         }
     }};
 }
 
 macro_rules! _unroll_one_chr_16_aa {
-    ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r = unsafe { _chr_c16_aa(aa_ptr, $cc, $start_ptr) };
-        if !r.is_none() {
-            return r;
+        let r1 = unsafe { _chr_c16_aa(aa_ptr, $cc1, $start_ptr) };
+        let r2 = unsafe { _chr_c16_aa(aa_ptr, $cc2, $start_ptr) };
+        if !r1.is_none() && r2.is_none() {
+            return r1;
+        } else if r1.is_none() && !r2.is_none() {
+            return r2;
+        } else if !r1.is_none() && !r2.is_none() {
+            let idx1 = r1.map(|a| a).unwrap();
+            let idx2 = r2.map(|a| a).unwrap();
+            if idx1 < idx2 {
+                return Some(idx1);
+            } else {
+                return Some(idx2);
+            }
         }
     }};
 }
 
 #[inline(always)]
-fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     if buf.is_empty() {
         return None;
     }
-    if buf[0] == c {
+    if buf[0] == c1 || buf[0] == c2 {
         return Some(0);
     }
     //
@@ -89,11 +111,12 @@ fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc: __m128i = unsafe { _c16_value(c) };
+        let cc1: __m128i = unsafe { _c16_value(c1) };
+        let cc2: __m128i = unsafe { _c16_value(c2) };
         {
             let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
             let loop_size = 16;
-            _unroll_one_chr_16_uu!(buf_ptr, cc, start_ptr, loop_size, 0);
+            _unroll_one_chr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
             //
             buf_ptr = unsafe { buf_ptr.add(remaining_align) };
         }
@@ -103,14 +126,14 @@ fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let loop_size = 16;
             let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
             while buf_ptr <= end_ptr_16_8 {
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 5);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 6);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 7);
                 //
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
@@ -119,22 +142,23 @@ fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             while buf_ptr <= end_ptr_16 {
-                _unroll_one_chr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
                 //
                 buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
     }
     //
-    let cc = (c as u64) * 0x0101_0101_0101_0101_u64;
-    basic::_memchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+    let cc1 = (c1 as u64) * 0x0101_0101_0101_0101_u64;
+    let cc2 = (c2 as u64) * 0x0101_0101_0101_0101_u64;
+    basic::_memchr_double_remaining_15_bytes_impl(buf_ptr, cc1, cc2, start_ptr, end_ptr)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memchr_avx(buf: &[u8], c: u8) -> Option<usize> {
-    _memchr_sse2_impl(buf, c)
+pub unsafe fn _memchr_double_avx(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    _memchr_double_sse2_impl(buf, c1, c2)
 }
 /*
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
