@@ -2,6 +2,8 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+* add `memchr_double()` and `memrchr_double()`
+
 0.1.19 (2022-02-07)
 =====
 

@@ -21,6 +21,7 @@ pub unsafe fn _memrmem_sse2_avx(haystack: &[u8], needle: &[u8]) -> Option<usize>
     _memrmem_sse2_avx_impl(haystack, needle)
 }
 
+#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
 #[inline(always)]
 fn _memrmem_sse2_avx_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
@@ -49,6 +50,7 @@ fn _memrmem_sse2_avx_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     }
 }
 
+#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
 #[inline(always)]
 fn _memrmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
@@ -74,6 +76,7 @@ fn _memrmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     None
 }
 
+#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
 #[inline(always)]
 fn _memrmem_sse2_avx_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
