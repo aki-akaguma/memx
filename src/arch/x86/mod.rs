@@ -6,6 +6,14 @@ mod x86_chr;
 ))]
 pub(crate) use x86_chr::_memchr_impl;
 
+mod x86_chr_double;
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    any(target_feature = "sse2", target_feature = "avx")
+))]
+pub(crate) use x86_chr_double::_memchr_double_impl;
+
 mod x86_cmp;
 
 #[cfg(all(
@@ -49,6 +57,14 @@ mod x86_rchr;
     any(target_feature = "sse2", target_feature = "avx")
 ))]
 pub(crate) use x86_rchr::_memrchr_impl;
+
+mod x86_rchr_double;
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    any(target_feature = "sse2", target_feature = "avx")
+))]
+pub(crate) use x86_rchr_double::_memrchr_double_impl;
 
 mod x86_rnechr;
 
