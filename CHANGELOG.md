@@ -2,6 +2,9 @@ TBD
 ===
 Unreleased changes. Release notes have not yet been written.
 
+0.1.20 (2022-02-11)
+=====
+
 * add `memchr_double()`, `memrchr_double()`, `memchr_double_iter()`, and `memrchr_double_iter()`.
 
 0.1.19 (2022-02-07)
