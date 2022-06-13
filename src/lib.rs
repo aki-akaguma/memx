@@ -7,7 +7,7 @@ memmem(), memcpy(), memset().
 # Features
 
 - Rewriting with rust lang.
-- minimum support rustc 1.46.0 (04488afe3 2020-08-24)
+- minimum support rustc 1.56.1 (59eed8a2a 2021-11-01)
 
 # Todo
 
