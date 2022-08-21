@@ -25,8 +25,12 @@ macro_rules! _unroll_one_cmp_16 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(aa_ptr, 16)) };
-        let bbc = unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(bb_ptr, 16)) };
+        let aac = unsafe {
+            crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(aa_ptr, 16))
+        };
+        let bbc = unsafe {
+            crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(bb_ptr, 16))
+        };
         if aac != bbc {
             return _cmp_bytes_16(aa_ptr, bb_ptr);
         }
@@ -38,8 +42,12 @@ macro_rules! _unroll_one_cmp_8 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(aa_ptr, 8)) };
-        let bbc = unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(bb_ptr, 8)) };
+        let aac = unsafe {
+            crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(aa_ptr, 8))
+        };
+        let bbc = unsafe {
+            crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(bb_ptr, 8))
+        };
         if aac != bbc {
             return _cmp_bytes_8(aa_ptr, bb_ptr);
         }
@@ -51,8 +59,12 @@ macro_rules! _unroll_one_cmp_4 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(aa_ptr, 4)) };
-        let bbc = unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(bb_ptr, 4)) };
+        let aac = unsafe {
+            crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(aa_ptr, 4))
+        };
+        let bbc = unsafe {
+            crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(bb_ptr, 4))
+        };
         if aac != bbc {
             return _cmp_bytes_4(aa_ptr, bb_ptr);
         }
@@ -64,8 +76,12 @@ macro_rules! _unroll_one_cmp_2 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(aa_ptr, 2)) };
-        let bbc = unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(bb_ptr, 2)) };
+        let aac = unsafe {
+            crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(aa_ptr, 2))
+        };
+        let bbc = unsafe {
+            crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(bb_ptr, 2))
+        };
         if aac != bbc {
             return _cmp_bytes_2(aa_ptr, bb_ptr);
         }
@@ -334,8 +350,10 @@ fn _start_cmp_16(a: &[u8], b: &[u8]) -> Ordering {
 
 #[inline(always)]
 fn _cmp_bytes_16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let aac = unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(a_ptr, 16)) };
-    let bbc = unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(b_ptr, 16)) };
+    let aac =
+        unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(a_ptr, 16)) };
+    let bbc =
+        unsafe { crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(b_ptr, 16)) };
     let bits = aac ^ bbc;
     if bits != 0 {
         let pos = (bits.trailing_zeros() / 8) as usize;
@@ -351,8 +369,10 @@ fn _cmp_bytes_16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_bytes_8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let aac = unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(a_ptr, 8)) };
-    let bbc = unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(b_ptr, 8)) };
+    let aac =
+        unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(a_ptr, 8)) };
+    let bbc =
+        unsafe { crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(b_ptr, 8)) };
     let bits = aac ^ bbc;
     if bits != 0 {
         let pos = (bits.trailing_zeros() / 8) as usize;
@@ -368,8 +388,10 @@ fn _cmp_bytes_8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_bytes_4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let aac = unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(a_ptr, 4)) };
-    let bbc = unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(b_ptr, 4)) };
+    let aac =
+        unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(a_ptr, 4)) };
+    let bbc =
+        unsafe { crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(b_ptr, 4)) };
     let bits = aac ^ bbc;
     if bits != 0 {
         let pos = (bits.trailing_zeros() / 8) as usize;
@@ -385,8 +407,10 @@ fn _cmp_bytes_4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_bytes_2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let aac = unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(a_ptr, 2)) };
-    let bbc = unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(b_ptr, 2)) };
+    let aac =
+        unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(a_ptr, 2)) };
+    let bbc =
+        unsafe { crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(b_ptr, 2)) };
     let bits = aac ^ bbc;
     if bits != 0 {
         let pos = (bits.trailing_zeros() / 8) as usize;

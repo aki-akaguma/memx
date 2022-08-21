@@ -27,7 +27,11 @@ impl<'a> Iterator for MemrchrDoubleIter<'a> {
         if self.position == 0 {
             return None;
         }
-        match crate::memrchr_double(&self.haystack[..(self.position - 1)], self.needle1, self.needle2) {
+        match crate::memrchr_double(
+            &self.haystack[..(self.position - 1)],
+            self.needle1,
+            self.needle2,
+        ) {
             Some(idx) => {
                 self.position = idx + 1;
                 Some(idx)

@@ -106,4 +106,3 @@ fn _memrmem_sse2_avx_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> 
     }
     None
 }
-
