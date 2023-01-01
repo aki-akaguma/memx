@@ -1,5 +1,36 @@
 ## Benchmark results
 
+- compile by rustc 1.65.0 (897e37553 2022-11-02)
+
+  1. x86_64-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memnechr            |  354.970 µs |  213.340 µs |  352.960 µs |  230.870 µs |
+| memx_memnechr           |  266.610 µs |  129.560 µs |  264.010 µs |  126.410 µs |
+| memx_memnechr_basic     |  295.980 µs |  160.640 µs |  300.220 µs |  166.560 µs |
+| memx_memnechr_sse2      |  263.570 µs |  124.470 µs |  260.490 µs |  124.630 µs |
+
+  2. i686-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memnechr            |  513.510 µs |  290.160 µs |  486.290 µs |  279.910 µs |
+| memx_memnechr           |  489.590 µs |  206.490 µs |  524.300 µs |  217.240 µs |
+| memx_memnechr_basic     |  449.060 µs |  207.250 µs |  468.060 µs |  213.440 µs |
+| memx_memnechr_sse2      |  429.490 µs |  186.690 µs |  444.730 µs |  190.020 µs |
+
+  3. i586-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memnechr            |  405.950 µs |  253.840 µs |  385.150 µs |  239.060 µs |
+| memx_memnechr           |  344.910 µs |  190.420 µs |  359.960 µs |  195.390 µs |
+| memx_memnechr_basic     |  346.550 µs |  190.720 µs |  360.560 µs |  195.110 µs |
+
+
+- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
+
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
@@ -36,7 +67,6 @@
 | memx_memchr             | 1042.000 us |  555.030 us | 1129.400 us |  519.740 us |
 | memx_memchr_basic       | 1005.600 us |  573.360 us | 1095.400 us |  525.020 us |
 
-- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 - `us` is micro seconds
 - `:en` is english haystack.
 - `:ja` is japanese haystack.

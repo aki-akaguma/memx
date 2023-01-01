@@ -1,5 +1,42 @@
 ## Benchmark results
 
+- compile by rustc 1.65.0 (897e37553 2022-11-02)
+
+  1. x86_64-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |  345.080 µs |  174.540 µs |  367.910 µs |  173.570 µs |
+| libc_memchr             |  248.100 µs |   71.511 µs |  556.140 µs |  196.210 µs |
+| memchr_memchr           |  222.400 µs |   65.960 µs |  228.730 µs |   64.952 µs |
+| memx_memchr             |  222.810 µs |   62.752 µs |  228.010 µs |   61.856 µs |
+| memx_memchr_basic       |  221.130 µs |   81.848 µs |  222.740 µs |   80.764 µs |
+| memx_memchr_sse2        |  219.550 µs |   61.723 µs |  224.140 µs |   60.966 µs |
+
+  2. i686-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |  334.490 µs |  171.860 µs |  332.310 µs |  171.970 µs |
+| libc_memchr             |  262.810 µs |   73.846 µs |  513.760 µs |  135.280 µs |
+| memchr_memchr           |  450.520 µs |  185.020 µs |  473.630 µs |  195.330 µs |
+| memx_memchr             |  344.480 µs |   92.301 µs |  381.360 µs |   99.499 µs |
+| memx_memchr_basic       |  273.220 µs |  119.050 µs |  286.910 µs |  122.920 µs |
+| memx_memchr_sse2        |  273.580 µs |   77.384 µs |  284.580 µs |   79.335 µs |
+
+  3. i586-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memchr              |  372.370 µs |  174.760 µs |  350.480 µs |  177.600 µs |
+| libc_memchr             |  266.980 µs |   76.251 µs |  488.450 µs |  135.900 µs |
+| memchr_memchr           |  484.290 µs |  191.520 µs |  498.300 µs |  214.450 µs |
+| memx_memchr             |  278.310 µs |  119.930 µs |  293.870 µs |  122.600 µs |
+| memx_memchr_basic       |  287.260 µs |  121.290 µs |  290.630 µs |  122.860 µs |
+
+
+- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
+
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
@@ -42,8 +79,6 @@
 | memx_memchr             | 1042.000 us |  555.030 us | 1129.400 us |  519.740 us |
 | memx_memchr_basic       | 1005.600 us |  573.360 us | 1095.400 us |  525.020 us |
 
-
-- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 - `us` is micro seconds
 - `:en` is english haystack.
 - `:ja` is japanese haystack.

@@ -4,6 +4,8 @@ bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem benc
 #bench_nms = bench-memset
 
 target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
+#target_base = x86_64-unknown-linux i686-unknown-linux
+#target_base = i586-unknown-linux
 
 define build-templ =
 target/stamp/stamp.build.$(1).$(2):
@@ -57,7 +59,7 @@ clean:
 	@rm -fr target
 
 
-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.build.$(bnm).$(tbm)))
+bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.build.$(bnm).$(tbm)))
 
 bench-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.bench.$(bnm).$(tbm)))
 

@@ -1,5 +1,40 @@
 ## Benchmark results
 
+- compile by rustc 1.65.0 (897e37553 2022-11-02)
+
+  1. x86_64-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memrmem             |  523.580 µs |  750.570 µs |  518.120 µs |  699.500 µs |
+| libc_memrmem            | 1673.900 µs | 1741.800 µs |  663.160 µs |  716.840 µs |
+| memchr_memrmem          |  640.620 µs |  654.340 µs |  644.800 µs |  636.110 µs |
+| memx_memrmem            |  111.440 µs |  111.430 µs |  109.450 µs |  110.460 µs |
+| memx_memrmem_basic      |  107.080 µs |  106.800 µs |  107.900 µs |  105.740 µs |
+| memx_memrmem_sse2       |  111.260 µs |  111.570 µs |  109.020 µs |  110.720 µs |
+
+  2. i686-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memrmem             |  684.790 µs |  834.990 µs |  747.330 µs |  897.520 µs |
+| memchr_memrmem          |  876.840 µs |  875.640 µs |  940.730 µs |  919.030 µs |
+| memx_memrmem            |  126.750 µs |  126.820 µs |  134.590 µs |  130.590 µs |
+| memx_memrmem_basic      |  131.900 µs |  125.920 µs |  144.120 µs |  134.920 µs |
+| memx_memrmem_sse2       |  123.040 µs |  123.190 µs |  131.030 µs |  127.570 µs |
+
+  3. i586-unknown-linux-:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memrmem             |  760.540 µs |  670.560 µs |  779.660 µs |  711.960 µs |
+| memchr_memrmem          |  836.530 µs | 1221.000 µs |  887.700 µs | 1212.200 µs |
+| memx_memrmem            |  132.750 µs |  132.000 µs |  153.510 µs |  138.450 µs |
+| memx_memrmem_basic      |  133.510 µs |  131.940 µs |  150.390 µs |  137.360 µs |
+
+
+- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
+
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
@@ -40,7 +75,6 @@
 | memx_memrmem_basic      | 2005.800 us | 2027.800 us |  556.750 us |  542.600 us |
 
 
-- compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 - `us` is micro seconds
 - `:en` is english haystack.
 - `:ja` is japanese haystack.

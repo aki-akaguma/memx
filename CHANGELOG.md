@@ -1,6 +1,10 @@
-TBD
+TBD: memx
 ===
 Unreleased changes. Release notes have not yet been written.
+
+* update benchmark results
+* update crates: criterion(0.4.0)
+* change criterion unit 'uc' to 'μc'
 
 0.1.21 (2022-06-13)
 =====
