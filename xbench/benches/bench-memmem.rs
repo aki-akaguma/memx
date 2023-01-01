@@ -142,7 +142,7 @@ fn process_memx_memmem_basic(texts: &[&str], pattern: &str) -> usize {
     target_feature = "sse2"
 ))]
 #[inline(never)]
-fn process_memx_memmem_sse2(texts: &[&str], pattern: &str) -> usize {
+fn process_memx_memmem_sse2_avx(texts: &[&str], pattern: &str) -> usize {
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
     let mut found: usize = 0;
@@ -151,7 +151,8 @@ fn process_memx_memmem_sse2(texts: &[&str], pattern: &str) -> usize {
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = unsafe { memx::arch::x86::_memmem_sse2(&line_bytes[curr_idx..], pat_bytes) };
+            let r =
+                unsafe { memx::arch::x86::_memmem_sse2_avx(&line_bytes[curr_idx..], pat_bytes) };
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = curr_idx + pos + pat_len;
@@ -193,7 +194,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     {
-        let n = process_memx_memmem_sse2(black_box(&vv), black_box(&pat_string));
+        let n = process_memx_memmem_sse2_avx(black_box(&vv), black_box(&pat_string));
         assert_eq!(n, match_cnt);
     }
     cache_flush(&vv, &pat_string);
@@ -234,7 +235,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     ))]
     c.bench_function("memx_memmem_sse2", |b| {
         b.iter(|| {
-            let _r = process_memx_memmem_sse2(black_box(&vv), black_box(&pat_string));
+            let _r = process_memx_memmem_sse2_avx(black_box(&vv), black_box(&pat_string));
         })
     });
 }
@@ -243,7 +244,7 @@ criterion_group! {
     name = benches;
     config = Criterion::default()
         .warm_up_time(std::time::Duration::from_millis(300))
-        .measurement_time(std::time::Duration::from_millis(3000));
+        .measurement_time(std::time::Duration::from_millis(4000));
     targets = criterion_benchmark
 }
 //criterion_group!(benches, criterion_benchmark);

@@ -1,13 +1,13 @@
 [package]
 name = "xbench"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 
 [dev-dependencies]
 memx = { path=".." }
-criterion = "0.3"
+criterion = "0.4"
 memchr = "2.4"
 clf = "0.1"
 

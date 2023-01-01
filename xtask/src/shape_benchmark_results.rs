@@ -69,7 +69,7 @@ fn output2(bench_vec_1: Vec<BenchStr>, bench_vec_2: Vec<BenchStr>) -> anyhow::Re
             );
         } else {
             println!(
-                "| {:<23} | {:>8.3} us | {:>8.3} us |",
+                "| {:<23} | {:>8.3} µs | {:>8.3} µs |",
                 bench1.name,
                 bench1.time / 0.000001,
                 bench2.time / 0.000001,
@@ -113,7 +113,7 @@ fn output4(
         let bench4 = &bench_vec_4[idx4];
         if bench1.is_cycle {
             println!(
-                "| {:<23} | {:>8.3} us | {:>8.3} us | {:>8.3} us | {:>8.3} us |",
+                "| {:<23} | {:>8.3} µs | {:>8.3} µs | {:>8.3} µs | {:>8.3} µs |",
                 bench1.name,
                 bench1.time / 1000.0,
                 bench2.time / 1000.0,
@@ -122,7 +122,7 @@ fn output4(
             );
         } else {
             println!(
-                "| {:<23} | {:>8.3} us | {:>8.3} us | {:>8.3} us | {:>8.3} us |",
+                "| {:<23} | {:>8.3} µs | {:>8.3} µs | {:>8.3} µs | {:>8.3} µs |",
                 bench1.name,
                 bench1.time / 0.000001,
                 bench2.time / 0.000001,
@@ -140,9 +140,9 @@ fn _output(bench_vec: Vec<BenchStr>) -> anyhow::Result<()> {
     println!("|:{:<22}-|-{:>11}:|", "-".repeat(22), "-".repeat(11),);
     for bench in bench_vec {
         if bench.is_cycle {
-            println!("| {:<22} | {:>8.3} us |", bench.name, bench.time / 1000.0,);
+            println!("| {:<22} | {:>8.3} µs |", bench.name, bench.time / 1000.0,);
         } else {
-            println!("| {:<22} | {:>8.3} us |", bench.name, bench.time / 0.000001,);
+            println!("| {:<22} | {:>8.3} µs |", bench.name, bench.time / 0.000001,);
         }
     }
     //
@@ -255,7 +255,7 @@ fn normalize_time(num_s: &str, unit_s: &str) -> anyhow::Result<f64> {
     let num: f64 = num_s.parse::<f64>()?;
     let unit: f64 = match unit_s {
         "ms" => 0.001,
-        "us" => 0.000001,
+        "µs" => 0.000001,
         "ns" => 0.000000001,
         "ps" => 0.000000000001,
         "cycles" => 1.0,
