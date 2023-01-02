@@ -15,6 +15,7 @@ default = ["std"]
 std = []
 
 [dependencies]
+cpufeatures = "0.2.5"
 
 [dev-dependencies]
 rustversion = "1.0"

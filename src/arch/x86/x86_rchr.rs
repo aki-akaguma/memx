@@ -102,20 +102,22 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let unroll = 8;
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
-            let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-            if buf_ptr >= min_ptr {
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
-                    _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
+                if buf_ptr >= min_ptr {
+                    while buf_ptr >= min_ptr {
+                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 7);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 6);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 5);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 4);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 3);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 2);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 1);
+                        _unroll_one_rchr_16_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
+                    }
+                    buf_ptr_cur = buf_ptr;
                 }
-                buf_ptr_cur = buf_ptr;
             }
         }
         {

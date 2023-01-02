@@ -82,16 +82,34 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 fn _cpy_small(dst_ptr: *mut u8, src_ptr: *const u8, end_ptr: *const u8) -> Result<(), RangeError> {
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
+    /*
     {
         let loop_size = 8;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        while b_ptr <= end_ptr_8 {
-            let aa_ptr = a_ptr as *mut u64;
-            let bb_ptr = b_ptr as *const u64;
-            unsafe { *aa_ptr = *bb_ptr };
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-            b_ptr = unsafe { b_ptr.add(loop_size) };
+        if unsafe { end_ptr.offset_from(b_ptr) } >= (loop_size) as isize {
+            let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+            while b_ptr <= end_ptr_8 {
+                let aa_ptr = a_ptr as *mut u64;
+                let bb_ptr = b_ptr as *const u64;
+                unsafe { *aa_ptr = *bb_ptr };
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+                b_ptr = unsafe { b_ptr.add(loop_size) };
+            }
+        }
+    }
+    */
+    {
+        let loop_size = 1;
+        if unsafe { end_ptr.offset_from(b_ptr) } >= (loop_size) as isize {
+            let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
+            while b_ptr <= end_ptr_8 {
+                let aa_ptr = a_ptr as *mut u8;
+                let bb_ptr = b_ptr as *const u8;
+                unsafe { *aa_ptr = *bb_ptr };
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size) };
+                b_ptr = unsafe { b_ptr.add(loop_size) };
+            }
         }
     }
     // the remaining data is the max: 7 bytes.
@@ -478,33 +496,79 @@ fn _cpy_tiny_0_15(dst_ptr: *mut u8, src_ptr: *const u8, len: usize) {
 
 #[inline(always)]
 fn _copy_8_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
+    /* error on miri
     let a_ptr = dst_ptr as *mut u64;
     let b_ptr = src_ptr as *const u64;
+    unsafe { *a_ptr = *b_ptr };
+    */
+    let a_ptr = dst_ptr as *mut u8;
+    let b_ptr = src_ptr as *const u8;
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
     unsafe { *a_ptr = *b_ptr };
 }
 
 #[inline(always)]
 fn _copy_4_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
+    /* error on miri
     let a_ptr = dst_ptr as *mut u32;
     let b_ptr = src_ptr as *const u32;
+    unsafe { *a_ptr = *b_ptr };
+    */
+    /*
+    let a_ptr = dst_ptr as *mut u16;
+    let b_ptr = src_ptr as *const u16;
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    */
+    let a_ptr = dst_ptr as *mut u8;
+    let b_ptr = src_ptr as *const u8;
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
+    unsafe { *a_ptr = *b_ptr };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
     unsafe { *a_ptr = *b_ptr };
 }
 
 #[inline(always)]
 fn _copy_2_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
+    /* error on miri
     let a_ptr = dst_ptr as *mut u16;
     let b_ptr = src_ptr as *const u16;
     unsafe { *a_ptr = *b_ptr };
-    /*
      */
-    /*
     let a_ptr = dst_ptr as *mut u8;
     let b_ptr = src_ptr as *const u8;
     unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { dst_ptr.add(1) };
-    let b_ptr = unsafe { src_ptr.add(1) };
+    let a_ptr = unsafe { a_ptr.add(1) };
+    let b_ptr = unsafe { b_ptr.add(1) };
     unsafe { *a_ptr = *b_ptr };
-    */
 }
 
 #[inline(always)]

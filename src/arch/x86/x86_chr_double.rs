@@ -124,18 +124,20 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 16;
-            let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-            while buf_ptr <= end_ptr_16_8 {
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 5);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 6);
-                _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 7);
-                //
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16_8 {
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 5);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 6);
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 7);
+                    //
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
             }
         }
         {
