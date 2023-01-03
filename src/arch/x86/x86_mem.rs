@@ -1,5 +1,8 @@
 use crate::mem as basic;
 
+#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
+use super::cpuid_avx;
+
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
@@ -58,10 +61,19 @@ fn _memmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = 0;
     while curr_idx < hay_len {
+        // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+        // after stabilization
+        let r = if cpuid_avx::get() {
+            unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_1st_byte) }
+        } else {
+            unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_1st_byte) }
+        };
+        /*
         #[cfg(target_feature = "avx")]
         let r = unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_1st_byte) };
         #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
         let r = unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_1st_byte) };
+        */
         //
         if let Some(pos) = r {
             let r_idx = curr_idx + pos;
@@ -88,10 +100,19 @@ fn _memmem_sse2_avx_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = nee_last_idx;
     while curr_idx < hay_len {
+        // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+        // after stabilization
+        let r = if cpuid_avx::get() {
+            unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_last_byte) }
+        } else {
+            unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_last_byte) }
+        };
+        /*
         #[cfg(target_feature = "avx")]
         let r = unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_last_byte) };
         #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
         let r = unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_last_byte) };
+        */
         //
         if let Some(pos) = r {
             let r_idx = curr_idx + pos - nee_last_idx;

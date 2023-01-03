@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * out-of-bounds pointer arithmetic at x86 sse2: x86_chr, x86_chr_double.
+* compile error on `no_std`
 
 ## 0.1.21 (2022-06-13)
 ### Changed

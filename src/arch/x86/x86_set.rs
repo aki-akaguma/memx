@@ -15,19 +15,28 @@ use mmx::_mm256_set1_epi8;
 use mmx::_mm256_store_si256;
 use mmx::_mm256_storeu_si256;
 
+use super::{cpuid_avx, cpuid_sse2};
+
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memset_impl(buf: &mut [u8], c: u8) {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx::get() {
+        unsafe { _memset_avx(buf, c) };
+    } else if cpuid_sse2::get() {
+        unsafe { _memset_sse2(buf, c) };
+    } else {
+        _memset_basic(buf, c);
+    }
+    /*
     #[cfg(target_feature = "avx")]
-    unsafe {
-        _memset_avx(buf, c)
-    };
+    unsafe { _memset_avx(buf, c) };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    unsafe {
-        _memset_sse2(buf, c)
-    };
+    unsafe { _memset_sse2(buf, c) };
     #[cfg(not(any(target_feature = "sse2", target_feature = "avx")))]
     _memset_basic(buf, c);
+    */
 }
 
 fn _memset_basic(buf: &mut [u8], c: u8) {

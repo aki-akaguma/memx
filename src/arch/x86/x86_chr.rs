@@ -19,9 +19,21 @@ use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
+use super::{cpuid_avx, cpuid_sse2};
+
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx::get() {
+        unsafe { _memchr_avx(buf, c) }
+    } else if cpuid_sse2::get() {
+        unsafe { _memchr_sse2(buf, c) }
+    } else {
+        _memchr_basic(buf, c)
+    }
+    /*
     #[cfg(target_feature = "avx")]
     let r = unsafe { _memchr_avx(buf, c) };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
@@ -29,6 +41,7 @@ pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
     let r = _memchr_basic(buf, c);
     r
+    */
     /*
      * <WSID>
      * The is_x86_feature_detected!() routine is slower, and not support no_std.

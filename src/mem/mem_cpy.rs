@@ -39,7 +39,7 @@ macro_rules! _unroll_one_cpy_16 {
         //
         let aaa_ptr = aa_ptr as *mut u128;
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(bb_ptr, 16))
+            crate::utils::_read_a_native_endian_u128(core::slice::from_raw_parts(bb_ptr, 16))
         };
         unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
@@ -52,7 +52,7 @@ macro_rules! _unroll_one_cpy_8 {
         //
         let aaa_ptr = aa_ptr as *mut u64;
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(bb_ptr, 8))
+            crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(bb_ptr, 8))
         };
         unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
@@ -65,7 +65,7 @@ macro_rules! _unroll_one_cpy_4 {
         //
         let aaa_ptr = aa_ptr as *mut u32;
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(bb_ptr, 4))
+            crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(bb_ptr, 4))
         };
         unsafe { aaa_ptr.write_unaligned(bbc) };
     }};
@@ -78,7 +78,7 @@ macro_rules! _unroll_one_cpy_2 {
         //
         let aaa_ptr = aa_ptr as *mut u16;
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(bb_ptr, 2))
+            crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(bb_ptr, 2))
         };
         unsafe { aaa_ptr.write_unaligned(bbc) };
     }};

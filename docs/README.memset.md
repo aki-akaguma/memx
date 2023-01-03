@@ -6,30 +6,30 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.485 µs |    3.388 µs |    1.446 µs |    3.270 µs |
-| libc_memset             |    1.441 µs |    3.357 µs |    1.424 µs |    3.250 µs |
-| memx_memset             |    1.123 µs |    2.374 µs |    1.128 µs |    2.502 µs |
-| memx_memset_basic       |    1.470 µs |    3.028 µs |    1.461 µs |    3.146 µs |
-| memx_memset_sse2        |    1.123 µs |    2.376 µs |    1.127 µs |    2.502 µs |
+| std_memset              |    1.512 µs |    3.460 µs |    1.476 µs |    3.341 µs |
+| libc_memset             |    1.454 µs |    3.413 µs |    1.453 µs |    3.292 µs |
+| memx_memset             |    1.323 µs |    2.611 µs |    1.320 µs |    2.717 µs |
+| memx_memset_basic       |    1.479 µs |    3.056 µs |    1.491 µs |    3.193 µs |
+| memx_memset_sse2        |    1.147 µs |    2.431 µs |    1.147 µs |    2.559 µs |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.188 µs |    2.589 µs |    2.383 µs |    4.315 µs |
-| libc_memset             |    1.185 µs |    2.573 µs |    2.269 µs |    4.178 µs |
-| memx_memset             |    1.172 µs |    2.398 µs |    1.126 µs |    2.340 µs |
-| memx_memset_basic       |    3.163 µs |    5.693 µs |    3.102 µs |    5.577 µs |
-| memx_memset_sse2        |    1.171 µs |    2.397 µs |    1.098 µs |    2.325 µs |
+| std_memset              |    1.202 µs |    2.648 µs |    2.446 µs |    4.453 µs |
+| libc_memset             |    1.211 µs |    2.624 µs |    2.309 µs |    4.262 µs |
+| memx_memset             |    1.499 µs |    2.854 µs |    1.472 µs |    2.768 µs |
+| memx_memset_basic       |    3.212 µs |    5.804 µs |    3.210 µs |    5.892 µs |
+| memx_memset_sse2        |    1.189 µs |    2.525 µs |    1.143 µs |    2.381 µs |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memset              |    1.188 µs |    2.525 µs |    2.405 µs |    4.397 µs |
-| libc_memset             |    1.185 µs |    2.555 µs |    2.269 µs |    4.171 µs |
-| memx_memset             |    2.745 µs |    5.188 µs |    2.807 µs |    5.328 µs |
-| memx_memset_basic       |    2.718 µs |    5.110 µs |    2.769 µs |    5.309 µs |
+| std_memset              |    1.187 µs |    2.576 µs |    2.447 µs |    4.461 µs |
+| libc_memset             |    1.203 µs |    2.540 µs |    2.301 µs |    4.237 µs |
+| memx_memset             |    2.729 µs |    5.222 µs |    2.822 µs |    5.334 µs |
+| memx_memset_basic       |    2.788 µs |    5.281 µs |    2.826 µs |    5.290 µs |
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
 

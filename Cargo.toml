@@ -11,11 +11,12 @@ readme = "README.md"
 repository = "https://github.com/aki-akaguma/memx"
 
 [features]
-default = ["std"]
-std = []
+default = []
 
 [dependencies]
-cpufeatures = "0.2.5"
+
+[target.'cfg(any(target_arch = "aarch64", target_arch = "x86_64", target_arch = "x86"))'.dependencies]
+cpufeatures = "0.2"
 
 [dev-dependencies]
 rustversion = "1.0"
