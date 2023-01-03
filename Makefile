@@ -44,7 +44,9 @@ target/stamp/stamp.bench.$(1).armv7:
 endef
 
 
-all: README.md
+all: readme
+
+readme: README.md
 
 README.md: src/lib.rs
 	cargo readme > $@

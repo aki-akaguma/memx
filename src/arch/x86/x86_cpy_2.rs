@@ -1,9 +1,21 @@
 use crate::mem as basic;
 use crate::RangeError;
 
+use super::{ cpuid_avx, cpuid_sse2 };
+
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx::get() {
+        unsafe { _memcpy_avx(dst, src) }
+    } else if cpuid_sse2::get() {
+        unsafe { _memcpy_sse2(dst, src) }
+    } else {
+        _memcpy_basic(dst, src)
+    }
+    /*
     #[cfg(target_feature = "avx")]
     let r = unsafe { _memcpy_avx(dst, src) };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
@@ -11,6 +23,7 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     #[cfg(not(any(target_feature = "sse2", target_feature = "avx")))]
     let r = _memcpy_basic(dst, src);
     r
+    */
 }
 
 fn _memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {

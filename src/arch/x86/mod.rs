@@ -1,3 +1,6 @@
+cpufeatures::new!(cpuid_avx, "avx");
+cpufeatures::new!(cpuid_sse2, "sse2");
+
 mod x86_chr;
 
 #[cfg(all(

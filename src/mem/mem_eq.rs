@@ -24,10 +24,10 @@ macro_rules! _unroll_one_eq_16 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aac = unsafe {
-            crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(aa_ptr, 16))
+            crate::utils::_read_a_native_endian_u128(core::slice::from_raw_parts(aa_ptr, 16))
         };
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u128(std::slice::from_raw_parts(bb_ptr, 16))
+            crate::utils::_read_a_native_endian_u128(core::slice::from_raw_parts(bb_ptr, 16))
         };
         if aac != bbc {
             return false;
@@ -41,10 +41,10 @@ macro_rules! _unroll_one_eq_8 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aac = unsafe {
-            crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(aa_ptr, 8))
+            crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(aa_ptr, 8))
         };
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u64(std::slice::from_raw_parts(bb_ptr, 8))
+            crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(bb_ptr, 8))
         };
         if aac != bbc {
             return false;
@@ -58,10 +58,10 @@ macro_rules! _unroll_one_eq_4 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aac = unsafe {
-            crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(aa_ptr, 4))
+            crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(aa_ptr, 4))
         };
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u32(std::slice::from_raw_parts(bb_ptr, 4))
+            crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(bb_ptr, 4))
         };
         if aac != bbc {
             return false;
@@ -75,10 +75,10 @@ macro_rules! _unroll_one_eq_2 {
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
         let aac = unsafe {
-            crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(aa_ptr, 2))
+            crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(aa_ptr, 2))
         };
         let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u16(std::slice::from_raw_parts(bb_ptr, 2))
+            crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(bb_ptr, 2))
         };
         if aac != bbc {
             return false;

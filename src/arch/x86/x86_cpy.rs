@@ -17,9 +17,21 @@ use mmx::_mm256_storeu_si256;
 use mmx::_mm256_loadu_si256;
 */
 
+use super::{cpuid_avx, cpuid_sse2};
+
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx::get() {
+        unsafe { _memcpy_avx(dst, src) }
+    } else if cpuid_sse2::get() {
+        unsafe { _memcpy_sse2(dst, src) }
+    } else {
+        _memcpy_basic(dst, src)
+    }
+    /*
     #[cfg(target_feature = "avx")]
     let r = unsafe { _memcpy_avx(dst, src) };
     #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
@@ -27,6 +39,7 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     #[cfg(not(any(target_feature = "sse2", target_feature = "avx")))]
     let r = _memcpy_basic(dst, src);
     r
+    */
 }
 
 fn _memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
@@ -501,30 +514,11 @@ fn _copy_8_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let b_ptr = src_ptr as *const u64;
     unsafe { *a_ptr = *b_ptr };
     */
-    let a_ptr = dst_ptr as *mut u8;
-    let b_ptr = src_ptr as *const u8;
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
+    let aaa_ptr = dst_ptr as *mut u64;
+    let bbc = unsafe {
+        crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(src_ptr, 8))
+    };
+    unsafe { aaa_ptr.write_unaligned(bbc) };
 }
 
 #[inline(always)]
@@ -534,26 +528,11 @@ fn _copy_4_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let b_ptr = src_ptr as *const u32;
     unsafe { *a_ptr = *b_ptr };
     */
-    /*
-    let a_ptr = dst_ptr as *mut u16;
-    let b_ptr = src_ptr as *const u16;
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    */
-    let a_ptr = dst_ptr as *mut u8;
-    let b_ptr = src_ptr as *const u8;
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
+    let aaa_ptr = dst_ptr as *mut u32;
+    let bbc = unsafe {
+        crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(src_ptr, 4))
+    };
+    unsafe { aaa_ptr.write_unaligned(bbc) };
 }
 
 #[inline(always)]
@@ -562,13 +541,12 @@ fn _copy_2_bytes(dst_ptr: *mut u8, src_ptr: *const u8) {
     let a_ptr = dst_ptr as *mut u16;
     let b_ptr = src_ptr as *const u16;
     unsafe { *a_ptr = *b_ptr };
-     */
-    let a_ptr = dst_ptr as *mut u8;
-    let b_ptr = src_ptr as *const u8;
-    unsafe { *a_ptr = *b_ptr };
-    let a_ptr = unsafe { a_ptr.add(1) };
-    let b_ptr = unsafe { b_ptr.add(1) };
-    unsafe { *a_ptr = *b_ptr };
+    */
+    let aaa_ptr = dst_ptr as *mut u16;
+    let bbc = unsafe {
+        crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(src_ptr, 2))
+    };
+    unsafe { aaa_ptr.write_unaligned(bbc) };
 }
 
 #[inline(always)]

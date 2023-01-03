@@ -16,22 +16,22 @@ memmem(), memcpy(), memset().
 - [x] Support more fast routine on x86_64
 - [x] Support #!\[no_std\]
 
-# Support status of miri :: rustc 1.68.0-nightly (9c07efe84 2022-12-16)
+# Support status of miri :: rustc 1.68.0-nightly (77429957a 2023-01-01)
 
 Ok lists:
 
+- cargo miri test --target=x86_64-unknown-linux-gnu
+- cargo miri test --target=i686-unknown-linux-gnu
 - cargo miri test --target=i586-unknown-linux-gnu
 - cargo miri test --target=aarch64-unknown-linux-gnu
 - cargo miri test --target=armv7-unknown-linux-gnueabihf
 
 Failed lists:
 
-- cargo miri test --target=x86_64-unknown-linux-gnu
-- cargo miri test --target=i686-unknown-linux-gnu
-
-miri error: `unsupported operation: can't call foreign function: llvm.x86.sse2.storeu.dq`
+- nothing
 
 */
+#![no_std]
 use core::cmp::Ordering;
 
 pub mod arch;
@@ -264,7 +264,7 @@ pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
 #[inline(always)]
 pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
 where
-    T: std::ops::Div<Output = T> + std::ops::Mul<Output = T> + From<u8>,
+    T: core::ops::Div<Output = T> + core::ops::Mul<Output = T> + From<u8>,
 {
     /*
     // a hight bit propagation: bits: 0b_1000_0000
