@@ -338,11 +338,7 @@ fn _rnechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<us
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0x8080_8080_8080_8080_8080_8080_8080_8080_u128 {
         let bits = propagate_a_high_bit(bits);
-        Some(
-            plus_offset_from(buf_ptr, start_ptr) + 16
-                - 1
-                - ((bits as u128).leading_ones() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
         None
     }
@@ -363,11 +359,7 @@ fn _rnechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0x8080_8080_8080_8080_u64 {
         let bits = propagate_a_high_bit(bits);
-        Some(
-            plus_offset_from(buf_ptr, start_ptr) + 8
-                - 1
-                - ((bits as u64).leading_ones() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
         None
     }
@@ -388,11 +380,7 @@ fn _rnechr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0x8080_8080_u32 {
         let bits = propagate_a_high_bit(bits);
-        Some(
-            plus_offset_from(buf_ptr, start_ptr) + 4
-                - 1
-                - ((bits as u32).leading_ones() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
         None
     }
@@ -413,11 +401,7 @@ fn _rnechr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0x8080_u16 {
         let bits = propagate_a_high_bit(bits);
-        Some(
-            plus_offset_from(buf_ptr, start_ptr) + 2
-                - 1
-                - ((bits as u16).leading_ones() / 8) as usize,
-        )
+        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
         None
     }

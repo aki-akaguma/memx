@@ -20,11 +20,11 @@ memmem(), memcpy(), memset().
 
 Ok lists:
 
-- cargo miri test --target=x86_64-unknown-linux-gnu
-- cargo miri test --target=i686-unknown-linux-gnu
-- cargo miri test --target=i586-unknown-linux-gnu
-- cargo miri test --target=aarch64-unknown-linux-gnu
-- cargo miri test --target=armv7-unknown-linux-gnueabihf
+- cargo +nightly miri test --target=x86_64-unknown-linux-gnu
+- cargo +nightly miri test --target=i686-unknown-linux-gnu
+- cargo +nightly miri test --target=i586-unknown-linux-gnu
+- cargo +nightly miri test --target=aarch64-unknown-linux-gnu
+- cargo +nightly miri test --target=armv7-unknown-linux-gnueabihf
 
 Failed lists:
 
@@ -161,6 +161,7 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
         not(any(target_feature = "sse2", target_feature = "avx"))
     ))]
     let r = mem::_memcmp_impl(a, b);
+    r
     */
     //
     mem::_memcmp_impl(a, b)

@@ -42,7 +42,7 @@ fn _align_unroll_one_4(a_ptr: *mut u8, cc: u64, offset: usize) {
 
 fn _align_unroll_one_8(a_ptr: *mut u8, cc: u64, offset: usize) {
     let aa_ptr = unsafe { a_ptr.add(offset) } as *mut u64;
-    unsafe { *aa_ptr = cc as u64 };
+    unsafe { *aa_ptr = cc };
 }
 
 #[inline(always)]
@@ -342,7 +342,7 @@ pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *const u8, cc: u64, end_p
     {
         let loop_size = 8;
         if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
-            let cc: u64 = cc as u64;
+            let cc: u64 = cc;
             let aa_ptr = a_ptr as *mut u64;
             unsafe { aa_ptr.write_unaligned(cc) };
             //
