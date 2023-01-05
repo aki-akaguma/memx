@@ -242,7 +242,7 @@ unsafe fn _check_c32_uu(
     let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
     let mask = _mm256_movemask_epi8(mm_eq) as u32;
     if mask != 0xFFFF_FFFF_u32 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 32 - 1 - (mask as u32).leading_ones() as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 32 - 1 - mask.leading_ones() as usize)
     } else {
         None
     }

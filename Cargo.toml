@@ -29,3 +29,6 @@ members = [
     "xtask",
     "xbench",
 ]
+
+[profile.release]
+lto = true

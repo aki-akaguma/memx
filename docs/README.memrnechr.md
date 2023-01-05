@@ -1,32 +1,34 @@
 ## Benchmark results
 
-- compile by rustc 1.65.0 (897e37553 2022-11-02)
+- compile by rustc 1.66.0 (69f9c33d7 2022-12-12)
 
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |  444.090 µs |  258.030 µs |  438.810 µs |  258.610 µs |
-| memx_memrnechr          |  383.280 µs |  167.690 µs |  382.140 µs |  166.870 µs |
-| memx_memrnechr_basic    |  366.170 µs |  189.560 µs |  363.230 µs |  189.090 µs |
-| memx_memrnechr_sse2     |  341.850 µs |  154.350 µs |  341.900 µs |  153.500 µs |
+| std_memrnechr           |  428.330 µs |  257.680 µs |  419.190 µs |  250.830 µs |
+| memx_memrnechr          |  331.020 µs |  155.300 µs |  326.310 µs |  155.960 µs |
+| memx_memrnechr_basic    |  323.300 µs |  173.000 µs |  320.020 µs |  174.470 µs |
+| memx_memrnechr_sse2     |  318.960 µs |  148.870 µs |  316.290 µs |  149.410 µs |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |  498.460 µs |  265.180 µs |  521.930 µs |  271.510 µs |
-| memx_memrnechr          |  533.600 µs |  220.110 µs |  575.730 µs |  228.930 µs |
-| memx_memrnechr_basic    |  478.920 µs |  233.640 µs |  526.290 µs |  241.950 µs |
-| memx_memrnechr_sse2     |  437.330 µs |  188.500 µs |  481.390 µs |  197.940 µs |
+| std_memrnechr           |  397.440 µs |  228.810 µs |  403.330 µs |  229.440 µs |
+| memx_memrnechr          |  334.010 µs |  154.620 µs |  363.040 µs |  163.750 µs |
+| memx_memrnechr_basic    |  306.350 µs |  169.230 µs |  311.060 µs |  174.180 µs |
+| memx_memrnechr_sse2     |  322.170 µs |  147.510 µs |  330.710 µs |  154.040 µs |
+
+- compile by rustc 1.65.0 (897e37553 2022-11-02)
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |  397.650 µs |  254.500 µs |  409.730 µs |  255.440 µs |
-| memx_memrnechr          |  366.040 µs |  210.470 µs |  392.650 µs |  220.140 µs |
-| memx_memrnechr_basic    |  365.710 µs |  211.350 µs |  391.870 µs |  220.810 µs |
+| std_memrnechr           |  366.170 µs |  243.150 µs |  376.460 µs |  239.600 µs |
+| memx_memrnechr          |  257.810 µs |  165.470 µs |  267.750 µs |  173.470 µs |
+| memx_memrnechr_basic    |  256.890 µs |  166.650 µs |  268.220 µs |  173.360 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
