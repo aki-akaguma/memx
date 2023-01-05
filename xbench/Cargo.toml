@@ -8,7 +8,7 @@ edition = "2021"
 [dev-dependencies]
 memx = { path=".." }
 criterion = "0.4"
-memchr = "2.4"
+memchr = "2.5"
 clf = "0.1"
 
 [[bench]]
