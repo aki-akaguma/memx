@@ -1,3 +1,13 @@
+rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \
+	1.64.0 1.65.0 1.66.0
+target_base_vers = x86_64-unknown-linux-gnu i586-unknown-linux-gnu
+
+define test-rustc-templ =
+target/stamp/stamp.test-rustc.$(1).$(2):
+	@mkdir -p target/stamp
+	cargo +$(1) test --target=$(2)
+	@touch target/stamp/stamp.test-rustc.$(1).$(2)
+endef
 
 bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
 #bench_nms = bench-memrnechr
@@ -59,6 +69,13 @@ test-no_std:
 
 clean:
 	@rm -fr target
+
+test-all-version: $(foreach ver,$(rustc_vers),$(foreach tb,$(target_base_vers),target/stamp/stamp.test-rustc.$(ver).$(tb)))
+
+test-clean:
+	@rm -fr target/stamp
+
+$(foreach ver,$(rustc_vers),$(eval $(foreach tb,$(target_base_vers),$(eval $(call test-rustc-templ,$(ver),$(tb))))))
 
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.build.$(bnm).$(tbm)))
