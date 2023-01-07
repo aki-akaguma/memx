@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * rust-version = "1.56.0" into Cargo.toml
 * `all-test-version` target into Makefile
 * rust-version = "1.57.0" into xbench/Cargo.toml
+* badges into README.tpl
 
 ### Changed
 * update README.md
 * change clean target of Makefile
+
 
 ## [0.1.23] (2023-01-05)
 ### Added

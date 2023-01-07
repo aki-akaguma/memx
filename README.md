@@ -1,5 +1,10 @@
 # memx
 
+[![crate][crate-image]][crate-link]
+[![Docs][docs-image]][docs-link]
+![Rust Version][rustc-image]
+![Apache2/MIT licensed][license-image]
+
 `memx` minics libc.
 
 This crate is implemented memory functions like libc memcmp(), memchr(),
@@ -55,3 +60,12 @@ This project is licensed under either of
    https://opensource.org/licenses/MIT)
 
 at your option.
+
+[//]: # (badges)
+
+[crate-image]: https://img.shields.io/crates/v/memx.svg
+[crate-link]: https://crates.io/crates/memx
+[docs-image]: https://docs.rs/memx/badge.svg
+[docs-link]: https://docs.rs/memx/
+[rustc-image]: https://img.shields.io/badge/rustc-1.56+-blue.svg
+[license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
