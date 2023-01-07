@@ -68,7 +68,8 @@ test-no_std:
 	cargo test --no-default-features
 
 clean:
-	@rm -fr target
+	@cargo clean
+	@rm -f z.*
 
 test-all-version: $(foreach ver,$(rustc_vers),$(foreach tb,$(target_base_vers),target/stamp/stamp.test-rustc.$(ver).$(tb)))
 

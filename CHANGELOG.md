@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * update README.md
+* change clean target of Makefile
 
 ## [0.1.23] (2023-01-05)
 ### Added
