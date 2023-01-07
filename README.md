@@ -21,11 +21,11 @@ memmem(), memcpy(), memset().
 
 Ok lists:
 
-- cargo miri test --target=x86_64-unknown-linux-gnu
-- cargo miri test --target=i686-unknown-linux-gnu
-- cargo miri test --target=i586-unknown-linux-gnu
-- cargo miri test --target=aarch64-unknown-linux-gnu
-- cargo miri test --target=armv7-unknown-linux-gnueabihf
+- cargo +nightly miri test --target=x86_64-unknown-linux-gnu
+- cargo +nightly miri test --target=i686-unknown-linux-gnu
+- cargo +nightly miri test --target=i586-unknown-linux-gnu
+- cargo +nightly miri test --target=aarch64-unknown-linux-gnu
+- cargo +nightly miri test --target=armv7-unknown-linux-gnueabihf
 
 Failed lists:
 
