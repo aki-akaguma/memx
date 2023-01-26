@@ -105,9 +105,9 @@ pub unsafe fn _memcmp_sse2(a: &[u8], b: &[u8]) -> Ordering {
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[target_feature(enable = "avx")]
+#[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memcmp_avx(a: &[u8], b: &[u8]) -> Ordering {
+pub unsafe fn _memcmp_avx2(a: &[u8], b: &[u8]) -> Ordering {
     _memcmp_sse2_impl(a, b)
 }
 

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Makefile: rustc version `1.66.0` to `1.66.1`
 * clippy: `redundant\_clone`, `bool\_assert\_comparison`, `manual\_find`
 * clippy: `needless\_borrow`
+* bug: `signal: 4, SIGILL: illegal instruction`, `\_mm256\_cmpeq\_epi8()` requires `AVX2` instead of `AVX`
 
 
 ## [0.1.24] (2023-01-10)

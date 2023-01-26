@@ -19,15 +19,15 @@ use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
-use super::{cpuid_avx, cpuid_sse2};
+use super::{cpuid_avx2, cpuid_sse2};
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub(crate) fn _memchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx::get() {
-        unsafe { _memchr_double_avx(buf, c1, c2) }
+    if cpuid_avx2::get() {
+        unsafe { _memchr_double_avx2(buf, c1, c2) }
     } else if cpuid_sse2::get() {
         unsafe { _memchr_double_sse2(buf, c1, c2) }
     } else {
@@ -170,9 +170,9 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[target_feature(enable = "avx")]
+#[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memchr_double_avx(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub unsafe fn _memchr_double_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     _memchr_double_sse2_impl(buf, c1, c2)
 }
 /*

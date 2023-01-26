@@ -15,15 +15,15 @@ use mmx::_mm256_set1_epi8;
 use mmx::_mm256_store_si256;
 use mmx::_mm256_storeu_si256;
 
-use super::{cpuid_avx, cpuid_sse2};
+use super::{cpuid_avx2, cpuid_sse2};
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memset_impl(buf: &mut [u8], c: u8) {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx::get() {
-        unsafe { _memset_avx(buf, c) };
+    if cpuid_avx2::get() {
+        unsafe { _memset_avx2(buf, c) };
     } else if cpuid_sse2::get() {
         unsafe { _memset_sse2(buf, c) };
     } else {
@@ -51,10 +51,10 @@ pub unsafe fn _memset_sse2(buf: &mut [u8], c: u8) {
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[target_feature(enable = "avx")]
+#[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memset_avx(buf: &mut [u8], c: u8) {
-    _memset_avx_impl(buf, c)
+pub unsafe fn _memset_avx2(buf: &mut [u8], c: u8) {
+    _memset_avx2_impl(buf, c)
 }
 
 #[inline(always)]
@@ -105,7 +105,7 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
 }
 
 #[inline(always)]
-fn _memset_avx_impl(buf: &mut [u8], c: u8) {
+fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
     if buf_len == 0 {
         return;
