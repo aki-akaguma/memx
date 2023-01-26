@@ -11,11 +11,11 @@ mod test_memx_memeq {
         let pat_2 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'0'];
         //
         let r = test_memeq(&buf_0[0..(buf_0.len() - 1)], &pat_1[0..(pat_1.len() - 1)]);
-        assert_eq!(r, true);
+        assert!(r);
         let r = test_memeq(&buf_0, &pat_1);
-        assert_eq!(r, false);
+        assert!(!r);
         let r = test_memeq(&buf_0, &pat_2);
-        assert_eq!(r, false);
+        assert!(!r);
     }
     #[test]
     fn test02() {
@@ -31,33 +31,33 @@ mod test_memx_memeq {
             let mut pat = buf_1.clone();
             pat.push(b'5');
             let r = test_memeq(&buf, &pat);
-            assert_eq!(r, true);
+            assert!(r);
             //
             let mut buf = buf_1.clone();
             buf.push(b'5');
             let mut pat = buf_1.clone();
             pat.push(b'9');
             let r = test_memeq(&buf, &pat);
-            assert_eq!(r, false);
+            assert!(!r);
             //
             let mut buf = buf_1.clone();
             buf.push(b'5');
             let mut pat = buf_1.clone();
             pat.push(b'0');
             let r = test_memeq(&buf, &pat);
-            assert_eq!(r, false);
+            assert!(!r);
             //
             let buf = buf_1.clone();
             let mut pat = buf_1.clone();
             pat.push(b'0');
             let r = test_memeq(&buf, &pat);
-            assert_eq!(r, false);
+            assert!(!r);
             //
             let mut buf = buf_1.clone();
             buf.push(b'5');
             let pat = buf_1.clone();
             let r = test_memeq(&buf, &pat);
-            assert_eq!(r, false);
+            assert!(!r);
         }
     }
 }
