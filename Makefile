@@ -1,5 +1,5 @@
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \
-	1.64.0 1.65.0 1.66.0
+	1.64.0 1.65.0 1.66.1
 target_base_vers = x86_64-unknown-linux-gnu i586-unknown-linux-gnu
 
 define test-rustc-templ =
