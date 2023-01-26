@@ -1,0 +1,59 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RUSTFLAGS: -Dwarnings
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test rust ${{matrix.rust}} on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [beta, stable, 1.56.0]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{matrix.rust}}
+          components: rust-src
+      - run: cargo test
+
+  build:
+    name: Build rust ${{matrix.rust}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [1.58.1]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust}}
+          components: rust-src
+      - run: cargo check
+
+  clippy:
+    name: Clippy rust beta
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@beta
+        with:
+          components: clippy, rust-src
+      - run: cargo clippy --tests

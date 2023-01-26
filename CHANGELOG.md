@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] *
+### Added
+* `.github/workflows/test.yml`
+* test status badges into `README.tpl`
+
 ### Fixed
 * Makefile: rustc version `1.66.0` to `1.66.1`
 * clippy: `redundant\_clone`, `bool\_assert\_comparison`, `manual\_find`

@@ -4,6 +4,7 @@
 [![Docs][docs-image]][docs-link]
 ![Rust Version][rustc-image]
 ![Apache2/MIT licensed][license-image]
+[![Test][test-image]][test-link]
 
 {{readme}}
 
@@ -39,3 +40,5 @@ at your option.
 [docs-link]: https://docs.rs/{{crate}}/
 [rustc-image]: https://img.shields.io/badge/rustc-1.56+-blue.svg
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
+[test-image]: https://github.com/aki-akaguma/{{crate}}/actions/workflows/test.yml/badge.svg
+[test-link]: https://github.com/aki-akaguma/{{crate}}/actions/workflows/test.yml
