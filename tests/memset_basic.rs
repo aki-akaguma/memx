@@ -5,14 +5,13 @@ mod test_memx_memset_basic {
     //
     #[test]
     fn test01() {
-        let dst = vec![b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0'];
+        let mut dst = vec![b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0'];
         let src = vec![b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A'];
         //
-        let mut dst2 = dst.clone();
-        let dst_sl = dst2.as_mut_slice();
+        let dst_sl = dst.as_mut_slice();
         //
         test_memset(&mut dst_sl[0..3], src[0]);
-        assert_eq!(&dst2[0..3], &src[0..3]);
+        assert_eq!(&dst[0..3], &src[0..3]);
     }
     #[test]
     fn test02() {

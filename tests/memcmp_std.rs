@@ -2,7 +2,7 @@ mod test_std_memcmp {
     use std::cmp::Ordering;
     //
     fn test_memcmp(buf: &[u8], pat_bytes: &[u8]) -> Ordering {
-        buf.cmp(&pat_bytes)
+        buf.cmp(pat_bytes)
     }
     //
     #[test]

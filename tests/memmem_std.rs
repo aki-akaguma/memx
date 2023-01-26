@@ -3,12 +3,7 @@ mod test_std_memmem {
         if buf.len() < pat_bytes.len() {
             return None;
         }
-        for i in 0..=(buf.len() - pat_bytes.len()) {
-            if &buf[i..(i + pat_bytes.len())] == pat_bytes {
-                return Some(i);
-            }
-        }
-        None
+        (0..=(buf.len() - pat_bytes.len())).find(|&i| &buf[i..(i + pat_bytes.len())] == pat_bytes)
     }
     //
     #[test]

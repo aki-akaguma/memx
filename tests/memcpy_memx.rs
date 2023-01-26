@@ -1,20 +1,19 @@
 mod test_memx_memcpy {
     fn test_memcpy(dst: &mut [u8], src: &[u8]) {
         let r = memx::memcpy(dst, src);
-        assert_eq!(r.is_ok(), true);
+        assert!(r.is_ok());
     }
     //
     #[test]
     fn test01() {
-        let dst = vec![b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0'];
+        let mut dst = vec![b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0'];
         let src = vec![b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'0'];
         //
-        let mut dst2 = dst.clone();
-        let dst_sl = dst2.as_mut_slice();
+        let dst_sl = dst.as_mut_slice();
         let src_sl = src.as_slice();
         //
         test_memcpy(dst_sl, &src_sl[0..3]);
-        assert_eq!(&dst2[0..3], &src[0..3]);
+        assert_eq!(&dst[0..3], &src[0..3]);
     }
     #[test]
     fn test02() {
