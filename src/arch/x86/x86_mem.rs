@@ -1,14 +1,14 @@
 use crate::mem as basic;
 
-#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
-use super::cpuid_avx;
+#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+use super::cpuid_avx2;
 
 #[inline(always)]
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(any(target_feature = "sse2", target_feature = "avx"))]
-    let r = unsafe { _memmem_sse2_avx(haystack, needle) };
-    #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+    let r = unsafe { _memmem_sse2_avx2(haystack, needle) };
+    #[cfg(not(any(target_feature = "avx2", target_feature = "sse2")))]
     let r = _memmem_basic(haystack, needle);
     r
 }
@@ -18,15 +18,15 @@ fn _memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
+#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memmem_sse2_avx(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    _memmem_sse2_avx_impl(haystack, needle)
+pub unsafe fn _memmem_sse2_avx2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    _memmem_sse2_avx2_impl(haystack, needle)
 }
 
-#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
+#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
 #[inline(always)]
-fn _memmem_sse2_avx_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+fn _memmem_sse2_avx2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
     let nee_len = needle.len();
     if hay_len < nee_len {
@@ -42,20 +42,20 @@ fn _memmem_sse2_avx_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         let weight_1st = crate::_ASCII_STOCHAS[byte_1st as usize];
         let weight_last = crate::_ASCII_STOCHAS[byte_last as usize];
         if weight_1st <= weight_last {
-            _memmem_sse2_avx_impl_1st(haystack, needle)
+            _memmem_sse2_avx2_impl_1st(haystack, needle)
         } else {
-            _memmem_sse2_avx_impl_last(haystack, needle)
+            _memmem_sse2_avx2_impl_last(haystack, needle)
         }
     } else if byte_last.is_ascii() {
-        _memmem_sse2_avx_impl_1st(haystack, needle)
+        _memmem_sse2_avx2_impl_1st(haystack, needle)
     } else {
-        _memmem_sse2_avx_impl_last(haystack, needle)
+        _memmem_sse2_avx2_impl_last(haystack, needle)
     }
 }
 
-#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
+#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
 #[inline(always)]
-fn _memmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+fn _memmem_sse2_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
     let nee_len = needle.len();
     let nee_1st_byte = needle[0];
@@ -63,8 +63,8 @@ fn _memmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx < hay_len {
         // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
         // after stabilization
-        let r = if cpuid_avx::get() {
-            unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_1st_byte) }
+        let r = if cpuid_avx2::get() {
+            unsafe { super::_memchr_avx2(&haystack[curr_idx..], nee_1st_byte) }
         } else {
             unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_1st_byte) }
         };
@@ -91,9 +91,9 @@ fn _memmem_sse2_avx_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     None
 }
 
-#[cfg(any(target_feature = "sse2", target_feature = "avx"))]
+#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
 #[inline(always)]
-fn _memmem_sse2_avx_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+fn _memmem_sse2_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
     let nee_len = needle.len();
     let nee_last_idx = nee_len - 1;
@@ -102,8 +102,8 @@ fn _memmem_sse2_avx_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx < hay_len {
         // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
         // after stabilization
-        let r = if cpuid_avx::get() {
-            unsafe { super::_memchr_avx(&haystack[curr_idx..], nee_last_byte) }
+        let r = if cpuid_avx2::get() {
+            unsafe { super::_memchr_avx2(&haystack[curr_idx..], nee_last_byte) }
         } else {
             unsafe { super::_memchr_sse2(&haystack[curr_idx..], nee_last_byte) }
         };

@@ -31,7 +31,7 @@ Failed lists:
 - nothing
 
 */
-#![no_std]
+//#![no_std]
 use core::cmp::Ordering;
 
 pub mod arch;
@@ -47,13 +47,13 @@ pub struct RangeError;
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memchr_impl(buf, c);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memchr_impl(buf, c);
     //
@@ -64,13 +64,13 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
 pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memrchr_impl(buf, c);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memrchr_impl(buf, c);
     //
@@ -81,13 +81,13 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
 pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memnechr_impl(buf, c);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memnechr_impl(buf, c);
     //
@@ -98,13 +98,13 @@ pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
 pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memrnechr_impl(buf, c);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memrnechr_impl(buf, c);
     //
@@ -115,13 +115,13 @@ pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
 pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memchr_double_impl(buf, c1, c2);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memchr_double_impl(buf, c1, c2);
     //
@@ -132,13 +132,13 @@ pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memrchr_double_impl(buf, c1, c2);
     //
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memrchr_double_impl(buf, c1, c2);
     //
@@ -180,12 +180,12 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memmem_impl(haystack, needle);
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memmem_impl(haystack, needle);
     //
@@ -200,12 +200,12 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memrmem_impl(haystack, needle);
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memrmem_impl(haystack, needle);
     //
@@ -220,12 +220,12 @@ pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     let r = arch::x86::_memcpy_impl(dst, src);
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     let r = mem::_memcpy_impl(dst, src);
     //
@@ -238,12 +238,12 @@ pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 pub fn memset(buf: &mut [u8], c: u8) {
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
+        any(target_feature = "sse2", target_feature = "avx2")
     ))]
     arch::x86::_memset_impl(buf, c);
     #[cfg(any(
         not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
+        not(any(target_feature = "sse2", target_feature = "avx2"))
     ))]
     mem::_memset_impl(buf, c);
 }
