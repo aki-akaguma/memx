@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `.github/workflows/test-windows.yml`
 * test status badges into `README.tpl`
 
+### Changed
+* refactored `Makefile`
+
 ### Removed
 * `COPYING`
 
