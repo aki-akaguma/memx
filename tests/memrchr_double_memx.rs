@@ -14,7 +14,7 @@ mod test_memx_memrchr_double {
     fn test02() {
         let buf_g = vec![b'G'];
         let buf_0 = vec![0_u8];
-        for x in 0..600 {
+        let f = |x: usize| {
             let buf = {
                 let mut buf: Vec<u8> = buf_g.clone();
                 buf.append(&mut buf_0.repeat(x));
@@ -25,6 +25,15 @@ mod test_memx_memrchr_double {
             //
             let r = test_memchr_double(&buf, b'G', b'g');
             assert_eq!(r, Some(1 + x));
+        };
+        if cfg!(miri) {
+            for x in [0, 299, 599].into_iter() {
+                f(x);
+            }
+        } else {
+            for x in 0..600 {
+                f(x);
+            }
         }
     }
 }

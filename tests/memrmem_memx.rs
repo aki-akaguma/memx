@@ -15,7 +15,7 @@ mod test_memx_memrmem {
     fn test02() {
         let buf_0 = vec![0_u8];
         let pat = vec![b'g', b'h', b'j'];
-        for x in 0..600 {
+        let f = |x: usize| {
             let buf = {
                 let mut buf = pat.clone();
                 buf.extend_from_slice(&buf_0.repeat(1 + x));
@@ -25,6 +25,15 @@ mod test_memx_memrmem {
             //
             let r = test_memrmem(&buf, &pat);
             assert_eq!(r, Some(pat.len() + 1 + x));
+        };
+        if cfg!(miri) {
+            for x in [0, 299, 599].into_iter() {
+                f(x);
+            }
+        } else {
+            for x in 0..600 {
+                f(x);
+            }
         }
     }
 }
