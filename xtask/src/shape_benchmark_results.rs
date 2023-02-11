@@ -6,18 +6,18 @@ pub fn run(_program: &str, _args: &[&str]) -> anyhow::Result<()> {
     let mut bench_vec_2 = get_bench("z.bench.ja.1.log")?;
     let mut bench_vec_3 = {
         let r = get_bench("z.musl.bench.en.1.log");
-        if r.is_err() {
-            Vec::new()
+        if let Ok(a) = r {
+            a
         } else {
-            r.unwrap()
+            Vec::new()
         }
     };
     let mut bench_vec_4 = {
         let r = get_bench("z.musl.bench.ja.1.log");
-        if r.is_err() {
-            Vec::new()
+        if let Ok(a) = r {
+            a
         } else {
-            r.unwrap()
+            Vec::new()
         }
     };
     //set_size(&mut bench_vec, "z.size-release.curl.log")?;
@@ -221,7 +221,7 @@ fn get_bench(in_file: &str) -> anyhow::Result<Vec<BenchStr>> {
             // cmp_structopt::curl::   time:   [714991.6559 cycles 715483.2743 cycles 716029.3928 cycles]
             let nm = normalize_name(&caps[1])?;
             let tm = normalize_time(&caps[2], &caps[3])?;
-            let is_cycle = if &caps[3] == "cycles" { true } else { false };
+            let is_cycle = &caps[3] == "cycles";
             let time_1k = if nm.ends_with("^01k") {
                 tm
             } else if nm.ends_with("^08k") {
@@ -235,8 +235,8 @@ fn get_bench(in_file: &str) -> anyhow::Result<Vec<BenchStr>> {
             vec_benchstr.push(BenchStr {
                 name: nm,
                 time: tm,
-                is_cycle: is_cycle,
-                time_1k: time_1k,
+                is_cycle,
+                time_1k,
                 ..BenchStr::default()
             });
         }
