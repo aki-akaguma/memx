@@ -34,7 +34,7 @@ mod test_std_memcmp {
     #[test]
     fn test02() {
         let buf_0 = vec![0_u8];
-        for x in 0..600 {
+        let f = |x: usize| {
             let buf_1 = {
                 let buf: Vec<u8> = buf_0.repeat(1 + x);
                 buf
@@ -69,9 +69,18 @@ mod test_std_memcmp {
             //
             let mut buf = buf_1.clone();
             buf.push(b'5');
-            let pat = buf_1.clone();
+            let pat = buf_1;
             let r = test_memcmp(&buf, &pat);
             assert_eq!(r, Ordering::Greater);
+        };
+        if cfg!(miri) {
+            for x in [0, 299, 599].into_iter() {
+                f(x);
+            }
+        } else {
+            for x in 0..600 {
+                f(x);
+            }
         }
     }
 }

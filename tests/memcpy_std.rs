@@ -18,7 +18,7 @@ mod test_std_memcpy {
     fn test02() {
         let dst_0 = vec![0_u8];
         let src_0 = vec![b'1'];
-        for x in 0..600 {
+        let f = |x: usize| {
             let mut dst: Vec<u8> = dst_0.repeat(1 + x + 16);
             let src: Vec<u8> = src_0.repeat(1 + x);
             //
@@ -32,6 +32,15 @@ mod test_std_memcpy {
             assert_eq!(dst[src_sl.len() + 2], 0);
             assert_eq!(dst[src_sl.len() + 3], 0);
             assert_eq!(dst[src_sl.len() + 4], 0);
+        };
+        if cfg!(miri) {
+            for x in [0, 299, 599].into_iter() {
+                f(x);
+            }
+        } else {
+            for x in 0..600 {
+                f(x);
+            }
         }
     }
 }

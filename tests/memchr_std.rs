@@ -20,7 +20,7 @@ mod test_std_memchr {
     #[test]
     fn test02() {
         let buf_0 = vec![0_u8];
-        for x in 0..600 {
+        let f = |x: usize| {
             let buf = {
                 let mut buf: Vec<u8> = buf_0.repeat(1 + x);
                 buf.push(b'G');
@@ -29,6 +29,15 @@ mod test_std_memchr {
             //
             let r = test_memchr(&buf, b'G');
             assert_eq!(r, Some(1 + x));
+        };
+        if cfg!(miri) {
+            for x in [0, 299, 599].into_iter() {
+                f(x);
+            }
+        } else {
+            for x in 0..600 {
+                f(x);
+            }
         }
     }
 }
