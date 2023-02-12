@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] *
+## [Unreleased]
+
+
+## [0.1.26] (2023-02-12)
 ### Added
 * `.github/workflows/test-ubuntu.yml`
 * `.github/workflows/test-macos.yml`
@@ -22,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 * `LICENSE-APACHE`, `LICENSE-MIT`
 * clippy: `redundant_field_names`, `unnecessary_unwrap`, `needless_bool`
-
 
 ## [0.1.25] (2023-01-28)
 ### Added
