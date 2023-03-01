@@ -6,16 +6,23 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     if a.is_empty() || b.is_empty() {
         return false;
     }
-    #[cfg(target_pointer_width = "128")]
-    let r = _start_eq_128(a, b);
-    #[cfg(target_pointer_width = "64")]
-    let r = _start_eq_64(a, b);
-    #[cfg(target_pointer_width = "32")]
-    let r = _start_eq_32(a, b);
-    #[cfg(target_pointer_width = "16")]
-    let r = _start_eq_16(a, b);
-    //
-    r
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64"))]
+    {
+        _start_eq_128(a, b)
+    }
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64")))]
+    {
+        #[cfg(target_pointer_width = "128")]
+        let r = _start_eq_128(a, b);
+        #[cfg(target_pointer_width = "64")]
+        let r = _start_eq_64(a, b);
+        #[cfg(target_pointer_width = "32")]
+        let r = _start_eq_32(a, b);
+        #[cfg(target_pointer_width = "16")]
+        let r = _start_eq_16(a, b);
+        //
+        r
+    }
 }
 
 macro_rules! _unroll_one_eq_16 {
@@ -99,7 +106,12 @@ macro_rules! _unroll_one_eq_1 {
     }};
 }
 
-#[cfg(target_pointer_width = "128")]
+#[cfg(any(
+    target_pointer_width = "128",
+    target_arch = "x86_64",
+    target_arch = "x86",
+    target_arch = "aarch64"
+))]
 #[inline(always)]
 fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     //
@@ -377,3 +389,38 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     true
 }
 */
+
+#[cfg(test)]
+mod disasm {
+    use super::*;
+    //
+    #[test]
+    fn do_procs() {
+        let a = b"abcdefg".to_vec();
+        let b = b"abcdefg".to_vec();
+        let a = a.as_slice();
+        let b = b.as_slice();
+        assert!(do_proc_basic(a, b));
+        #[cfg(target_pointer_width = "128")]
+        assert!(do_proc_128(a, b));
+        #[cfg(target_pointer_width = "64")]
+        assert!(do_proc_64(a, b));
+        #[cfg(target_pointer_width = "32")]
+        assert!(do_proc_32(a, b));
+    }
+    fn do_proc_basic(a: &[u8], b: &[u8]) -> bool {
+        _memeq_impl(a, b)
+    }
+    #[cfg(target_pointer_width = "128")]
+    fn do_proc_128(a: &[u8], b: &[u8]) -> bool {
+        _start_eq_128(a, b)
+    }
+    #[cfg(target_pointer_width = "64")]
+    fn do_proc_64(a: &[u8], b: &[u8]) -> bool {
+        _start_eq_64(a, b)
+    }
+    #[cfg(target_pointer_width = "32")]
+    fn do_proc_32(a: &[u8], b: &[u8]) -> bool {
+        _start_eq_32(a, b)
+    }
+}
