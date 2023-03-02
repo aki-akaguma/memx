@@ -15,10 +15,26 @@ use mmx::_mm256_set1_epi8;
 use mmx::_mm256_store_si256;
 use mmx::_mm256_storeu_si256;
 
+#[cfg(target_arch = "x86_64")]
+use super::cpuid_avx2;
+
+#[cfg(target_arch = "x86")]
 use super::{cpuid_avx2, cpuid_sse2};
 
 #[inline(always)]
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+#[cfg(target_arch = "x86_64")]
+pub fn _memset_impl(buf: &mut [u8], c: u8) {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx2::get() {
+        unsafe { _memset_avx2(buf, c) };
+    } else {
+        unsafe { _memset_sse2(buf, c) };
+    }
+}
+
+#[inline(always)]
+#[cfg(target_arch = "x86")]
 pub fn _memset_impl(buf: &mut [u8], c: u8) {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
@@ -29,14 +45,6 @@ pub fn _memset_impl(buf: &mut [u8], c: u8) {
     } else {
         _memset_basic(buf, c);
     }
-    /*
-    #[cfg(target_feature = "avx")]
-    unsafe { _memset_avx(buf, c) };
-    #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    unsafe { _memset_sse2(buf, c) };
-    #[cfg(not(any(target_feature = "sse2", target_feature = "avx")))]
-    _memset_basic(buf, c);
-    */
 }
 
 fn _memset_basic(buf: &mut [u8], c: u8) {
@@ -99,7 +107,7 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
             }
         }
     }
-    let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
+    let cc: u128 = c as u128 * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128;
     // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(a_ptr, cc, end_ptr)
 }
@@ -156,7 +164,34 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
             a_ptr = unsafe { a_ptr.add(loop_size) };
         }
     }
-    let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
+    let cc: u128 = c as u128 * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128;
     // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(a_ptr, cc, end_ptr)
+}
+
+#[cfg(test)]
+mod disasm {
+    use super::*;
+    //
+    #[test]
+    fn do_procs() {
+        let mut a = b"abcdefg".to_vec();
+        let a = a.as_mut_slice();
+        let c = b'A';
+        do_proc_basic(a, c);
+        do_proc_sse2(a, c);
+        do_proc_avx2(a, c);
+    }
+    #[inline(never)]
+    fn do_proc_basic(a: &mut [u8], c: u8) {
+        _memset_basic(a, c)
+    }
+    #[inline(never)]
+    fn do_proc_sse2(a: &mut [u8], c: u8) {
+        unsafe { _memset_sse2(a, c) }
+    }
+    #[inline(never)]
+    fn do_proc_avx2(a: &mut [u8], c: u8) {
+        unsafe { _memset_avx2(a, c) }
+    }
 }

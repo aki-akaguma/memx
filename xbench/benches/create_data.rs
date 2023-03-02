@@ -32,7 +32,7 @@ pub fn create_data_cmp() -> (Vec<String>, &'static str, usize, usize, usize) {
     }
 }
 
-pub fn create_data_cpy() -> (Vec<Vec<u8>>, &'static [u8]) {
+pub fn create_data_cpy() -> (Vec<Vec<u8>>, Vec<u8>) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
         "ja.1" => create_data_cpy_ja_1(),
@@ -258,19 +258,26 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 
-pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {
+pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, Vec<u8>) {
+    /*
     let a1 = "aaaaaaaaaaaaaaaaaaaaa"; // 21 bytes
     let a2 = "aaaaaaaaaaaa"; // 12 bytes
     let a3 = "aaaaaaaaaaaaaa,"; // 15 bytes
     let a4 = "aaaaaaaaaaaaaaaaaaaaa"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    //let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    //let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    //let s1 = a1.repeat(100) + a2 + a3.repeat(10).as_str(); // 2262 = 21*100 + 12 + 15*10
+    //let s2 = a4.repeat(100) + a3.repeat(10).as_str(); // 2250 = 21*100 + 15*10
+    */
+    let s1 = "a".repeat(1024);
+    let s2 = "a".repeat(4 * 1024);
 
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 30 {
+        if i > 5 {
             break;
         }
         if i % 2 == 0 {
@@ -279,24 +286,30 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, &'static [u8]) {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    //let match_cnt = 10200;
-    let match_s = "E1234567890123456789012345E".as_bytes(); // 27 bytes
-    (v, match_s)
+    let src_s = "E1234567890123456789012345E".as_bytes(); // 27 bytes
+    (v, src_s.to_vec())
 }
 
-pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, &'static [u8]) {
+pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, Vec<u8>) {
+    /*
     let a1 = "あああああああ"; // 21 bytes
     let a2 = "ああああ"; // 12 bytes
     let a3 = "あああああ"; // 15 bytes
     let a4 = "あああああああ"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    //let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    //let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    //let s1 = a1.repeat(100) + a2 + a3.repeat(10).as_str(); // 2262 = 21*100 + 12 + 15*10
+    //let s2 = a4.repeat(100) + a3.repeat(10).as_str(); // 2250 = 21*100 + 15*10
+    */
+    let s1 = "a".repeat(1024);
+    let s2 = "a".repeat(4 * 1024);
 
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 36 {
+        if i > 5 {
             break;
         }
         if i % 2 == 0 {
@@ -305,9 +318,11 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, &'static [u8]) {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    //let match_cnt = 10170;
-    let match_s = "いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい".as_bytes(); // 99 bytes
-    (v, match_s)
+    //let src_s = "いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい".as_bytes(); // 99 bytes
+    let b1 = "いいいいいいいいいいいいいいいいいいいい"; // 60 bytes
+    let m1 = b1.repeat(16);
+    let src_s = m1.as_bytes();
+    (v, src_s.to_vec())
 }
 
 pub fn create_data_set_en_1() -> Vec<Vec<u8>> {
@@ -315,8 +330,11 @@ pub fn create_data_set_en_1() -> Vec<Vec<u8>> {
     let a2 = "aaaaaaaaaaaa"; // 12 bytes
     let a3 = "aaaaaaaaaaaaaa,"; // 15 bytes
     let a4 = "aaaaaaaaaaaaaaaaaaaaa"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    //let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    //let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    let s1 = a1.repeat(100) + a2 + a3.repeat(10).as_str(); // 2262 = 21*100 + 12 + 15*10
+    let s2 = a4.repeat(100) + a3.repeat(10).as_str(); // 2250 = 21*100 + 15*10
 
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;
@@ -340,8 +358,11 @@ pub fn create_data_set_ja_1() -> Vec<Vec<u8>> {
     let a2 = "ああああ"; // 12 bytes
     let a3 = "あああああ"; // 15 bytes
     let a4 = "あああああああ"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+
+    //let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
+    //let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    let s1 = a1.repeat(100) + a2 + a3.repeat(10).as_str(); // 2262 = 21*100 + 12 + 15*10
+    let s2 = a4.repeat(100) + a3.repeat(10).as_str(); // 2250 = 21*100 + 15*10
 
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;

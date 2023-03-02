@@ -4,6 +4,12 @@ mod barrier;
 use barrier::cache_line_flush;
 use barrier::memory_barrier;
 
+macro_rules! j_bool {
+    ($j: expr) => {
+        $j < 16 || $j % 4 == 0
+    };
+}
+
 #[inline(never)]
 fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     let pat_len = pat_bytes.len();
@@ -11,8 +17,11 @@ fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            line_bytes[j..(j + pat_len)].copy_from_slice(pat_bytes);
+            if j_bool!(j) {
+                line_bytes[j..(j + pat_len)].copy_from_slice(pat_bytes);
+            }
         }
+        line_bytes[(line_len - pat_bytes.len())..].copy_from_slice(pat_bytes);
     }
 }
 
@@ -40,8 +49,11 @@ fn process_libc_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            let _r = _x_libc_memcpy(&mut line_bytes[j..], pat_bytes);
+            if j_bool!(j) {
+                let _r = _x_libc_memcpy(&mut line_bytes[j..], pat_bytes);
+            }
         }
+        let _r = _x_libc_memcpy(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -52,8 +64,11 @@ fn process_memx_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            let _ = memx::memcpy(&mut line_bytes[j..], pat_bytes);
+            if j_bool!(j) {
+                let _ = memx::memcpy(&mut line_bytes[j..], pat_bytes);
+            }
         }
+        let _ = memx::memcpy(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -64,8 +79,11 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            let _ = memx::mem::memcpy_basic(&mut line_bytes[j..], pat_bytes);
+            if j_bool!(j) {
+                let _ = memx::mem::memcpy_basic(&mut line_bytes[j..], pat_bytes);
+            }
         }
+        let _ = memx::mem::memcpy_basic(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -80,8 +98,16 @@ fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &mut texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            let _ = unsafe { memx::arch::x86::_memcpy_sse2(&mut line_bytes[j..], pat_bytes) };
+            if j_bool!(j) {
+                let _ = unsafe { memx::arch::x86::_memcpy_sse2(&mut line_bytes[j..], pat_bytes) };
+            }
         }
+        let _ = unsafe {
+            memx::arch::x86::_memcpy_sse2(
+                &mut line_bytes[(line_len - pat_bytes.len())..],
+                pat_bytes,
+            )
+        };
     }
 }
 
@@ -92,12 +118,11 @@ fn assert_result(texts: &[Vec<u8>], pat_bytes: &[u8]) {
         let line_bytes = &texts[i];
         let line_len = line_bytes.len();
         for j in 0..=(line_len - pat_len) {
-            assert_eq!(line_bytes[j], pat_bytes[0]);
-            assert_eq!(
-                &line_bytes[(line_bytes.len() - pat_bytes.len())..],
-                pat_bytes
-            );
+            if j_bool!(j) {
+                assert_eq!(line_bytes[j], pat_bytes[0]);
+            }
         }
+        assert_eq!(&line_bytes[(line_len - pat_len)..], pat_bytes);
     }
 }
 
@@ -116,23 +141,23 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     {
         let mut v1 = v.clone();
-        process_std_memcpy(black_box(&mut v1), black_box(pat_bytes));
-        assert_result(&v1, pat_bytes);
+        process_std_memcpy(black_box(&mut v1), black_box(&pat_bytes));
+        assert_result(&v1, &pat_bytes);
     }
     {
         let mut v1 = v.clone();
-        process_libc_memcpy(black_box(&mut v1), black_box(pat_bytes));
-        assert_result(&v1, pat_bytes);
+        process_libc_memcpy(black_box(&mut v1), black_box(&pat_bytes));
+        assert_result(&v1, &pat_bytes);
     }
     {
         let mut v1 = v.clone();
-        process_memx_memcpy(black_box(&mut v1), black_box(pat_bytes));
-        assert_result(&v1, pat_bytes);
+        process_memx_memcpy(black_box(&mut v1), black_box(&pat_bytes));
+        assert_result(&v1, &pat_bytes);
     }
     {
         let mut v1 = v.clone();
-        process_memx_memcpy_basic(black_box(&mut v1), black_box(pat_bytes));
-        assert_result(&v1, pat_bytes);
+        process_memx_memcpy_basic(black_box(&mut v1), black_box(&pat_bytes));
+        assert_result(&v1, &pat_bytes);
     }
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
@@ -140,39 +165,39 @@ fn criterion_benchmark(c: &mut Criterion) {
     ))]
     {
         let mut v1 = v.clone();
-        process_memx_memcpy_sse2(black_box(&mut v1), black_box(pat_bytes));
-        assert_result(&v1, pat_bytes);
+        process_memx_memcpy_sse2(black_box(&mut v1), black_box(&pat_bytes));
+        assert_result(&v1, &pat_bytes);
     }
-    cache_flush(&v, pat_bytes);
+    cache_flush(&v, &pat_bytes);
     //
     c.bench_function("std_memcpy", |b| {
         b.iter(|| {
-            process_std_memcpy(black_box(&mut v), black_box(pat_bytes));
+            process_std_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
-    cache_flush(&v, pat_bytes);
+    cache_flush(&v, &pat_bytes);
     c.bench_function("libc_memcpy", |b| {
         b.iter(|| {
-            process_libc_memcpy(black_box(&mut v), black_box(pat_bytes));
+            process_libc_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
-    cache_flush(&v, pat_bytes);
+    cache_flush(&v, &pat_bytes);
     c.bench_function("memx_memcpy", |b| {
         b.iter(|| {
-            process_memx_memcpy(black_box(&mut v), black_box(pat_bytes));
+            process_memx_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
-    cache_flush(&v, pat_bytes);
+    cache_flush(&v, &pat_bytes);
     c.bench_function("memx_memcpy_basic", |b| {
         b.iter(|| {
-            process_memx_memcpy_basic(black_box(&mut v), black_box(pat_bytes));
+            process_memx_memcpy_basic(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
-    cache_flush(&v, pat_bytes);
+    cache_flush(&v, &pat_bytes);
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "x86"),
         target_feature = "sse2"
@@ -180,7 +205,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     {
         c.bench_function("memx_memcpy_sse2", |b| {
             b.iter(|| {
-                process_memx_memcpy_sse2(black_box(&mut v), black_box(pat_bytes));
+                process_memx_memcpy_sse2(black_box(&mut v), black_box(&pat_bytes));
                 memory_barrier(&mut v);
             })
         });
@@ -191,7 +216,7 @@ criterion_group! {
     name = benches;
     config = Criterion::default()
         .warm_up_time(std::time::Duration::from_millis(300))
-        .measurement_time(std::time::Duration::from_millis(3000));
+        .measurement_time(std::time::Duration::from_millis(6000));
     targets = criterion_benchmark
 }
 //criterion_group!(benches, criterion_benchmark);
