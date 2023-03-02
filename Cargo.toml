@@ -33,3 +33,7 @@ members = [
 
 [profile.release]
 lto = true
+
+[profile.bench]
+opt-level = 3
+lto = true
