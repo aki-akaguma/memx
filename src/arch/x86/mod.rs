@@ -35,7 +35,12 @@ mod x86_cpy;
 pub(crate) use x86_cpy::_memcpy_impl;
 
 mod x86_eq;
-//pub(crate) use x86_eq::_memeq_impl;
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    any(target_feature = "sse2", target_feature = "avx2")
+))]
+pub(crate) use x86_eq::_memeq_impl;
 
 mod x86_mem;
 
@@ -114,10 +119,10 @@ pub use x86_cmp::_memcmp_sse2;
 pub use x86_cpy::_memcpy_avx2;
 pub use x86_cpy::_memcpy_sse2;
 
-//pub use x86_eq::_memeq_avx;
-//pub use x86_eq::_memeq_sse2;
+pub use x86_eq::_memeq_avx2;
+pub use x86_eq::_memeq_sse2;
 
-//pub use x86_mem::_memmem_avx;
+//pub use x86_mem::_memmem_avx2;
 //pub use x86_mem::_memmem_sse2;
 
 pub use x86_nechr::_memnechr_avx2;
@@ -129,7 +134,7 @@ pub use x86_rchr::_memrchr_sse2;
 pub use x86_rnechr::_memrnechr_avx2;
 pub use x86_rnechr::_memrnechr_sse2;
 
-//pub use x86_rmem::_memrmem_avx;
+//pub use x86_rmem::_memrmem_avx2;
 //pub use x86_rmem::_memrmem_sse2;
 
 pub use x86_set::_memset_avx2;

@@ -45,16 +45,10 @@ pub struct RangeError;
 
 /// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == c)`.
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memchr_impl(buf, c);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memchr_impl(buf, c);
     //
     r
@@ -62,16 +56,10 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == c)`.
 pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memrchr_impl(buf, c);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memrchr_impl(buf, c);
     //
     r
@@ -79,16 +67,10 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().position(|&x| x != c)`, not included libc.
 pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memnechr_impl(buf, c);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memnechr_impl(buf, c);
     //
     r
@@ -96,16 +78,10 @@ pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().rposition(|&x| x != c)`, not included libc.
 pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memrnechr_impl(buf, c);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memrnechr_impl(buf, c);
     //
     r
@@ -113,16 +89,10 @@ pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
 pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memchr_double_impl(buf, c1, c2);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memchr_double_impl(buf, c1, c2);
     //
     r
@@ -130,16 +100,10 @@ pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2)`.
 pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memrchr_double_impl(buf, c1, c2);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memrchr_double_impl(buf, c1, c2);
     //
     r
@@ -147,29 +111,24 @@ pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 /// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
-    /*
-     * why is sse2 slower ?
-     *
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memcmp_impl(a, b);
     //
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx"))
-    ))]
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memcmp_impl(a, b);
-    r
-    */
     //
-    mem::_memcmp_impl(a, b)
+    r
 }
 
 /// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
-    mem::_memeq_impl(a, b)
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+    let r= arch::x86::_memeq_impl(a, b);
+    //
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
+    let r= mem::_memeq_impl(a, b);
+    //
+    r
 }
 
 /// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)` or `haystack.windows(needle.len()).position(|window| window == needle)`.
@@ -178,15 +137,10 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
 ///
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memmem_impl(haystack, needle);
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    //
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memmem_impl(haystack, needle);
     //
     r
@@ -198,15 +152,10 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
 ///
 pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memrmem_impl(haystack, needle);
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    //
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memrmem_impl(haystack, needle);
     //
     r
@@ -218,15 +167,10 @@ pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 /// The `src` and the `dst` must not overlape.
 /// This function return `Err(RangeError)` if `dst.len() < src.len()`, otherwise return `Ok(())`
 pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memcpy_impl(dst, src);
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    //
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     let r = mem::_memcpy_impl(dst, src);
     //
     r
@@ -236,15 +180,10 @@ pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 ///
 /// The `memset()` function fills `buf` with the `c`.
 pub fn memset(buf: &mut [u8], c: u8) {
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        any(target_feature = "sse2", target_feature = "avx2")
-    ))]
+    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     arch::x86::_memset_impl(buf, c);
-    #[cfg(any(
-        not(any(target_arch = "x86_64", target_arch = "x86",)),
-        not(any(target_feature = "sse2", target_feature = "avx2"))
-    ))]
+    //
+    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
     mem::_memset_impl(buf, c);
 }
 
