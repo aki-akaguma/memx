@@ -29,7 +29,10 @@ doc:
 	cargo doc
 
 tarpaulin:
-	cargo tarpaulin --offline --engine llvm --out html --output-dir ./target
+	#RUSTFLAGS="-C target-feature=-sse2,-avx2"
+	#cargo tarpaulin --offline --engine llvm --out html --output-dir ./target
+	cargo tarpaulin --offline --engine ptrace --out lcov --output-dir ./target
+	genhtml -o target/lcov --demangle-cpp target/lcov.info
 
 
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \

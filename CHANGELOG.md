@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] *
+### Added
+* `tarpaulin` supports into `Makefile`
+
 ### Changed
 * tuned `x86_64`, `x86`, `aarch64`: `mem_cmp()`, `mem_eq()`, `mem_cpy()`
 * refactor: `mem_set()`
