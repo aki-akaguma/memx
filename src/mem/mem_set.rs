@@ -477,7 +477,7 @@ pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *const u8, cc: u64, end_pt
         if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
             let cc: u32 = cc as u32;
             let aa_ptr = a_ptr as *mut u32;
-            unsafe { aa_ptr.write(cc) };
+            unsafe { aa_ptr.write_unaligned(cc) };
             //
             a_ptr = unsafe { a_ptr.add(loop_size) };
         }
@@ -494,7 +494,7 @@ pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *const u8, cc: u32, end_pt
         if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
             let cc: u16 = cc as u16;
             let aa_ptr = a_ptr as *mut u16;
-            unsafe { aa_ptr.write(cc) };
+            unsafe { aa_ptr.write_unaligned(cc) };
             //
             a_ptr = unsafe { a_ptr.add(loop_size) };
         }

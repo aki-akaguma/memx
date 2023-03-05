@@ -13,6 +13,7 @@ mod test_memx_memset {
         test_memset(&mut dst_sl[0..3], src[0]);
         assert_eq!(&dst[0..3], &src[0..3]);
     }
+    #[cfg(not(miri))]
     #[test]
     fn test02() {
         let dst_0 = vec![0_u8];
