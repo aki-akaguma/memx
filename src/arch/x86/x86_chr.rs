@@ -19,10 +19,26 @@ use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
+#[cfg(target_arch = "x86_64")]
+use super::cpuid_avx2;
+
+#[cfg(target_arch = "x86")]
 use super::{cpuid_avx2, cpuid_sse2};
 
 #[inline(always)]
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+#[cfg(target_arch = "x86_64")]
+pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx2::get() {
+        unsafe { _memchr_avx2(buf, c) }
+    } else {
+        unsafe { _memchr_sse2(buf, c) }
+    }
+}
+
+#[inline(always)]
+#[cfg(target_arch = "x86")]
 pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
@@ -33,27 +49,6 @@ pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     } else {
         _memchr_basic(buf, c)
     }
-    /*
-    #[cfg(target_feature = "avx")]
-    let r = unsafe { _memchr_avx(buf, c) };
-    #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    let r = unsafe { _memchr_sse2(buf, c) };
-    #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
-    let r = _memchr_basic(buf, c);
-    r
-    */
-    /*
-     * <WSID>
-     * The is_x86_feature_detected!() routine is slower, and not support no_std.
-     * What should i do ?
-     * </WSID>
-     *
-    if is_x86_feature_detected!("avx") {
-        unsafe { _memchr_avx(buf, c) }
-    } else {
-        unsafe { _memchr_sse2(buf, c) }
-    }
-    */
 }
 
 fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
