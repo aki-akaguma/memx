@@ -154,7 +154,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
             }
         }
     }
-    {
+    if buf_len >= 16 {
         let loop_size = 16;
         let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
         if a_ptr <= end_ptr_8 {
