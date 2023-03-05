@@ -19,10 +19,26 @@ use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
+#[cfg(target_arch = "x86_64")]
+use super::cpuid_avx2;
+
+#[cfg(target_arch = "x86")]
 use super::{cpuid_avx2, cpuid_sse2};
 
 #[inline(always)]
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+#[cfg(target_arch = "x86_64")]
+pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid_avx2::get() {
+        unsafe { _memrchr_double_avx2(buf, c1, c2) }
+    } else {
+        unsafe { _memrchr_double_sse2(buf, c1, c2) }
+    }
+}
+
+#[inline(always)]
+#[cfg(target_arch = "x86")]
 pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
@@ -33,27 +49,6 @@ pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> 
     } else {
         _memrchr_double_basic(buf, c1, c2)
     }
-    /*
-    #[cfg(target_feature = "avx")]
-    let r = unsafe { _memrchr_double_avx(buf, c1, c2) };
-    #[cfg(all(target_feature = "sse2", not(target_feature = "avx")))]
-    let r = unsafe { _memrchr_double_sse2(buf, c1, c2) };
-    #[cfg(not(any(target_feature = "avx", target_feature = "sse2")))]
-    let r = _memrchr_double_basic(buf, c1, c2);
-    r
-    */
-    /*
-     * <WSID>
-     * The is_x86_feature_detected!() routine is slower, and not support no_std.
-     * What should i do ?
-     * </WSID>
-     *
-    if is_x86_feature_detected!("avx") {
-        unsafe { _memrchr_avx(buf, c) }
-    } else {
-        unsafe { _memrchr_sse2(buf, c) }
-    }
-    */
 }
 
 fn _memrchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {

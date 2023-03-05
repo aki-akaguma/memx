@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * updated benchmark results
 * tuned `x86_64`, `x86`, `aarch64`: `mem_cmp()`, `mem_eq()`, `mem_cpy()`
 * refactor: `mem_set()`
+* bits: `x86_chr()`, `x86_chr_double()`, `x86_rchr()`, `x86_rchr_double()`
+* bits: `x86_nechr()`, `x86_rnechr()`
 
 
 ## [0.1.26] (2023-02-12)
