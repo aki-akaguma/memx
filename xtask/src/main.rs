@@ -15,12 +15,12 @@ fn main() -> anyhow::Result<()> {
     let env_args: Vec<&str> = env_args[1..].iter().map(|s| s.as_str()).collect();
     #[rustfmt::skip]
     match cmd {
-        "shape_benchmark_results" => shape_benchmark_results::run(&format!("{} {}", program, cmd), &env_args)?,
+        "shape_benchmark_results" => shape_benchmark_results::run(&format!("{program} {cmd}"), &env_args)?,
         //
         "--help" | "-h" | "-H" | "help" => print_help_and_exit(program),
         "--version" | "-V" | "-v" => print_version_and_exit(program),
         _ => {
-            eprintln!("Not fount command: {}", cmd);
+            eprintln!("Not fount command: {cmd}");
             unreachable!()
         }
     };

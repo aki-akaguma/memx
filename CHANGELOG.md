@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * bits: `x86_chr()`, `x86_chr_double()`, `x86_rchr()`, `x86_rchr_double()`
 * bits: `x86_nechr()`, `x86_rnechr()`
 
+### Fixed
+* clippy: `uninlined_format_args`
+
 
 ## [0.1.26] (2023-02-12)
 ### Added
