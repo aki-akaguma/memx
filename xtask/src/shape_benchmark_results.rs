@@ -167,7 +167,7 @@ fn _set_size(bench_vec: &mut Vec<BenchStr>, in_file: &str) -> anyhow::Result<()>
     let re_1 = regex::Regex::new(r"^ *(\d+)\t.*\t([^ ]+)$").unwrap();
     let reader = std::io::BufReader::new(
         std::fs::File::open(in_file)
-            .with_context(|| format!("could not open file `{}`", in_file))?,
+            .with_context(|| format!("could not open file `{in_file}`"))?,
     );
     for line in reader.lines() {
         let line = line?;
@@ -183,7 +183,7 @@ fn _set_size(bench_vec: &mut Vec<BenchStr>, in_file: &str) -> anyhow::Result<()>
             let i = match bench_vec.iter().position(|x| x.name == name) {
                 Some(i) => i,
                 None => {
-                    let msg = format!("can not find size: {}", name);
+                    let msg = format!("can not find size: {name}");
                     return Err(anyhow::Error::msg(msg));
                 }
             };
@@ -212,7 +212,7 @@ fn get_bench(in_file: &str) -> anyhow::Result<Vec<BenchStr>> {
     //
     let reader = std::io::BufReader::new(
         std::fs::File::open(in_file)
-            .with_context(|| format!("could not open file `{}`", in_file))?,
+            .with_context(|| format!("could not open file `{in_file}`"))?,
     );
     for line in reader.lines() {
         let line = line?;
@@ -260,7 +260,7 @@ fn normalize_time(num_s: &str, unit_s: &str) -> anyhow::Result<f64> {
         "ps" => 0.000000000001,
         "cycles" => 1.0,
         _ => {
-            let msg = format!("can not convert unit: {}", unit_s);
+            let msg = format!("can not convert unit: {unit_s}");
             return Err(anyhow::Error::msg(msg));
         }
     };
