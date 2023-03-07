@@ -3,9 +3,12 @@
 #[test]
 fn test00() {
     let buf = vec![];
-    //
     let r = test_memchr_double(&buf, b'G', b'g');
     assert_eq!(r, None);
+    //
+    let buf = vec![b'g'];
+    let r = test_memchr_double(&buf, b'G', b'g');
+    assert_eq!(r, Some(0));
 }
 #[test]
 fn test01() {

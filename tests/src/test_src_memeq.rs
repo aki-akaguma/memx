@@ -3,9 +3,11 @@
 #[test]
 fn test00() {
     let buf_0 = vec![];
-    let pat_0 = vec![];
+    let pat_1 = vec![];
+    let pat_2 = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'0'];
     //
-    assert!(test_memeq(&buf_0, &pat_0));
+    assert!(test_memeq(&buf_0, &pat_1));
+    assert!(!test_memeq(&buf_0, &pat_2));
 }
 #[test]
 fn test01() {
