@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] *
 ### Added
+* `clippy::uninlined_format_args` to `Makefile`
 * `tarpaulin` supports into `Makefile`
 
 ### Changed
