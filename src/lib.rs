@@ -123,10 +123,10 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
 /// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
-    let r= arch::x86::_memeq_impl(a, b);
+    let r = arch::x86::_memeq_impl(a, b);
     //
     #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
-    let r= mem::_memeq_impl(a, b);
+    let r = mem::_memeq_impl(a, b);
     //
     r
 }

@@ -15,11 +15,35 @@ fn test00() {
 }
 #[test]
 fn test01() {
-    let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];
-    let pat = vec![b'G', b'H', b'J'];
+    let buf = vec![b'A', b'B', b'G', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K'];
+    let pat = vec![b'G', b'H', b'I'];
+    let r = test_memmem(&buf, &pat);
+    assert_eq!(r, Some(7));
     //
+    let buf = vec![b'A', b'B', b'g', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K'];
+    let pat = vec![b'g', b'h', b'i'];
+    let r = test_memmem(&buf, &pat);
+    assert_eq!(r, None);
+    //
+    let buf = vec![b'A', b'B', b'g', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'g'];
+    let pat = vec![b'g', b'h', b'i'];
+    let r = test_memmem(&buf, &pat);
+    assert_eq!(r, None);
+    //
+    let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'\xE3', b'\x81', b'\x82', b'G', b'H', b'I', b'J', b'K'];
+    let pat = vec![b'\xE3', b'\x81', b'\x82'];
     let r = test_memmem(&buf, &pat);
     assert_eq!(r, Some(6));
+    //
+    let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'\xE3', b'\x81', b'\x82', b'G', b'H', b'I', b'J', b'G', b'K'];
+    let pat = vec![b'\xE3', b'\x81', b'\x82', b'G'];
+    let r = test_memmem(&buf, &pat);
+    assert_eq!(r, Some(6));
+    //
+    let buf = vec![b'A', b'B', b'C', b'\x82', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'\x82'];
+    let pat = vec![b'i', b'\xE3', b'\x81', b'\x82'];
+    let r = test_memmem(&buf, &pat);
+    assert_eq!(r, None);
 }
 #[test]
 fn test02() {

@@ -166,8 +166,7 @@ fn _set_size(bench_vec: &mut Vec<BenchStr>, in_file: &str) -> anyhow::Result<()>
     let mut base_size = 0u64;
     let re_1 = regex::Regex::new(r"^ *(\d+)\t.*\t([^ ]+)$").unwrap();
     let reader = std::io::BufReader::new(
-        std::fs::File::open(in_file)
-            .with_context(|| format!("could not open file `{in_file}`"))?,
+        std::fs::File::open(in_file).with_context(|| format!("could not open file `{in_file}`"))?,
     );
     for line in reader.lines() {
         let line = line?;
@@ -211,8 +210,7 @@ fn get_bench(in_file: &str) -> anyhow::Result<Vec<BenchStr>> {
             .unwrap();
     //
     let reader = std::io::BufReader::new(
-        std::fs::File::open(in_file)
-            .with_context(|| format!("could not open file `{in_file}`"))?,
+        std::fs::File::open(in_file).with_context(|| format!("could not open file `{in_file}`"))?,
     );
     for line in reader.lines() {
         let line = line?;

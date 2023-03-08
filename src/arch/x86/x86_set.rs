@@ -29,7 +29,10 @@ pub fn _memset_impl(buf: &mut [u8], c: u8) {
     if cpuid_avx2::get() {
         unsafe { _memset_avx2(buf, c) };
     } else {
+        #[cfg(not(miri))]
         unsafe { _memset_sse2(buf, c) };
+        #[cfg(miri)]
+        _memset_basic(buf, c);
     }
 }
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `tarpaulin` supports into `Makefile`
 
 ### Changed
+* refined code coverage
 * refactored test sources
 * updated benchmark results
 * tuned `x86_64`, `x86`, `aarch64`: `mem_cmp()`, `mem_eq()`, `mem_cpy()`

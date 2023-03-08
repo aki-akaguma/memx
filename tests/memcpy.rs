@@ -20,7 +20,7 @@ mod test_memx_memcpy {
 }
 mod test_memx_memcpy_basic {
     use memx::RangeError;
-    fn test_memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError>  {
+    fn test_memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         memx::mem::memcpy_basic(dst, src)
     }
     //

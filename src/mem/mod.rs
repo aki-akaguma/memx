@@ -13,12 +13,6 @@ pub(crate) use mem_cmp::_memcmp_impl;
 
 mod mem_cpy;
 pub(crate) use mem_cpy::_memcpy_impl;
-#[allow(unused_imports)]
-pub(crate) use mem_cpy::_memcpy_remaining_15_bytes_impl;
-#[allow(unused_imports)]
-pub(crate) use mem_cpy::_memcpy_remaining_3_bytes_impl;
-#[allow(unused_imports)]
-pub(crate) use mem_cpy::_memcpy_remaining_7_bytes_impl;
 
 mod mem_eq;
 pub(crate) use mem_eq::_memeq_impl;
@@ -53,8 +47,6 @@ mod mem_set;
 pub(crate) use mem_set::_memset_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_set::_memset_remaining_15_bytes_impl;
-#[allow(unused_imports)]
-pub(crate) use mem_set::_start_set_64;
 
 use super::RangeError;
 use core::cmp::Ordering;
