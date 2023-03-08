@@ -1,3 +1,4 @@
+#![tarpaulin::skip]
 use super::super::RangeError;
 
 #[inline(always)]

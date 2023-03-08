@@ -14,6 +14,11 @@ repository = "https://github.com/aki-akaguma/memx"
 [features]
 default = []
 
+# for test and tarpaulin
+test_pointer_width_128 = []
+test_pointer_width_64 = []
+test_pointer_width_32 = []
+
 [dependencies]
 
 [target.'cfg(any(target_arch = "aarch64", target_arch = "x86_64", target_arch = "x86"))'.dependencies]

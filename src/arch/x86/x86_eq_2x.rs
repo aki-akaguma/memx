@@ -1,3 +1,4 @@
+#![tarpaulin::skip]
 #[inline(always)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     //

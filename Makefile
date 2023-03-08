@@ -8,6 +8,7 @@ README.md: README.tpl src/lib.rs
 
 test:
 	cargo test --offline
+	cargo test --offline --features test_pointer_width_128
 
 test-no-default-features:
 	cargo test --offline --no-default-features
@@ -31,10 +32,24 @@ doc:
 tarpaulin:
 	@#cargo tarpaulin --offline --engine llvm --out html --output-dir ./target
 	@#cargo tarpaulin --offline --engine ptrace --out html --output-dir ./target
-	cargo tarpaulin --offline --tests --engine llvm --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.1
+	@
+	cargo tarpaulin --offline --tests --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.1
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
-	cargo tarpaulin --offline --tests --engine llvm --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.2
-	genhtml -o target/lcov --demangle-cpp target/lcov.info.1 target/lcov.info.2
+	cargo tarpaulin --offline --tests --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.2
+	@
+	cargo tarpaulin --offline --tests --features test_pointer_width_128 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.3
+	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
+	cargo tarpaulin --offline --tests --features test_pointer_width_128 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.4
+	@
+	cargo tarpaulin --offline --tests --features test_pointer_width_64 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.5
+	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
+	cargo tarpaulin --offline --tests --features test_pointer_width_64 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.6
+	@
+	cargo tarpaulin --offline --tests --features test_pointer_width_32 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.7
+	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
+	cargo tarpaulin --offline --tests --features test_pointer_width_32 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.8
+	@
+	genhtml -o target/lcov --demangle-cpp target/lcov.info.*
 
 
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \

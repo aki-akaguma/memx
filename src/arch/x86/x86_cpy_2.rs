@@ -1,3 +1,4 @@
+#![tarpaulin::skip]
 use crate::mem as basic;
 use crate::RangeError;
 
