@@ -75,7 +75,7 @@ target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 define build-templ =
 target/stamp/stamp.build.$(1).$(2):
 	@mkdir -p target/stamp
-	make -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-build-all
+	$(MAKE) -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-build-all
 	@touch target/stamp/stamp.build.$(1).$(2)
 
 endef
@@ -83,7 +83,7 @@ endef
 define build-armv7-templ =
 target/stamp/stamp.build.$(1).armv7:
 	@mkdir -p target/stamp
-	make -f makefile.build BENCH_NM=$(1) bench-build-arm-all
+	$(MAKE) -f makefile.build BENCH_NM=$(1) bench-build-arm-all
 	@touch target/stamp/stamp.build.$(1).armv7
 
 endef
@@ -92,8 +92,8 @@ define bench-templ =
 target/stamp/stamp.bench.$(1).$(2):
 	@mkdir -p target/stamp
 	@mkdir -p target/result
-	make -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-all
-	make -f makefile.build report | tee target/result/result.$(1).$(2).txt
+	$(MAKE) -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-all
+	$(MAKE) -f makefile.build report | tee target/result/result.$(1).$(2).txt
 	@touch target/stamp/stamp.bench.$(1).$(2)
 
 endef
@@ -102,8 +102,8 @@ define bench-armv7-templ =
 target/stamp/stamp.bench.$(1).armv7:
 	@mkdir -p target/stamp
 	@mkdir -p target/result
-	make -f makefile.build BENCH_NM=$(1) bench-arm-all
-	make -f makefile.build report | tee target/result/result.$(1).armv7.txt
+	$(MAKE) -f makefile.build BENCH_NM=$(1) bench-arm-all
+	$(MAKE) -f makefile.build report | tee target/result/result.$(1).armv7.txt
 	@touch target/stamp/stamp.bench.$(1).armv7
 
 endef
