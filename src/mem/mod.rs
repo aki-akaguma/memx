@@ -1,3 +1,5 @@
+#![doc(hidden)]
+
 mod mem_chr;
 pub(crate) use mem_chr::_memchr_impl;
 #[allow(unused_imports)]
