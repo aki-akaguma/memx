@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * bits: `x86_nechr()`, `x86_rnechr()`
 
 ### Fixed
+* `$(MAKE)`
 * clippy: `uninlined_format_args`
 
 
