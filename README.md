@@ -42,12 +42,29 @@ Failed lists:
 
 # Benchmark results
 
-- [`memchr()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr.md)
-- [`memcmp()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memcmp.md)
-- [`memcpy()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memcpy.md)
-- [`memeq()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memeq.md)
-- [`memmem()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memmem.md)
-- [`memset()`](https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md)
+| forward search | backward search |
+|:---------------|:----------------|
+| [`memchr()`]   | [`memrchr()`]   |
+| [`memnechr()`] | [`memrnechr()`] |
+| [`memmem()`]   | [`memrmem()`]   |
+
+| memory op      |
+|:---------------|
+| [`memcmp()`]   |
+| [`memeq()`]    |
+| [`memcpy()`]   |
+| [`memset()`]   |
+
+[`memchr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr.md
+[`memcmp()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memcmp.md
+[`memcpy()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memcpy.md
+[`memeq()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memeq.md
+[`memmem()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memmem.md
+[`memnechr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memnechr.md
+[`memrchr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr.md
+[`memrmem()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrmem.md
+[`memrnechr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr.md
+[`memset()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md
 
 # Changelogs
 
