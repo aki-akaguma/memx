@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `tarpaulin` supports into `Makefile`
 
 ### Changed
+* updated `README.tpl`
 * refined code coverage
 * refactored test sources
 * updated benchmark results
