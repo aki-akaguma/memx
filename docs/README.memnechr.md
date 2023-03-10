@@ -1,32 +1,41 @@
 ## Benchmark results
 
-- compile by rustc 1.67.1 (d5a82bbd2 2023-02-07)
+- compile by rustc 1.68.0 (2c8cc3432 2023-03-06)
+
+  0. x86_64-unknown-linux- @Broadwell:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memnechr            |  194.370 µs |  115.540 µs |  210.270 µs |  124.780 µs |
+| memx_memnechr           |  190.390 µs |   98.596 µs |  200.710 µs |  110.450 µs |
+| memx_memnechr_basic     |  191.760 µs |   99.658 µs |  216.470 µs |  115.580 µs |
+| memx_memnechr_sse2      |  176.930 µs |   87.416 µs |  190.310 µs |   94.458 µs |
 
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |  378.440 µs |  211.210 µs |  365.980 µs |  210.190 µs |
-| memx_memnechr           |  314.280 µs |  142.280 µs |  318.370 µs |  144.450 µs |
-| memx_memnechr_basic     |  310.920 µs |  158.340 µs |  309.140 µs |  160.340 µs |
-| memx_memnechr_sse2      |  293.470 µs |  132.410 µs |  290.600 µs |  134.570 µs |
+| std_memnechr            |  379.190 µs |  211.770 µs |  367.690 µs |  210.860 µs |
+| memx_memnechr           |  317.890 µs |  143.870 µs |  316.710 µs |  145.170 µs |
+| memx_memnechr_basic     |  311.880 µs |  158.930 µs |  312.450 µs |  161.080 µs |
+| memx_memnechr_sse2      |  295.140 µs |  133.040 µs |  291.220 µs |  135.010 µs |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |  391.570 µs |  226.720 µs |  395.090 µs |  227.630 µs |
-| memx_memnechr           |  345.170 µs |  151.110 µs |  346.990 µs |  151.250 µs |
-| memx_memnechr_basic     |  306.280 µs |  159.940 µs |  312.620 µs |  161.460 µs |
-| memx_memnechr_sse2      |  329.020 µs |  148.660 µs |  347.200 µs |  149.970 µs |
+| std_memnechr            |  389.590 µs |  239.400 µs |  393.910 µs |  229.200 µs |
+| memx_memnechr           |  346.650 µs |  152.870 µs |  348.460 µs |  152.610 µs |
+| memx_memnechr_basic     |  307.930 µs |  160.480 µs |  311.940 µs |  162.180 µs |
+| memx_memnechr_sse2      |  331.930 µs |  150.050 µs |  333.790 µs |  155.440 µs |
 
   3. i586-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |  346.090 µs |  214.800 µs |  353.270 µs |  223.260 µs |
-| memx_memnechr           |  264.710 µs |  156.940 µs |  286.920 µs |  171.480 µs |
-| memx_memnechr_basic     |  264.550 µs |  156.930 µs |  286.720 µs |  172.290 µs |
+| std_memnechr            |  346.010 µs |  214.610 µs |  356.240 µs |  224.160 µs |
+| memx_memnechr           |  266.330 µs |  158.130 µs |  290.040 µs |  171.650 µs |
+| memx_memnechr_basic     |  265.420 µs |  159.030 µs |  288.830 µs |  171.570 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
