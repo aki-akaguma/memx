@@ -153,6 +153,7 @@ fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    /*
     {
         let unroll = 8;
         let loop_size = 16;
@@ -170,6 +171,7 @@ fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 16;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -193,6 +195,7 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    /*
     {
         let unroll = 8;
         let loop_size = 8;
@@ -210,6 +213,7 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 8;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -233,6 +237,7 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    /*
     {
         let unroll = 8;
         let loop_size = 4;
@@ -250,6 +255,7 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 4;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
