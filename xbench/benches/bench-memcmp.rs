@@ -37,16 +37,8 @@ fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     fn _x_libc_memcmp(a: &[u8], b: &[u8]) -> Ordering {
         let cx = a.as_ptr();
         let ct = b.as_ptr();
-        let a_len = a.len();
-        let b_len = b.len();
-        if a_len != b_len {
-            if a_len < b_len {
-                return Ordering::Less;
-            } else {
-                return Ordering::Greater;
-            }
-        }
-        let r = unsafe { memcmp(cx, ct, a_len) };
+        let x_len = a.len().min(b.len());
+        let r = unsafe { memcmp(cx, ct, x_len) };
         if r == 0 {
             Ordering::Equal
         } else if r < 0 {
