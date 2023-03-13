@@ -153,6 +153,20 @@ fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    {
+        let unroll = 3;
+        let loop_size = 16;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
     /*
     {
         let unroll = 8;
@@ -203,6 +217,20 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    {
+        let unroll = 3;
+        let loop_size = 8;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
     /*
     {
         let unroll = 8;
@@ -232,6 +260,7 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     }
     // the remaining data is the max: 7 bytes.
     _memcmp_remaining_7_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
+    //_memcmp_remaining_n_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
 }
 
 #[cfg(any(
@@ -253,6 +282,20 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
+    {
+        let unroll = 3;
+        let loop_size = 4;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
     /*
     {
         let unroll = 8;
@@ -283,6 +326,28 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
     }
     // the remaining data is the max: 3 bytes.
     _memcmp_remaining_3_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
+}
+
+#[inline(always)]
+fn _memcmp_remaining_n_bytes_impl(
+    a_ptr: *const u8,
+    b_ptr: *const u8,
+    a_len: usize,
+    b_len: usize,
+    end_ptr: *const u8,
+) -> Ordering {
+    let mut a_ptr = a_ptr;
+    let mut b_ptr = b_ptr;
+    while unsafe { end_ptr.offset_from(a_ptr) } > 0 {
+        let aac = unsafe { *(a_ptr as *const u8) };
+        let bbc = unsafe { *(b_ptr as *const u8) };
+        if aac != bbc {
+            return aac.cmp(&bbc);
+        }
+        a_ptr = unsafe { a_ptr.add(1) };
+        b_ptr = unsafe { b_ptr.add(1) };
+    }
+    a_len.cmp(&b_len)
 }
 
 #[inline(always)]

@@ -45,7 +45,7 @@ TARGET_MUSL = x86_64-unknown-linux-musl
 TARGET_ARM_ANDR = armv7-linux-androideabi
 TARGET_ARM_MUSL = armv7-unknown-linux-musleabihf
 
-TSK = taskset -c 2
+TSK = taskset -c 1
 
 
 all:
