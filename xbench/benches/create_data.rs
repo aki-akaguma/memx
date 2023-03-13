@@ -223,10 +223,10 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 6120;
+    let match_cnt = 6480; //6120;
     let less_cnt = 4050;
     let greater_cnt = 0;
-    let match_s = "aaaaaaaaaaaaaaaaaaaaaaaaaaa"; // 27 bytes
+    let match_s = "aaaaaaaaaaaaaaa"; // 15 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 
@@ -235,14 +235,14 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
     let a2 = "ああああ"; // 12 bytes
     let a3 = "あああああ"; // 15 bytes
     let a4 = "あああああああ"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    let s1 = a1.repeat(30) + a2 + a3.repeat(10).as_str(); // 792 = 21*30 + 12 + 15*10
+    let s2 = a4.repeat(20) + a3.repeat(10).as_str(); // 570 = 21*20 + 15*10
 
     let mut v: Vec<String> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 36 {
+        if i > 24 {
             break;
         }
         if i % 2 == 0 {
@@ -251,10 +251,10 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 3204;
-    let less_cnt = 6408;
+    let match_cnt = 4872;
+    let less_cnt = 9744;
     let greater_cnt = 0;
-    let match_s = "あああああああああああああああああああああああああああああああああ"; // 99 bytes
+    let match_s = "ああああああああああああああああああああああああ"; // 72 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 

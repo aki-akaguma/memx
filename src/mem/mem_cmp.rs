@@ -37,7 +37,7 @@ pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64"))]
         {
-            _start_cmp_128(a, b)
+            _start_cmp_64(a, b)
         }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64")))]
         {
@@ -184,7 +184,15 @@ fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
     _memcmp_remaining_15_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
 }
 
-#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+#[cfg(any(
+    any(
+        target_pointer_width = "64",
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64"
+    ),
+    feature = "test_pointer_width_64"
+))]
 #[inline(always)]
 fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     //
@@ -226,7 +234,15 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     _memcmp_remaining_7_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
 }
 
-#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
+#[cfg(any(
+    any(
+        target_pointer_width = "32",
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64"
+    ),
+    feature = "test_pointer_width_32"
+))]
 #[inline(always)]
 fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
     //
