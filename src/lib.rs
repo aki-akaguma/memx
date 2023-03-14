@@ -31,7 +31,7 @@ Failed lists:
 - nothing
 
 */
-//#![no_std]
+#![no_std]
 use core::cmp::Ordering;
 
 pub mod arch;

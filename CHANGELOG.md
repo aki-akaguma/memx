@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `rustfmt::skip` into `x86/x86_set.rs`
 
 ### Changed
+* reenabled `#![no_std]`
 * fine tuned `mem/mem_eq.rs`
 * fine tuned `mem/mem_cmp.rs`
 * refactor bench dependency: `Makefile`, `makefile.build`
