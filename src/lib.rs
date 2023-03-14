@@ -126,6 +126,9 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
 
 /// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
+    mem::_memeq_impl(a, b)
+    /*
+    sse2 or avx2 are slower, but I don't know why.
     #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
     let r = arch::x86::_memeq_impl(a, b);
     //
@@ -133,6 +136,7 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     let r = mem::_memeq_impl(a, b);
     //
     r
+    */
 }
 
 /// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)` or `haystack.windows(needle.len()).position(|window| window == needle)`.

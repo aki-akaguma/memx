@@ -35,7 +35,7 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64"))]
         {
-            _start_eq_128(a, b)
+            _start_eq_64(a, b)
         }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64")))]
         {
@@ -154,6 +154,21 @@ fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     let end_ptr = unsafe { a_ptr.add(a_len) };
     //
     {
+        let unroll = 3;
+        let loop_size = 16;
+        if a_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    /*
+    {
         let unroll = 8;
         let loop_size = 16;
         while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
@@ -170,6 +185,7 @@ fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 16;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -182,7 +198,15 @@ fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     _memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+#[cfg(any(
+    any(
+        target_pointer_width = "64",
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64"
+    ),
+    feature = "test_pointer_width_64"
+))]
 #[inline(always)]
 fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     //
@@ -195,6 +219,21 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(a_len) };
     //
+    {
+        let unroll = 3;
+        let loop_size = 8;
+        if a_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    /*
     {
         let unroll = 8;
         let loop_size = 8;
@@ -212,6 +251,7 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 8;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -224,7 +264,15 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     _memeq_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
+#[cfg(any(
+    any(
+        target_pointer_width = "32",
+        target_arch = "x86_64",
+        target_arch = "x86",
+        target_arch = "aarch64"
+    ),
+    feature = "test_pointer_width_32"
+))]
 #[inline(always)]
 fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
     //
@@ -237,6 +285,21 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
     let mut b_ptr = b.as_ptr();
     let end_ptr = unsafe { a_ptr.add(a_len) };
     //
+    {
+        let unroll = 3;
+        let loop_size = 4;
+        if a_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 1);
+                _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 2);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    /*
     {
         let unroll = 8;
         let loop_size = 4;
@@ -254,6 +317,7 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
             b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
         }
     }
+    */
     {
         let loop_size = 4;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
