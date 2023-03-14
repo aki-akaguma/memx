@@ -73,10 +73,10 @@ target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux
 
 define build-templ =
-target/stamp/stamp.build.$(1).$(2):
-	@mkdir -p target/stamp
+target/stamp.build/stamp.build.$(1).$(2):
+	@#mkdir -p target/stamp
 	$(MAKE) -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-build-all
-	@touch target/stamp/stamp.build.$(1).$(2)
+	@#touch target/stamp/stamp.build.$(1).$(2)
 
 endef
 
@@ -89,12 +89,12 @@ target/stamp/stamp.build.$(1).armv7:
 endef
 
 define bench-templ =
-target/stamp/stamp.bench.$(1).$(2):
-	@mkdir -p target/stamp
+target/stamp.bench/stamp.bench.$(1).$(2):
+	@mkdir -p target/stamp.bench
 	@mkdir -p target/result
 	$(MAKE) -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-all
 	$(MAKE) -f makefile.build report | tee target/result/result.$(1).$(2).txt
-	@touch target/stamp/stamp.bench.$(1).$(2)
+	@touch target/stamp.bench/stamp.bench.$(1).$(2)
 
 endef
 
@@ -116,9 +116,9 @@ test-clean:
 $(foreach ver,$(rustc_vers),$(eval $(foreach tb,$(target_base_vers),$(eval $(call test-rustc-templ,$(ver),$(tb))))))
 
 
-bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.build.$(bnm).$(tbm)))
+bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 
-bench-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp/stamp.bench.$(bnm).$(tbm)))
+bench-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.bench/stamp.bench.$(bnm).$(tbm)))
 
 build-arm-all: $(foreach bnm,$(bench_nms),target/stamp/stamp.build.$(bnm).armv7)
 
@@ -134,36 +134,36 @@ $(foreach bnm,$(bench_nms),$(eval $(call bench-armv7-templ,$(bnm))))
 
 
 clean-memchr:
-	@rm -f target/stamp/stamp.build.bench-memchr.*
-	@rm -f target/stamp/stamp.bench.bench-memchr.*
+	@rm -f target/stamp.build/stamp.build.bench-memchr.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memchr.*
 
 clean-memcmp:
-	@rm -f target/stamp/stamp.build.bench-memcmp.*
-	@rm -f target/stamp/stamp.bench.bench-memcmp.*
+	@rm -f target/stamp.build/stamp.build.bench-memcmp.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memcmp.*
 
 clean-memcpy:
-	@rm -f target/stamp/stamp.build.bench-memcpy.*
-	@rm -f target/stamp/stamp.bench.bench-memcpt.*
+	@rm -f target/stamp.build/stamp.build.bench-memcpy.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memcpt.*
 
 clean-memeq:
-	@rm -f target/stamp/stamp.build.bench-memeq.*
-	@rm -f target/stamp/stamp.bench.bench-memeq.*
+	@rm -f target/stamp.build/stamp.build.bench-memeq.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memeq.*
 
 clean-memmem:
-	@rm -f target/stamp/stamp.build.bench-memmem.*
-	@rm -f target/stamp/stamp.bench.bench-memmem.*
+	@rm -f target/stamp.build/stamp.build.bench-memmem.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memmem.*
 
 clean-memrchr:
-	@rm -f target/stamp/stamp.build.bench-memrchr.*
-	@rm -f target/stamp/stamp.bench.bench-memrchr.*
+	@rm -f target/stamp.build/stamp.build.bench-memrchr.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memrchr.*
 
 clean-memrmem:
-	@rm -f target/stamp/stamp.build.bench-memrmem.*
-	@rm -f target/stamp/stamp.bench.bench-memrmem.*
+	@rm -f target/stamp.build/stamp.build.bench-memrmem.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memrmem.*
 
 clean-memset:
-	@rm -f target/stamp/stamp.build.bench-memset.*
-	@rm -f target/stamp/stamp.bench.bench-memset.*
+	@rm -f target/stamp.build/stamp.build.bench-memset.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memset.*
 
 
 result-memchr:

@@ -62,15 +62,17 @@ bench-gnu: bench.en.1-gnu bench.ja.1-gnu
 
 bench-musl: bench.en.1-musl bench.ja.1-musl
 
-bench-build-gnu: target/stamp.bench-build-gnu
-target/stamp.bench-build-gnu:
+bench-build-gnu: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
+target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU):
+	@mkdir -p target/stamp.build
 	cargo xbench $(BENCH_STR) --no-run --target=$(TARGET_GNU)
-	@touch target/stamp.bench-build-gnu
+	@touch target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
 
-bench-build-musl: target/stamp.bench-build-musl
-target/stamp.bench-build-musl:
+bench-build-musl: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
+target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL):
+	@mkdir -p target/stamp.build
 	cargo xbench $(BENCH_STR) --no-run --target=$(TARGET_MUSL)
-	@touch target/stamp.bench-build-musl
+	@touch target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
 
 bench-clean:
 	@rm -fr target/criterion
@@ -83,22 +85,22 @@ report:
 	cargo xtask shape_benchmark_results
 
 
-bench.en.1-gnu: target/stamp.bench-build-gnu
+bench.en.1-gnu: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
 	@rm -fr target/criterion
 	@rm -f z.bench.en.1.log
 	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.en.1.log
 
-bench.ja.1-gnu: target/stamp.bench-build-gnu
+bench.ja.1-gnu: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
 	@rm -fr target/criterion
 	@rm -f z.bench.ja.1.log
 	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.ja.1.log
 
-bench.en.1-musl: target/stamp.bench-build-musl
+bench.en.1-musl: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
 	@rm -fr target/criterion
 	@rm -f z.musl.bench.en.1.log
 	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.en.1.log
 
-bench.ja.1-musl: target/stamp.bench-build-musl
+bench.ja.1-musl: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
 	@rm -fr target/criterion
 	@rm -f z.musl.bench.ja.1.log
 	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.ja.1.log
