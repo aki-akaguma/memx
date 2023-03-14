@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] *
 ### Changed
 * fine tuned `mem/mem_cmp.rs`
+* refactor bench dependency: `Makefile`, `makefile.build`
 
 ### Removed
 * unroll of `mem/mem_cmp.rs` for performance
