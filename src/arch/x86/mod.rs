@@ -40,6 +40,7 @@ mod x86_eq;
     any(target_arch = "x86_64", target_arch = "x86"),
     any(target_feature = "sse2", target_feature = "avx2")
 ))]
+#[allow(unused_imports)]
 pub(crate) use x86_eq::_memeq_impl;
 
 mod x86_mem;
