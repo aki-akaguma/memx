@@ -1,12 +1,4 @@
-cpufeatures::new!(cpuid_avx2, "avx2");
-cpufeatures::new!(cpuid_sse2, "sse2");
-
 mod x86_chr;
-
-#[cfg(all(
-    any(target_arch = "x86_64", target_arch = "x86"),
-    any(target_feature = "sse2", target_feature = "avx2")
-))]
 pub(crate) use x86_chr::_memchr_impl;
 
 mod x86_chr_double;
@@ -111,7 +103,9 @@ mod x86_set;
 ))]
 pub(crate) use x86_set::_memset_impl;
 
+#[allow(unused_imports)]
 pub use x86_chr::_memchr_avx2;
+#[allow(unused_imports)]
 pub use x86_chr::_memchr_sse2;
 
 pub use x86_cmp::_memcmp_avx2;
@@ -140,3 +134,76 @@ pub use x86_rnechr::_memrnechr_sse2;
 
 pub use x86_set::_memset_avx2;
 pub use x86_set::_memset_sse2;
+
+mod cpuid {
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    pub use cpuid_avx2::has_avx2;
+
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+    mod cpuid_avx2 {
+        use core::sync::atomic::AtomicI8;
+        use core::sync::atomic::Ordering;
+        cpufeatures::new!(cpuid_avx2, "avx2");
+        static mut HAS_AVX2_ATOM: AtomicI8 = AtomicI8::new(0);
+        //
+        #[inline(always)]
+        pub fn has_avx2() -> bool {
+            let val = unsafe { HAS_AVX2_ATOM.load(Ordering::Relaxed) };
+            if val != 0 {
+                val > 0
+            } else {
+                setup_avx2()
+            }
+        }
+        #[inline(never)]
+        fn setup_avx2() -> bool {
+            // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+            // after stabilization
+            let cpuid_avx2_token: cpuid_avx2::InitToken = cpuid_avx2::init();
+            if cpuid_avx2_token.get() {
+                unsafe { HAS_AVX2_ATOM.store(1, Ordering::Relaxed) };
+                true
+            } else {
+                unsafe { HAS_AVX2_ATOM.store(-1, Ordering::Relaxed) };
+                false
+            }
+        }
+    }
+
+    #[cfg(target_arch = "x86")]
+    pub use cpuid_sse2::has_sse2;
+
+    #[cfg(target_arch = "x86")]
+    mod cpuid_sse2 {
+        use core::sync::atomic::AtomicI8;
+        use core::sync::atomic::Ordering;
+        cpufeatures::new!(cpuid_sse2, "sse2");
+        static mut HAS_SSE2_ATOM: AtomicI8 = AtomicI8::new(0);
+        //
+        #[inline(always)]
+        pub fn has_sse2() -> bool {
+            let val = unsafe { HAS_SSE2_ATOM.load(Ordering::Relaxed) };
+            if val != 0 {
+                val > 0
+            } else {
+                setup_sse2()
+            }
+        }
+        #[inline(never)]
+        fn setup_sse2() -> bool {
+            // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+            // after stabilization
+            let cpuid_sse2_token: cpuid_sse2::InitToken = cpuid_sse2::init();
+            if cpuid_sse2_token.get() {
+                unsafe { HAS_SSE2_ATOM.store(1, Ordering::Relaxed) };
+                true
+            } else {
+                unsafe { HAS_SSE2_ATOM.store(-1, Ordering::Relaxed) };
+                false
+            }
+        }
+    }
+}
+
+cpufeatures::new!(cpuid_avx2, "avx2");
+cpufeatures::new!(cpuid_sse2, "sse2");

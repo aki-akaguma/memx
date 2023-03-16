@@ -99,18 +99,13 @@ pub fn create_data_mem_ja_1() -> (Vec<String>, &'static str, usize) {
 }
 
 pub fn create_data_chr_en_1() -> (Vec<String>, u8, usize) {
-    let a1 = "You could not possibl"; // 21 bytes
-    let a2 = "my dear Wats"; // 12 bytes
-    let a3 = "This gentleman,"; // 15 bytes
-    let a4 = "Your cases have indee"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
-
+    let s1 = EN_DAT_S1.to_string();
+    let s2 = EN_DAT_S2.to_string();
     let mut v: Vec<String> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 500 {
+        if i > 21 {
             break;
         }
         if i % 2 == 0 {
@@ -119,23 +114,19 @@ pub fn create_data_chr_en_1() -> (Vec<String>, u8, usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 20250;
-    (v, b'e', match_cnt)
+    let match_cnt = 768;
+    (v, b'r', match_cnt)
 }
 
 pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
-    let a1 = "吾輩は猫である"; // 21 bytes
-    let a2 = "夏目漱石"; // 12 bytes
-    let a3 = "坊っちゃん"; // 15 bytes
-    let a4 = "名前はまだない"; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
+    let s1 = JA_DAT_S1.to_string() + JA_DAT_S2;
+    let s2 = JA_DAT_S2.to_string();
 
     let mut v: Vec<String> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 500 {
+        if i > 21 {
             break;
         }
         if i % 2 == 0 {
@@ -144,9 +135,9 @@ pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 5000;
+    let match_cnt = 834;
     let c = {
-        let bytes = a3.as_bytes();
+        let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
     (v, c, match_cnt)
@@ -380,3 +371,27 @@ pub fn create_data_set_ja_1() -> Vec<Vec<u8>> {
     //let match_cnt = 10170;
     v
 }
+
+// data for test
+const EN_DAT_S1: &str = r#"You could not possibly have come at a better time, my dear Watson, he said cordially. I was afraid that you were engaged. So I am. Very much so. Then I can wait in the next room. Not at all. This gentleman, Mr. Wilson, has been my partner and helper in many of my most successful cases, and I have no doubt that he will be of the utmost use to me in yours also.
+Try the settee, said Holmes, relapsing into his armchair and putting his finger-tips together, as was his custom when in judicial moods. I know, my dear Watson, that you share my love of all that is bizarre and outside the conventions and humdrum routine of everyday life.
+You have shown your relish for it by the enthusiasm which has prompted you to chronicle, and, if you will excuse my saying so, somewhat to embellish so many of my own little adventures.
+
+"Your cases have indeed been of the greatest interest to me," I observed.
+
+You will remember that I remarked the other day, just before we went into the very simple problem presented by Miss Mary Sutherland, that for strange effects and extraordinary combinations we must go to life itself, which is always far more daring than any effort of the imagination.
+A proposition which I took the liberty of doubting.
+"#; // 1233 byte
+
+const EN_DAT_S2: &str = r#"For the Doctor Watsons of this world, as opposed to the Sherlock Holmeses, success in the province of detective work must always be, to a very large extent, the result of luck. Sherlock Holmes can extract a clew from a wisp of straw or a flake of cigar ash;
+but Doctor Watson has to have it taken out for him and dusted, and exhibited clearly, with a label attached.
+"#; // 367 byte
+
+const JA_DAT_S1: &str = r#"吾輩は猫である。名前はまだ無い。
+どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。しかもあとで聞くとそれは書生という人間中で一番獰悪な種族であったそうだ。この書生というのは時々我々を捕えて煮て食うという話である。しかしその当時は何という考もなかったから別段恐しいとも思わなかった。ただ彼の掌に載せられてスーと持ち上げられた時何だかフワフワした感じがあったばかりである。掌の上で少し落ちついて書生の顔を見たのがいわゆる人間というものの見始であろう。この時妙なものだと思った感じが今でも残っている。第一毛をもって装飾されべきはずの顔がつるつるしてまるで薬缶だ。その後猫にもだいぶ逢ったがこんな片輪には一度も出会わした事がない。のみならず顔の真中があまりに突起している。そうしてその穴の中から時々ぷうぷうと煙を吹く。どうも咽せぽくて実に弱った。これが人間の飲む煙草というものである事はようやくこの頃知った。
+"#; // 1346 byte
+
+const JA_DAT_S2: &str = r#"
+この書生の掌の裏でしばらくはよい心持に坐っておったが、しばらくすると非常な速力で運転し始めた。書生が動くのか自分だけが動くのか分らないが無暗に眼が廻る。胸が悪くなる。到底助からないと思っていると、どさりと音がして眼から火が出た。それまでは記憶しているがあとは何の事やらいくら考え出そうとしても分らない。
+ふと気が付いて見ると書生はいない。たくさんおった兄弟が一疋も見えぬ。肝心の母親さえ姿を隠してしまった。その上今までの所とは違って無暗に明るい。眼を明いていられぬくらいだ。はてな何でも容子がおかしいと、のそのそ這い出して見ると非常に痛い。吾輩は藁の上から急に笹原の中へ棄てられたのである。
+"#; // 884 byte
