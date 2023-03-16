@@ -63,14 +63,14 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
+#bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
 #bench_nms = bench-memcmp bench-memeq
-#bench_nms = bench-memnechr
+bench_nms = bench-memchr
 
-target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
+#target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
 #target_base = i686-unknown-linux i586-unknown-linux
-#target_base = x86_64-unknown-linux
+target_base = x86_64-unknown-linux
 
 define build-templ =
 target/stamp.build/stamp.build.$(1).$(2):
@@ -115,6 +115,9 @@ test-clean:
 
 $(foreach ver,$(rustc_vers),$(eval $(foreach tb,$(target_base_vers),$(eval $(call test-rustc-templ,$(ver),$(tb))))))
 
+
+bench-dat-check:
+	AKI_TEST_DAT=ja.1 AKI_TEST_STATISTICS="" AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no cargo xbench --bench=bench-memchr
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 

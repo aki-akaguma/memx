@@ -12,6 +12,9 @@ criterion = "0.4"
 memchr = "2.5"
 clf = "0.1"
 
+[target.'cfg(any(target_arch = "aarch64", target_arch = "x86_64", target_arch = "x86"))'.dependencies]
+cpufeatures = "0.2"
+
 [[bench]]
 name = "bench-memchr"
 path = "benches/bench-memchr.rs"

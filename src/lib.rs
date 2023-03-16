@@ -45,10 +45,10 @@ pub struct RangeError;
 
 /// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == c)`.
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memchr_impl(buf, c);
     //
-    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
     let r = mem::_memchr_impl(buf, c);
     //
     r
@@ -196,12 +196,16 @@ pub fn memset(buf: &mut [u8], c: u8) {
 }
 
 // ascii stochastics
+#[rustfmt::skip]
 pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    255, 0, 2, 0, 0, 0, 0, 0, 1, 1, 0, 3, 6, 14, 19, 1, 3, 4, 3, 2, 2, 1, 1, 1, 1, 1, 2, 0, 0, 1,
-    0, 0, 0, 4, 1, 5, 2, 4, 3, 0, 1, 5, 0, 0, 2, 3, 3, 2, 5, 0, 4, 6, 6, 1, 0, 0, 0, 0, 0, 1, 0, 1,
-    0, 1, 0, 39, 7, 20, 19, 69, 11, 9, 18, 39, 0, 2, 18, 12, 38, 38, 12, 1, 34, 35, 50, 13, 5, 5,
-    2, 7, 0, 0, 2, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    255, 0, 2, 0, 0, 0, 0, 0, 1, 1, 0, 3, 6, 14, 19, 1,
+    3, 4, 3, 2, 2, 1, 1, 1, 1, 1, 2, 0, 0, 1, 0, 0,
+    0, 4, 1, 5, 2, 4, 3, 0, 1, 5, 0, 0, 2, 3, 3, 2,
+    5, 0, 4, 6, 6, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1,
+    0, 39, 7, 20, 19, 69, 11, 9, 18, 39, 0, 2, 18, 12, 38, 38,
+    12, 1, 34, 35, 50, 13, 5, 5, 2, 7, 0, 0, 2, 0, 0, 0,
 ];
 
 #[inline(always)]
