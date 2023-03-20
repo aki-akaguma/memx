@@ -56,10 +56,10 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == c)`.
 pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     let r = arch::x86::_memrchr_impl(buf, c);
     //
-    #[cfg(not(any(target_feature = "sse2", target_feature = "avx2")))]
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
     let r = mem::_memrchr_impl(buf, c);
     //
     r
