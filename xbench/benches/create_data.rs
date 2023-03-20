@@ -144,18 +144,23 @@ pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
 }
 
 pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
-    let a1 = "You could not possib "; // 21 bytes
-    let a2 = "            "; // 12 bytes
-    let a3 = " his           "; // 15 bytes
-    let a4 = "                     "; // 21 bytes
-    let s1 = a1.repeat(10) + a2 + a3.repeat(10).as_str(); // 372 = 21*10 + 12 + 15*10
-    let s2 = a4.repeat(10) + a3.repeat(10).as_str(); // 360 = 21*10 + 15*10
-
+    let bb = b'r';
+    let cc = 'r';
+    let s1: String = EN_DAT_S1
+        .to_string()
+        .chars()
+        .map(|c| if c == cc { '.' } else { cc })
+        .collect();
+    let s2: String = EN_DAT_S2
+        .to_string()
+        .chars()
+        .map(|c| if c == cc { '.' } else { cc })
+        .collect();
     let mut v: Vec<String> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 500 {
+        if i > 21 {
             break;
         }
         if i % 2 == 0 {
@@ -164,10 +169,44 @@ pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 15000;
-    (v, b' ', match_cnt)
+    let match_cnt = 768;
+    (v, bb, match_cnt)
 }
 
+pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
+    let bb = b'r';
+    let bbb = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
+        .bytes()
+        .map(|c| if c == bbb { b'.' } else { bb })
+        .collect();
+    let v2: Vec<u8> = JA_DAT_S2.to_string()
+        .bytes()
+        .map(|c| if c == bbb { b'.' } else { bb })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 834;
+    (v, bb, match_cnt)
+}
+
+/*
 pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
     let a1 = "吾輩は猫である"; // 21 bytes
     let a2 = "            "; // 12 bytes
@@ -192,6 +231,7 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
     let match_cnt = 5250;
     (v, b' ', match_cnt)
 }
+*/
 
 pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize) {
     let a1 = "aaaaaaaaaaaaaaaaaaaaa"; // 21 bytes

@@ -65,7 +65,7 @@ endef
 
 #bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
 #bench_nms = bench-memcmp bench-memeq
-bench_nms = bench-memrchr
+bench_nms = bench-memnechr
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -117,7 +117,7 @@ $(foreach ver,$(rustc_vers),$(eval $(foreach tb,$(target_base_vers),$(eval $(cal
 
 
 bench-dat-check:
-	AKI_TEST_DAT=ja.1 AKI_TEST_STATISTICS="" AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no cargo xbench --bench=bench-memrchr
+	AKI_TEST_DAT=ja.1 AKI_TEST_STATISTICS="" AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no cargo xbench --bench=bench-memnechr
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 
