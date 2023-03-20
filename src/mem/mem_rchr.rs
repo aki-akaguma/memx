@@ -301,14 +301,14 @@ fn _c16_value(c: u8) -> u128 {
 fn _rchr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe {
         let slice = core::slice::from_raw_parts(buf_ptr, 16);
-        crate::utils::_read_a_native_endian_u128(slice)
+        crate::utils::_read_a_big_endian_u128(slice)
     };
     let v = v0 ^ c16;
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_0101_0101_0101_0101_u128)
         & !v
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -323,12 +323,12 @@ fn _c8_value(c: u8) -> u64 {
 fn _rchr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe {
         let slice = core::slice::from_raw_parts(buf_ptr, 8);
-        crate::utils::_read_a_native_endian_u64(slice)
+        crate::utils::_read_a_big_endian_u64(slice)
     };
     let v = v0 ^ c8;
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -343,12 +343,12 @@ fn _c4_value(c: u8) -> u32 {
 fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe {
         let slice = core::slice::from_raw_parts(buf_ptr, 4);
-        crate::utils::_read_a_native_endian_u32(slice)
+        crate::utils::_read_a_big_endian_u32(slice)
     };
     let v = v0 ^ c4;
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -358,12 +358,12 @@ fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> 
 fn _rchr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe {
         let slice = core::slice::from_raw_parts(buf_ptr, 2);
-        crate::utils::_read_a_native_endian_u16(slice)
+        crate::utils::_read_a_big_endian_u16(slice)
     };
     let v = v0 ^ c2;
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
