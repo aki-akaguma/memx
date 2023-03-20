@@ -3,8 +3,27 @@
 #[test]
 fn test00() {
     let buf = vec![];
-    //
     let r = test_memnechr(&buf, b'G');
+    assert_eq!(r, None);
+    //
+    let buf = vec![b'g'];
+    let r = test_memnechr(&buf, b'G');
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'a', b'A', b'A'];
+    let r = test_memnechr(&buf, b'A');
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'B', b'b', b'B'];
+    let r = test_memnechr(&buf, b'B');
+    assert_eq!(r, Some(1));
+    //
+    let buf = vec![b'C', b'C', b'a'];
+    let r = test_memnechr(&buf, b'C');
+    assert_eq!(r, Some(2));
+    //
+    let buf = vec![b'A', b'A', b'A'];
+    let r = test_memnechr(&buf, b'A');
     assert_eq!(r, None);
 }
 #[test]
