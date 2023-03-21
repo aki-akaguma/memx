@@ -193,14 +193,14 @@ fn _memchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
 
 #[allow(clippy::missing_safety_doc)]
 #[inline(always)]
-pub unsafe fn _memchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub fn _memchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
-    let end_ptr = buf_ptr.add(buf_len);
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let cc: __m256i = _c32_value(c);
+        let cc: __m256i = unsafe { _c32_value(c) };
         {
             let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
             let loop_size = 32;
@@ -224,11 +224,11 @@ pub unsafe fn _memchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let end_ptr_32 = unsafe { end_ptr.sub(loop_size) };
             while buf_ptr <= end_ptr_32 {
                 _unroll_one_chr_32_aa!(buf_ptr, cc, start_ptr, loop_size, 0);
-                buf_ptr = buf_ptr.add(loop_size);
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
         {
-            let cc: __m128i = _c16_value(c);
+            let cc: __m128i = unsafe { _c16_value(c) };
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             while buf_ptr <= end_ptr_16 {
@@ -238,7 +238,7 @@ pub unsafe fn _memchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc: __m128i = _c16_value(c);
+            let cc: __m128i = unsafe { _c16_value(c) };
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             while buf_ptr <= end_ptr_16 {

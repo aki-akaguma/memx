@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] *
 ### Fixed
 * sometimes returns incorrect values: `mem::_memrchr_impl()`
+* sometimes returns incorrect values: `mem::_memnechr_impl()`
 
 
 ## [0.1.28] (2023-03-15)
