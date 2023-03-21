@@ -27,11 +27,6 @@ fn statistics_std_memnechr(
                     founded.insert(pos, 0);
                 }
                 curr_idx = pos + curr_idx + 1;
-                //
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
             } else {
                 break;
             }
@@ -53,30 +48,28 @@ fn print_statistics_std_memnechr(texts: &[&str], pat_byte: u8) {
     println!("");
 }
 
-#[inline(never)]
+#[inline(always)]
 pub fn std_memnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
     buf.iter().position(|&x| x != c)
 }
 
 #[inline(never)]
 fn process_std_memnechr(texts: &[&str], pat_byte: u8) -> usize {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        std_memnechr_impl(buf, c)
+    }
+    //
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = std_memnechr_impl(&line_bytes[curr_idx..], pat_byte);
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
-                //
-                /*
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
-                */
             } else {
                 break;
             }
@@ -87,23 +80,21 @@ fn process_std_memnechr(texts: &[&str], pat_byte: u8) -> usize {
 
 #[inline(never)]
 fn process_memx_memnechr(texts: &[&str], pat_byte: u8) -> usize {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        memx::memnechr(buf, c)
+    }
+    //
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::memnechr(&line_bytes[curr_idx..], pat_byte);
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
-                //
-                /*
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
-                */
             } else {
                 break;
             }
@@ -114,23 +105,21 @@ fn process_memx_memnechr(texts: &[&str], pat_byte: u8) -> usize {
 
 #[inline(never)]
 fn process_memx_memnechr_basic(texts: &[&str], pat_byte: u8) -> usize {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        memx::mem::memnechr_basic(buf, c)
+    }
+    //
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = memx::mem::memnechr_basic(&line_bytes[curr_idx..], pat_byte);
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
-                //
-                /*
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
-                */
             } else {
                 break;
             }
@@ -145,23 +134,21 @@ fn process_memx_memnechr_basic(texts: &[&str], pat_byte: u8) -> usize {
 ))]
 #[inline(never)]
 fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        unsafe { memx::arch::x86::_memnechr_sse2(buf, c) }
+    }
+    //
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = unsafe { memx::arch::x86::_memnechr_sse2(&line_bytes[curr_idx..], pat_byte) };
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
-                //
-                /*
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
-                */
             } else {
                 break;
             }
@@ -176,23 +163,21 @@ fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
 ))]
 #[inline(never)]
 fn process_memx_memnechr_avx2(texts: &[&str], pat_byte: u8) -> usize {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        unsafe { memx::arch::x86::_memnechr_avx2(buf, c) }
+    }
+    //
     let mut found: usize = 0;
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = unsafe { memx::arch::x86::_memnechr_avx2(&line_bytes[curr_idx..], pat_byte) };
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
                 found += 1;
                 curr_idx = pos + curr_idx + 1;
-                //
-                /*
-                let r = memx::memchr(&line_bytes[curr_idx..], pat_byte);
-                if let Some(pos) = r {
-                    curr_idx = pos + curr_idx + 1;
-                }
-                */
             } else {
                 break;
             }

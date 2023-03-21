@@ -183,7 +183,8 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
         .bytes()
         .map(|c| if c == bbb { b'.' } else { bb })
         .collect();
-    let v2: Vec<u8> = JA_DAT_S2.to_string()
+    let v2: Vec<u8> = JA_DAT_S2
+        .to_string()
         .bytes()
         .map(|c| if c == bbb { b'.' } else { bb })
         .collect();
