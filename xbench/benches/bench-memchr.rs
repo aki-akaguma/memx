@@ -7,8 +7,18 @@ use barrier::cache_line_flush;
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 cpufeatures::new!(cpuid_avx2, "avx2");
 
+#[inline(always)]
+pub fn std_memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == c)
+}
+
 #[inline(never)]
 fn statistics_std_memchr(texts: &[&str], pat_byte: u8) -> std::collections::HashMap<usize, usize> {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        std_memchr_impl(buf, c)
+    }
+    //
     use std::collections::HashMap;
     let mut founded: HashMap<usize, usize> = HashMap::new();
     for line in texts {
@@ -16,12 +26,12 @@ fn statistics_std_memchr(texts: &[&str], pat_byte: u8) -> std::collections::Hash
         let line_len = line_bytes.len();
         let mut curr_idx = 0;
         while curr_idx < line_len {
-            let r = &line_bytes[curr_idx..].iter().position(|&x| x == pat_byte);
+            let r = _t_(&line_bytes[curr_idx..], pat_byte);
             if let Some(pos) = r {
-                if let Some(x) = founded.get_mut(pos) {
+                if let Some(x) = founded.get_mut(&pos) {
                     *x += 1;
                 } else {
-                    founded.insert(*pos, 0);
+                    founded.insert(pos, 0);
                 }
                 curr_idx = pos + curr_idx + 1;
             } else {
@@ -49,7 +59,7 @@ fn print_statistics_std_memchr(texts: &[&str], pat_byte: u8) {
 fn process_std_memchr(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        buf.iter().position(|&x| x == c)
+        std_memchr_impl(buf, c)
     }
     //
     let mut found: usize = 0;
@@ -283,6 +293,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             let n = process_memx_memchr_avx2(black_box(&vv), black_box(pat_byte));
             assert_eq!(n, match_cnt);
         }
+        std::process::exit(0);
     }
     //
     if let Ok(_val) = std::env::var("AKI_TEST_STATISTICS") {

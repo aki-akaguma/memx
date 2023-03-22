@@ -8,10 +8,20 @@ use barrier::cache_line_flush;
 cpufeatures::new!(cpuid_avx2, "avx2");
 
 #[inline(never)]
+pub fn std_memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x != c)
+}
+
+#[inline(never)]
 fn statistics_std_memrnechr(
     texts: &[&str],
     pat_byte: u8,
 ) -> std::collections::HashMap<usize, usize> {
+    #[inline(never)]
+    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
+        std_memrnechr_impl(buf, c)
+    }
+    //
     use std::collections::HashMap;
     let mut founded: HashMap<usize, usize> = HashMap::new();
     for line in texts {
@@ -19,7 +29,7 @@ fn statistics_std_memrnechr(
         let line_len = line_bytes.len();
         let mut curr_idx = line_len;
         while curr_idx > 0 {
-            let r = std_memrnechr_impl(&line_bytes[..curr_idx], pat_byte);
+            let r = _t_(&line_bytes[..curr_idx], pat_byte);
             if let Some(pos) = r {
                 let rpos = curr_idx - pos - 1;
                 if let Some(x) = founded.get_mut(&rpos) {
@@ -47,11 +57,6 @@ fn print_statistics_std_memrnechr(texts: &[&str], pat_byte: u8) {
         println!("{key} => {},", map[&key]);
     }
     println!("");
-}
-
-#[inline(never)]
-pub fn std_memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
-    buf.iter().rposition(|&x| x != c)
 }
 
 #[inline(never)]
@@ -223,6 +228,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             let n = process_memx_memrnechr_avx2(black_box(&vv), black_box(pat_byte));
             assert_eq!(n, match_cnt);
         }
+        std::process::exit(0);
     }
     //
     if let Ok(_val) = std::env::var("AKI_TEST_STATISTICS") {

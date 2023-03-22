@@ -7,7 +7,7 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
         return false;
     }
     #[cfg(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",
@@ -25,7 +25,7 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
         r
     }
     #[cfg(not(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",
@@ -167,25 +167,6 @@ fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
             }
         }
     }
-    /*
-    {
-        let unroll = 8;
-        let loop_size = 16;
-        while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 0);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 1);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 2);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 3);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 4);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 5);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 6);
-            _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 7);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    */
     {
         let loop_size = 16;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -233,25 +214,6 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
             }
         }
     }
-    /*
-    {
-        let unroll = 8;
-        let loop_size = 8;
-        while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 1);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 2);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 3);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 4);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 5);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 6);
-            _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 7);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    */
     {
         let loop_size = 8;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
@@ -299,25 +261,6 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
             }
         }
     }
-    /*
-    {
-        let unroll = 8;
-        let loop_size = 4;
-        while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 1);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 2);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 3);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 4);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 5);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 6);
-            _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 7);
-            //
-            a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-            b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-        }
-    }
-    */
     {
         let loop_size = 4;
         while unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
