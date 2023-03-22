@@ -5,8 +5,71 @@ use std::cmp::Ordering;
 mod barrier;
 use barrier::cache_line_flush;
 
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+cpufeatures::new!(cpuid_avx2, "avx2");
+
+#[inline(always)]
+pub fn std_memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
+    a.cmp(&b)
+}
+
+macro_rules! j_bool {
+    ($j: expr) => {
+        $j < 16 || $j % 4 == 0 || $j % 7 == 0
+    };
+}
+
+#[inline(never)]
+fn statistics_std_memcmp(
+    texts: &[&str],
+    pattern: &str,
+) -> std::collections::HashMap<Ordering, usize> {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        std_memcmp_impl(a, b)
+    }
+    //
+    let pat_bytes = pattern.as_bytes();
+    let pat_len = pat_bytes.len();
+    use std::collections::HashMap;
+    let mut founded: HashMap<Ordering, usize> = HashMap::new();
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        for i in 0..(line_len - pat_len) {
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                if let Some(x) = founded.get_mut(&r) {
+                    *x += 1;
+                } else {
+                    founded.insert(r, 1);
+                }
+            }
+        }
+    }
+    founded
+}
+
+#[allow(dead_code)]
+#[inline(never)]
+fn print_statistics_std_memcmp(texts: &[&str], pattern: &str) {
+    let map = statistics_std_memcmp(texts, pattern);
+    let mut vec: Vec<Ordering> = map.clone().into_keys().collect();
+    vec.sort_unstable();
+    println!("Statistics:");
+    for key in vec {
+        println!("{key:#?} => {},", map[&key]);
+    }
+    println!("");
+}
+
 #[inline(never)]
 fn process_std_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        std_memcmp_impl(a, b)
+    }
+    //
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
     let mut found_eq: usize = 0;
@@ -16,11 +79,13 @@ fn process_std_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = (&line_bytes[i..(i + pat_len)]).cmp(&pat_bytes);
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
             }
         }
     }
@@ -47,6 +112,10 @@ fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
             Ordering::Greater
         }
     }
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        _x_libc_memcmp(a, b)
+    }
     //
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
@@ -57,11 +126,13 @@ fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = _x_libc_memcmp(&line_bytes[i..(i + pat_len)], pat_bytes);
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
             }
         }
     }
@@ -70,6 +141,11 @@ fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
 
 #[inline(never)]
 fn process_memx_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        memx::memcmp(a, b)
+    }
+    //
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
     let mut found_eq: usize = 0;
@@ -79,11 +155,13 @@ fn process_memx_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = memx::memcmp(&line_bytes[i..(i + pat_len)], pat_bytes);
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
             }
         }
     }
@@ -92,6 +170,11 @@ fn process_memx_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
 
 #[inline(never)]
 fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        memx::mem::memcmp_basic(a, b)
+    }
+    //
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
     let mut found_eq: usize = 0;
@@ -101,11 +184,13 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r = memx::mem::memcmp_basic(&line_bytes[i..(i + pat_len)], pat_bytes);
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
             }
         }
     }
@@ -118,6 +203,11 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
 ))]
 #[inline(never)]
 fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        unsafe { memx::arch::x86::_memcmp_sse2(a, b) }
+    }
+    //
     let pat_bytes = pattern.as_bytes();
     let pat_len = pat_bytes.len();
     let mut found_eq: usize = 0;
@@ -127,12 +217,46 @@ fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usi
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
         for i in 0..(line_len - pat_len) {
-            let r =
-                unsafe { memx::arch::x86::_memcmp_sse2(&line_bytes[i..(i + pat_len)], pat_bytes) };
-            match r {
-                Ordering::Equal => found_eq += 1,
-                Ordering::Less => found_le += 1,
-                Ordering::Greater => found_gr += 1,
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
+            }
+        }
+    }
+    (found_eq, found_le, found_gr)
+}
+
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "x86"),
+    target_feature = "sse2"
+))]
+#[inline(never)]
+fn process_memx_memcmp_avx2(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
+    #[inline(never)]
+    fn _t_(a: &[u8], b: &[u8]) -> Ordering {
+        unsafe { memx::arch::x86::_memcmp_avx2(a, b) }
+    }
+    //
+    let pat_bytes = pattern.as_bytes();
+    let pat_len = pat_bytes.len();
+    let mut found_eq: usize = 0;
+    let mut found_le: usize = 0;
+    let mut found_gr: usize = 0;
+    for line in texts {
+        let line_bytes = line.as_bytes();
+        let line_len = line_bytes.len();
+        for i in 0..(line_len - pat_len) {
+            if j_bool!(i) {
+                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
+                match r {
+                    Ordering::Equal => found_eq += 1,
+                    Ordering::Less => found_le += 1,
+                    Ordering::Greater => found_gr += 1,
+                }
             }
         }
     }
@@ -154,32 +278,53 @@ fn criterion_benchmark(c: &mut Criterion) {
     let vv: Vec<&str> = v.iter().map(|item| item.as_str()).collect();
     let pat_string = pat_string_s.to_string();
     //
-    let (n_eq, n_le, n_gr) = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
-    assert_eq!(n_eq, match_cnt);
-    assert_eq!(n_le, less_cnt);
-    assert_eq!(n_gr, greater_count);
-    let (n_eq, n_le, n_gr) = process_libc_memcmp(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n_eq, match_cnt);
-    assert_eq!(n_le, less_cnt);
-    assert_eq!(n_gr, greater_count);
-    let (n_eq, n_le, n_gr) = process_memx_memcmp(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n_eq, match_cnt);
-    assert_eq!(n_le, less_cnt);
-    assert_eq!(n_gr, greater_count);
-    let (n_eq, n_le, n_gr) = process_memx_memcmp_basic(black_box(&vv), black_box(&pat_string));
-    assert_eq!(n_eq, match_cnt);
-    assert_eq!(n_le, less_cnt);
-    assert_eq!(n_gr, greater_count);
-    #[cfg(all(
-        any(target_arch = "x86_64", target_arch = "x86"),
-        target_feature = "sse2"
-    ))]
-    {
-        let (n_eq, n_le, n_gr) = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
+    if let Ok(_val) = std::env::var("AKI_TEST_DAT_CHECK") {
+        let (n_eq, n_le, n_gr) = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
         assert_eq!(n_eq, match_cnt);
         assert_eq!(n_le, less_cnt);
         assert_eq!(n_gr, greater_count);
+        let (n_eq, n_le, n_gr) = process_libc_memcmp(black_box(&vv), black_box(&pat_string));
+        assert_eq!(n_eq, match_cnt);
+        assert_eq!(n_le, less_cnt);
+        assert_eq!(n_gr, greater_count);
+        let (n_eq, n_le, n_gr) = process_memx_memcmp(black_box(&vv), black_box(&pat_string));
+        assert_eq!(n_eq, match_cnt);
+        assert_eq!(n_le, less_cnt);
+        assert_eq!(n_gr, greater_count);
+        let (n_eq, n_le, n_gr) = process_memx_memcmp_basic(black_box(&vv), black_box(&pat_string));
+        assert_eq!(n_eq, match_cnt);
+        assert_eq!(n_le, less_cnt);
+        assert_eq!(n_gr, greater_count);
+        #[cfg(all(
+            any(target_arch = "x86_64", target_arch = "x86"),
+            target_feature = "sse2"
+        ))]
+        {
+            let (n_eq, n_le, n_gr) =
+                process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
+            assert_eq!(n_eq, match_cnt);
+            assert_eq!(n_le, less_cnt);
+            assert_eq!(n_gr, greater_count);
+        }
+        #[cfg(all(
+            any(target_arch = "x86_64", target_arch = "x86"),
+            target_feature = "sse2"
+        ))]
+        if cpuid_avx2::get() {
+            let (n_eq, n_le, n_gr) =
+                process_memx_memcmp_avx2(black_box(&vv), black_box(&pat_string));
+            assert_eq!(n_eq, match_cnt);
+            assert_eq!(n_le, less_cnt);
+            assert_eq!(n_gr, greater_count);
+        }
+        std::process::exit(0);
     }
+    //
+    if let Ok(_val) = std::env::var("AKI_TEST_STATISTICS") {
+        print_statistics_std_memcmp(black_box(&vv), black_box(&pat_string));
+        std::process::exit(0);
+    }
+    //
     cache_flush(&vv, &pat_string);
     //
     c.bench_function("std_memcmp", |b| {
@@ -215,13 +360,26 @@ fn criterion_benchmark(c: &mut Criterion) {
             let _r = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
         })
     });
+    cache_flush(&vv, &pat_string);
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "x86"),
+        target_feature = "sse2"
+    ))]
+    if cpuid_avx2::get() {
+        c.bench_function("memx_memcmp_avx2", |b| {
+            b.iter(|| {
+                let _r = process_memx_memcmp_avx2(black_box(&vv), black_box(&pat_string));
+            })
+        });
+    }
 }
 
 criterion_group! {
     name = benches;
     config = Criterion::default()
-        .warm_up_time(std::time::Duration::from_millis(300))
-        .measurement_time(std::time::Duration::from_millis(4000));
+        .sample_size(200)
+        .warm_up_time(std::time::Duration::from_millis(100))
+        .measurement_time(std::time::Duration::from_millis(1000));
     targets = criterion_benchmark
 }
 //criterion_group!(benches, criterion_benchmark);

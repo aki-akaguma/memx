@@ -63,9 +63,9 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memcmp bench-memcpy bench-memeq bench-memmem bench-memrchr bench-memrmem bench-memset bench-memnechr bench-memrnechr
-#bench_nms = bench-memcmp bench-memeq
-bench_nms = bench-memrnechr
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memmem bench-memrmem bench-memcmp bench-memeq bench-memcpy bench-memset
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
+bench_nms = bench-memrmem
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -115,9 +115,30 @@ test-clean:
 
 $(foreach ver,$(rustc_vers),$(eval $(foreach tb,$(target_base_vers),$(eval $(call test-rustc-templ,$(ver),$(tb))))))
 
+ENV_DAT_CHECK = AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0 cargo xbench
 
 bench-dat-check:
-	AKI_TEST_DAT=ja.1 AKI_TEST_STATISTICS="" AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no cargo xbench --bench=bench-memnechr
+	@#AKI_TEST_DAT=ja.1 AKI_TEST_STATISTICS="" AKI_TEST_DAT_CHECK="" CARGO_PROFILE_BENCH_LTO=no cargo xbench --bench=bench-memnechr
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memchr
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memnechr
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memnechr
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memcmp
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memcmp
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memeq
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memeq
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memcpy
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memcpy
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memset
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memset
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memmem
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memmem
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 

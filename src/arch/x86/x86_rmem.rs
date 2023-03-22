@@ -1,16 +1,32 @@
 use crate::mem as basic;
 
-#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
-use super::cpuid_avx2;
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+use super::cpuid;
 
 #[inline(always)]
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-pub fn _memrmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
-    let r = unsafe { _memrmem_sse2_avx2(haystack, needle) };
-    #[cfg(not(any(target_feature = "avx2", target_feature = "sse2")))]
-    let r = _memrmem_basic(haystack, needle);
-    r
+#[cfg(target_arch = "x86_64")]
+pub(crate) fn _memrmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid::has_avx2() {
+        unsafe { _memrmem_avx2(haystack, needle) }
+    } else {
+        unsafe { _memrmem_sse2(haystack, needle) }
+    }
+}
+
+#[inline(always)]
+#[cfg(target_arch = "x86")]
+pub(crate) fn _memrmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    if cpuid::has_avx2() {
+        unsafe { _memrmem_avx2(haystack, needle) }
+    } else if cpuid::has_sse2() {
+        unsafe { _memrmem_sse2(haystack, needle) }
+    } else {
+        _memrmem_basic(haystack, needle)
+    }
 }
 
 fn _memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
@@ -18,9 +34,16 @@ fn _memrmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[cfg(any(target_feature = "sse2", target_feature = "avx2"))]
+#[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrmem_sse2_avx2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+pub unsafe fn _memrmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    _memrmem_sse2_avx2_impl(haystack, needle)
+}
+
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+#[target_feature(enable = "avx2")]
+#[allow(clippy::missing_safety_doc)]
+pub unsafe fn _memrmem_avx2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     _memrmem_sse2_avx2_impl(haystack, needle)
 }
 
@@ -63,7 +86,7 @@ fn _memrmem_sse2_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> 
     while curr_idx > 0 {
         // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
         // after stabilization
-        let r = if cpuid_avx2::get() {
+        let r = if cpuid::has_avx2() {
             unsafe { super::_memrchr_avx2(&haystack[..curr_idx], nee_1st_byte) }
         } else {
             unsafe { super::_memrchr_sse2(&haystack[..curr_idx], nee_1st_byte) }
@@ -99,7 +122,7 @@ fn _memrmem_sse2_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize>
     while curr_idx > 0 {
         // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
         // after stabilization
-        let r = if cpuid_avx2::get() {
+        let r = if cpuid::has_avx2() {
             unsafe { super::_memrchr_avx2(&haystack[..curr_idx], nee_last_byte) }
         } else {
             unsafe { super::_memrchr_sse2(&haystack[..curr_idx], nee_last_byte) }

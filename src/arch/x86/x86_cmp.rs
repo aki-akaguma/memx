@@ -1,18 +1,15 @@
 use crate::mem as basic;
 use core::cmp::Ordering;
 
-#[cfg(target_arch = "x86_64")]
-use super::cpuid_avx2;
-
-#[cfg(target_arch = "x86")]
-use super::{cpuid_avx2, cpuid_sse2};
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+use super::cpuid;
 
 #[inline(always)]
 #[cfg(target_arch = "x86_64")]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx2::get() {
+    if cpuid::has_avx2() {
         unsafe { _memcmp_avx2(a, b) }
     } else {
         unsafe { _memcmp_sse2(a, b) }
@@ -24,9 +21,9 @@ pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx2::get() {
+    if cpuid::has_avx2() {
         unsafe { _memcmp_avx2(a, b) }
-    } else if cpuid_sse2::get() {
+    } else if cpuid::has_sse2() {
         unsafe { _memcmp_sse2(a, b) }
     } else {
         _memcmp_basic(a, b)
