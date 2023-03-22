@@ -1,3 +1,4 @@
+use crate::utils::*;
 use crate::{plus_offset_from, propagate_a_high_bit};
 
 #[inline(always)]
@@ -9,7 +10,7 @@ pub fn _memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
         return Some(buf.len() - 1);
     }
     #[cfg(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",
@@ -27,7 +28,7 @@ pub fn _memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
         r
     }
     #[cfg(not(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",
@@ -125,6 +126,34 @@ fn _start_rnechr_128(buf: &[u8], c: u8) -> Option<usize> {
         }
     }
     {
+        let unroll = 4;
+        let loop_size = 16;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 3);
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 16;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
         let loop_size = 16;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
             let mut buf_ptr = buf_ptr_cur;
@@ -168,6 +197,34 @@ fn _start_rnechr_64(buf: &[u8], c: u8) -> Option<usize> {
         }
     }
     {
+        let unroll = 4;
+        let loop_size = 8;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 3);
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 8;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
         let loop_size = 8;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
             let mut buf_ptr = buf_ptr_cur;
@@ -204,6 +261,34 @@ fn _start_rnechr_32(buf: &[u8], c: u8) -> Option<usize> {
                 _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 4);
                 _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
                 _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 4;
+        let loop_size = 4;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
+                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 4;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
                 _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
                 _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
             }
@@ -295,7 +380,7 @@ pub(crate) fn _memrnechr_remaining_3_bytes_impl(
 
 #[inline(always)]
 fn _c16_value(c: u8) -> u128 {
-    (c as u128) * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128
+    (c as u128) * HAS_ZERO_ONES_U128
 }
 
 #[inline(always)]
@@ -305,10 +390,14 @@ fn _rnechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<us
         crate::utils::_read_a_native_endian_u128(slice)
     };
     let v = v0 ^ c16;
+    /*
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_0101_0101_0101_0101_u128)
         & !v
         & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
     if bits != 0x8080_8080_8080_8080_8080_8080_8080_8080_u128 {
+    */
+    let bits = has_zero_byte_u128(v);
+    if bits != HAS_ZERO_HIGHS_U128 {
         let bits = propagate_a_high_bit(bits);
         Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
@@ -318,7 +407,7 @@ fn _rnechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<us
 
 #[inline(always)]
 fn _c8_value(c: u8) -> u64 {
-    (c as u64) * 0x0101_0101_0101_0101_u64
+    (c as u64) * HAS_ZERO_ONES_U64
 }
 
 #[inline(always)]
@@ -328,8 +417,12 @@ fn _rnechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize
         crate::utils::_read_a_native_endian_u64(slice)
     };
     let v = v0 ^ c8;
+    /*
     let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
     if bits != 0x8080_8080_8080_8080_u64 {
+    */
+    let bits = has_zero_byte_u64(v);
+    if bits != HAS_ZERO_HIGHS_U64 {
         let bits = propagate_a_high_bit(bits);
         Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
@@ -339,7 +432,7 @@ fn _rnechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize
 
 #[inline(always)]
 fn _c4_value(c: u8) -> u32 {
-    (c as u32) * 0x0101_0101_u32
+    (c as u32) * HAS_ZERO_ONES_U32
 }
 
 #[inline(always)]
@@ -349,8 +442,12 @@ fn _rnechr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize
         crate::utils::_read_a_native_endian_u32(slice)
     };
     let v = v0 ^ c4;
+    /*
     let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
     if bits != 0x8080_8080_u32 {
+    */
+    let bits = has_zero_byte_u32(v);
+    if bits != HAS_ZERO_HIGHS_U32 {
         let bits = propagate_a_high_bit(bits);
         Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.leading_ones() / 8) as usize)
     } else {
@@ -365,8 +462,12 @@ fn _rnechr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize
         crate::utils::_read_a_native_endian_u16(slice)
     };
     let v = v0 ^ c2;
+    /*
     let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
     if bits != 0x8080_u16 {
+    */
+    let bits = has_zero_byte_u16(v);
+    if bits != HAS_ZERO_HIGHS_U16 {
         let bits = propagate_a_high_bit(bits);
         Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.leading_ones() / 8) as usize)
     } else {

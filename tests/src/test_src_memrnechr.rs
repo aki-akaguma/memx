@@ -6,9 +6,29 @@ fn test00() {
     let r = test_memrnechr(&buf, b'G');
     assert_eq!(r, None);
     //
-    let buf = vec![b'A', b'G'];
-    let r = test_memrnechr(&buf, b'g');
+    let buf = vec![b'g'];
+    let r = test_memrnechr(&buf, b'G');
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'a', b'A', b'A'];
+    let r = test_memrnechr(&buf, b'A');
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'B', b'C', b'B'];
+    let r = test_memrnechr(&buf, b'B');
     assert_eq!(r, Some(1));
+    //
+    let buf = vec![b'B', b'B', b'C'];
+    let r = test_memrnechr(&buf, b'B');
+    assert_eq!(r, Some(2));
+    //
+    let buf = vec![b'A', b'A', b'A'];
+    let r = test_memrnechr(&buf, b'A');
+    assert_eq!(r, None);
+    //
+    let buf = vec![b'C', b'B', b'B'];
+    let r = test_memrnechr(&buf, b'B');
+    assert_eq!(r, Some(0));
 }
 #[test]
 fn test01() {
