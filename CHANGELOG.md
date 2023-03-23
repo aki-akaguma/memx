@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * renewal benchmark
 
 ### Fixed
+* some bug: cargo test --features test_pointer_width_128
 * sometimes returns incorrect values: `mem::_memrchr_impl()`
 * sometimes returns incorrect values: `mem::_memnechr_impl()`
 
