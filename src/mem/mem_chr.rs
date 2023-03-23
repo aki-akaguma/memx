@@ -9,7 +9,7 @@ pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
         return Some(0);
     }
     #[cfg(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",
@@ -27,7 +27,7 @@ pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
         r
     }
     #[cfg(not(all(
-        any(test, tarpaulin),
+        any(feature = "test", tarpaulin),
         any(
             feature = "test_pointer_width_128",
             feature = "test_pointer_width_64",

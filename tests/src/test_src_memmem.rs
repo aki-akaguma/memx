@@ -12,6 +12,10 @@ fn test00() {
     assert_eq!(r, None);
     let r = test_memmem(&pat_2, &pat_1);
     assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let r = test_memmem(&buf, "BC".as_bytes());
+    assert_eq!(r, Some(1));
 }
 #[test]
 fn test01() {
