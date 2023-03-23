@@ -174,8 +174,7 @@ pub fn create_data_mem_en_1() -> (Vec<String>, &'static str, usize) {
         }
     }
     let match_cnt = 10;
-    let s = r#"of the imagination.
-A proposition which"#;
+    let s = r#"just before we went into the very simple problem"#;
     (v, s, match_cnt)
 }
 
@@ -195,8 +194,8 @@ pub fn create_data_mem_ja_1() -> (Vec<String>, &'static str, usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 21;
-    let s = "。吾輩は藁の上から急に笹原の中へ棄";
+    let match_cnt = 10;
+    let s = "顔がつるつるしてまるで薬缶";
     (v, s, match_cnt)
 }
 
