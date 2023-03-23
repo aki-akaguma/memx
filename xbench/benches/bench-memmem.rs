@@ -372,7 +372,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memmem_sse2", |b| {
+        c.bench_function("memx_memmem_avx2", |b| {
             b.iter(|| {
                 let _r = process_memx_memmem_avx2(black_box(&vv), black_box(&pat_string));
             })
