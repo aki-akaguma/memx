@@ -50,6 +50,12 @@ pub use x86_nechr::_memnechr_sse2;
 pub use x86_rnechr::_memrnechr_avx2;
 pub use x86_rnechr::_memrnechr_sse2;
 
+pub use x86_chr_double::_memchr_double_avx2;
+pub use x86_chr_double::_memchr_double_sse2;
+
+pub use x86_rchr_double::_memrchr_double_avx2;
+pub use x86_rchr_double::_memrchr_double_sse2;
+
 pub use x86_mem::_memmem_avx2;
 pub use x86_mem::_memmem_sse2;
 

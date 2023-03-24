@@ -9,6 +9,22 @@ fn test00() {
     let buf = vec![b'A', b'g'];
     let r = test_memrchr_double(&buf, b'G', b'g');
     assert_eq!(r, Some(1));
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let r = test_memrchr_double(&buf, b'A', b'a');
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let r = test_memrchr_double(&buf, b'B', b'b');
+    assert_eq!(r, Some(1));
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let r = test_memrchr_double(&buf, b'C', b'c');
+    assert_eq!(r, Some(2));
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let r = test_memrchr_double(&buf, b'a', b'b');
+    assert_eq!(r, None);
 }
 #[test]
 fn test01() {

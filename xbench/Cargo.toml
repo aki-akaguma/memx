@@ -21,23 +21,8 @@ path = "benches/bench-memchr.rs"
 harness = false
 
 [[bench]]
-name = "bench-memcmp"
-path = "benches/bench-memcmp.rs"
-harness = false
-
-[[bench]]
-name = "bench-memcpy"
-path = "benches/bench-memcpy.rs"
-harness = false
-
-[[bench]]
-name = "bench-memeq"
-path = "benches/bench-memeq.rs"
-harness = false
-
-[[bench]]
-name = "bench-memmem"
-path = "benches/bench-memmem.rs"
+name = "bench-memrchr"
+path = "benches/bench-memrchr.rs"
 harness = false
 
 [[bench]]
@@ -46,13 +31,34 @@ path = "benches/bench-memnechr.rs"
 harness = false
 
 [[bench]]
-name = "bench-memrchr"
-path = "benches/bench-memrchr.rs"
+name = "bench-memrnechr"
+path = "benches/bench-memrnechr.rs"
 harness = false
 
 [[bench]]
-name = "bench-memrnechr"
-path = "benches/bench-memrnechr.rs"
+name = "bench-memcmp"
+path = "benches/bench-memcmp.rs"
+harness = false
+
+[[bench]]
+name = "bench-memeq"
+path = "benches/bench-memeq.rs"
+harness = false
+
+[[bench]]
+name = "bench-memcpy"
+path = "benches/bench-memcpy.rs"
+harness = false
+
+[[bench]]
+name = "bench-memset"
+path = "benches/bench-memset.rs"
+harness = false
+
+
+[[bench]]
+name = "bench-memmem"
+path = "benches/bench-memmem.rs"
 harness = false
 
 [[bench]]
@@ -61,6 +67,11 @@ path = "benches/bench-memrmem.rs"
 harness = false
 
 [[bench]]
-name = "bench-memset"
-path = "benches/bench-memset.rs"
+name = "bench-memchr_double"
+path = "benches/bench-memchr_double.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrchr_double"
+path = "benches/bench-memrchr_double.rs"
 harness = false

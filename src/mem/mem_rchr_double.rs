@@ -360,12 +360,12 @@ fn _c16_value(c: u8) -> u128 {
 
 #[inline(always)]
 fn _rchr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
+    let v0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) };
     let v = v0 ^ c16;
     //
     let bits = PackedU128::new(v).may_have_zero_quick();
     if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -378,12 +378,12 @@ fn _c8_value(c: u8) -> u64 {
 
 #[inline(always)]
 fn _rchr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
+    let v0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) };
     let v = v0 ^ c8;
     //
     let bits = PackedU64::new(v).may_have_zero_quick();
     if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -396,12 +396,12 @@ fn _c4_value(c: u8) -> u32 {
 
 #[inline(always)]
 fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
+    let v0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) };
     let v = v0 ^ c4;
     //
     let bits = PackedU32::new(v).may_have_zero_quick();
     if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -409,12 +409,12 @@ fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> 
 
 #[inline(always)]
 fn _rchr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) };
+    let v0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) };
     let v = v0 ^ c2;
     //
     let bits = PackedU16::new(v).may_have_zero_quick();
     if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.leading_zeros() / 8) as usize)
+        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
     }
