@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] *
 ### Added
+* `memchr_double()`, `memrchr_double()` into `bench`
 * `grcov` target into `Makefile`
 
 ### Changed

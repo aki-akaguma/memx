@@ -16,6 +16,14 @@ pub fn create_data_nechr() -> (Vec<String>, u8, usize) {
     }
 }
 
+pub fn create_data_chr_double() -> (Vec<String>, (u8, u8), usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_chr_double_ja_1(),
+        _ => create_data_chr_double_en_1(),
+    }
+}
+
 pub fn create_data_mem() -> (Vec<String>, &'static str, usize) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
@@ -155,6 +163,56 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
     }
     let match_cnt = 834;
     (v, bb, match_cnt)
+}
+
+
+pub fn create_data_chr_double_en_1() -> (Vec<String>, (u8, u8), usize) {
+    let s1 = EN_DAT_S1.to_string();
+    let s2 = EN_DAT_S2.to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 768 + 162;
+    (v, (b'r', b'.'), match_cnt)
+}
+
+pub fn create_data_chr_double_ja_1() -> (Vec<String>, (u8, u8), usize) {
+    let s1 = JA_DAT_S1.to_string() + JA_DAT_S2;
+    let s2 = JA_DAT_S2.to_string();
+
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 834 + 134;
+    let c1 = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let c2 = {
+        let bytes = r"じ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    (v, (c1, c2), match_cnt)
 }
 
 pub fn create_data_mem_en_1() -> (Vec<String>, &'static str, usize) {
