@@ -67,7 +67,7 @@ endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memmem bench-memrmem bench-memcmp bench-memeq bench-memcpy bench-memset
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
-bench_nms = bench-memrmem
+bench_nms = bench-memchr
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux

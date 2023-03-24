@@ -1,3 +1,5 @@
+use crate::utils::*;
+
 #[inline(always)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     if a.is_empty() && b.is_empty() {
@@ -56,12 +58,8 @@ macro_rules! _unroll_one_eq_16 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe {
-            crate::utils::_read_a_native_endian_u128(core::slice::from_raw_parts(aa_ptr, 16))
-        };
-        let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u128(core::slice::from_raw_parts(bb_ptr, 16))
-        };
+        let aac = unsafe { _read_a_native_endian_from_ptr_u128(aa_ptr) };
+        let bbc = unsafe { _read_a_native_endian_from_ptr_u128(bb_ptr) };
         if aac != bbc {
             return false;
         }
@@ -73,12 +71,8 @@ macro_rules! _unroll_one_eq_8 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe {
-            crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(aa_ptr, 8))
-        };
-        let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u64(core::slice::from_raw_parts(bb_ptr, 8))
-        };
+        let aac = unsafe { _read_a_native_endian_from_ptr_u64(aa_ptr) };
+        let bbc = unsafe { _read_a_native_endian_from_ptr_u64(bb_ptr) };
         if aac != bbc {
             return false;
         }
@@ -90,12 +84,8 @@ macro_rules! _unroll_one_eq_4 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe {
-            crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(aa_ptr, 4))
-        };
-        let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u32(core::slice::from_raw_parts(bb_ptr, 4))
-        };
+        let aac = unsafe { _read_a_native_endian_from_ptr_u32(aa_ptr) };
+        let bbc = unsafe { _read_a_native_endian_from_ptr_u32(bb_ptr) };
         if aac != bbc {
             return false;
         }
@@ -107,12 +97,8 @@ macro_rules! _unroll_one_eq_2 {
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
         let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
         //
-        let aac = unsafe {
-            crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(aa_ptr, 2))
-        };
-        let bbc = unsafe {
-            crate::utils::_read_a_native_endian_u16(core::slice::from_raw_parts(bb_ptr, 2))
-        };
+        let aac = unsafe { _read_a_native_endian_from_ptr_u16(aa_ptr) };
+        let bbc = unsafe { _read_a_native_endian_from_ptr_u16(bb_ptr) };
         if aac != bbc {
             return false;
         }
