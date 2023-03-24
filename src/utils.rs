@@ -89,81 +89,36 @@ pub(crate) fn _read_a_big_endian_u16(input: &[u8]) -> u16 {
     r
 }
 
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_ONES_U128: u128 = u128::MAX / (u8::MAX as u128);
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_HIGHS_U128: u128 = HAS_ZERO_ONES_U128 * (u8::MAX / 2 + 1) as u128;
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_LOWS_U128: u128 = HAS_ZERO_ONES_U128 * (u8::MAX / 2) as u128;
-
-#[allow(dead_code)]
 #[inline(always)]
-pub(crate) fn has_zero_u128(x: u128) -> u128 {
-    x.wrapping_sub(HAS_ZERO_ONES_U128) & !x & HAS_ZERO_HIGHS_U128
+pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
+    (ptr as usize) - (origin as usize)
 }
 
-#[allow(dead_code)]
 #[inline(always)]
-pub(crate) fn has_zero_byte_u128(x: u128) -> u128 {
-    !((((x & HAS_ZERO_LOWS_U128).wrapping_add(HAS_ZERO_LOWS_U128)) | x) | HAS_ZERO_LOWS_U128)
+pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
+where
+    T: core::ops::Div<Output = T> + core::ops::Mul<Output = T> + From<u8>,
+{
+    /*
+    // a hight bit propagation: bits: 0b_1000_0000
+    let bits = bits | (bits >> 1); // 0b_1100_0000
+    let bits = bits | (bits >> 2); // 0b_1111_0000
+    let bits = bits | (bits >> 4); // 0b_1111_1111
+    */
+    /*
+    // a hight bit propagation:
+    // ------------------------ bits: 0b_0000_0000_1000_0000
+    let bits = bits / 0x80.into(); // 0b_0000_0000_0000_0001
+    let bits = bits * 0xFF.into(); // 0b_0000_0000_1111_1111
+    */
+    (bits / 0x80.into()) * 0xFF.into()
 }
 
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_ONES_U64: u64 = u64::MAX / (u8::MAX as u64);
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_HIGHS_U64: u64 = HAS_ZERO_ONES_U64 * (u8::MAX / 2 + 1) as u64;
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_LOWS_U64: u64 = HAS_ZERO_ONES_U64 * (u8::MAX / 2) as u64;
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_u64(x: u64) -> u64 {
-    x.wrapping_sub(HAS_ZERO_ONES_U64) & !x & HAS_ZERO_HIGHS_U64
-}
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_byte_u64(x: u64) -> u64 {
-    !((((x & HAS_ZERO_LOWS_U64).wrapping_add(HAS_ZERO_LOWS_U64)) | x) | HAS_ZERO_LOWS_U64)
-}
-
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_ONES_U32: u32 = u32::MAX / (u8::MAX as u32);
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_HIGHS_U32: u32 = HAS_ZERO_ONES_U32 * (u8::MAX / 2 + 1) as u32;
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_LOWS_U32: u32 = HAS_ZERO_ONES_U32 * (u8::MAX / 2) as u32;
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_u32(x: u32) -> u32 {
-    x.wrapping_sub(HAS_ZERO_ONES_U32) & !x & HAS_ZERO_HIGHS_U32
-}
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_byte_u32(x: u32) -> u32 {
-    !((((x & HAS_ZERO_LOWS_U32).wrapping_add(HAS_ZERO_LOWS_U32)) | x) | HAS_ZERO_LOWS_U32)
-}
-
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_ONES_U16: u16 = u16::MAX / (u8::MAX as u16);
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_HIGHS_U16: u16 = HAS_ZERO_ONES_U16 * (u8::MAX / 2 + 1) as u16;
-#[allow(dead_code)]
-pub(crate) const HAS_ZERO_LOWS_U16: u16 = HAS_ZERO_ONES_U16 * (u8::MAX / 2) as u16;
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_u16(x: u16) -> u16 {
-    x.wrapping_sub(HAS_ZERO_ONES_U16) & !x & HAS_ZERO_HIGHS_U16
-}
-
-#[allow(dead_code)]
-#[inline(always)]
-pub(crate) fn has_zero_byte_u16(x: u16) -> u16 {
-    !((((x & HAS_ZERO_LOWS_U16).wrapping_add(HAS_ZERO_LOWS_U16)) | x) | HAS_ZERO_LOWS_U16)
-}
+/*
+ * Refer.
+ *   https://mmi.hatenablog.com/entry/2017/07/27/230005
+ *   you should have memcpy(), memcmp(), memset() on nostd environments
+*/
 
 /* for rust playground
 fn main() {
@@ -208,4 +163,63 @@ has_zero_byte: 0x00808080
 v:             0x00000000
 has_zero:      0x80808080
 has_zero_byte: 0x80808080
+*/
+
+macro_rules! packed_integers {
+    ($($packed:ident: $ty:ident,)+) => {$(
+        #[derive(Debug, Default)]
+        pub(crate) struct $packed($ty);
+
+        #[allow(dead_code)]
+        impl $packed {
+            pub const ONES: $ty = $ty::MAX / (u8::MAX as $ty);
+            pub const HIGHS: $ty = Self::ONES * (u8::MAX / 2 + 1) as $ty;
+            pub const LOWS: $ty = Self::ONES * (u8::MAX / 2) as $ty;
+            //
+            pub fn new(v: $ty) -> Self {
+                Self(v)
+            }
+            pub fn may_have_zero_quick(&self) -> Self {
+                let x = self.0;
+                let v = x.wrapping_sub(Self::ONES) & !x & Self::HIGHS;
+                Self::new(v)
+            }
+            pub fn may_have_zero_byte(&self) -> Self {
+                let x = self.0;
+                let v = !((((x & Self::LOWS).wrapping_add(Self::LOWS)) | x) | Self::LOWS);
+                Self::new(v)
+            }
+            pub fn is_zeros(&self) -> bool {
+                self.0 == 0
+            }
+            pub fn is_highs(&self) -> bool {
+                self.0 == Self::HIGHS
+            }
+            pub fn propagate_a_high_bit(self) -> Self {
+                Self::new(propagate_a_high_bit(self.0))
+            }
+            pub fn leading_ones(&self) -> u32 {
+                self.0.leading_ones()
+            }
+            pub fn trailing_ones(&self) -> u32 {
+                self.0.trailing_ones()
+            }
+            pub fn trailing_zeros(&self) -> u32 {
+                self.0.trailing_zeros()
+            }
+        }
+    )+}
+}
+
+packed_integers! {
+    PackedU16: u16,
+    PackedU32: u32,
+    PackedU64: u64,
+    PackedU128: u128,
+}
+
+/*
+ * bits operation Reference:
+ * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
+ * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */

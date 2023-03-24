@@ -1,4 +1,4 @@
-use crate::plus_offset_from;
+use crate::utils::*;
 
 #[inline(always)]
 pub fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
@@ -294,7 +294,7 @@ pub(crate) fn _memrchr_remaining_3_bytes_impl(
 
 #[inline(always)]
 fn _c16_value(c: u8) -> u128 {
-    (c as u128) * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128
+    (c as u128) * PackedU128::ONES
 }
 
 #[inline(always)]
@@ -304,10 +304,9 @@ fn _rchr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usiz
         crate::utils::_read_a_big_endian_u128(slice)
     };
     let v = v0 ^ c16;
-    let bits = v.wrapping_sub(0x0101_0101_0101_0101_0101_0101_0101_0101_u128)
-        & !v
-        & 0x8080_8080_8080_8080_8080_8080_8080_8080_u128;
-    if bits != 0 {
+    //
+    let bits = PackedU128::new(v).may_have_zero_quick();
+    if !bits.is_zeros() {
         Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
@@ -316,7 +315,7 @@ fn _rchr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usiz
 
 #[inline(always)]
 fn _c8_value(c: u8) -> u64 {
-    (c as u64) * 0x0101_0101_0101_0101_u64
+    (c as u64) * PackedU64::ONES
 }
 
 #[inline(always)]
@@ -326,8 +325,9 @@ fn _rchr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> 
         crate::utils::_read_a_big_endian_u64(slice)
     };
     let v = v0 ^ c8;
-    let bits = v.wrapping_sub(0x0101_0101_0101_0101_u64) & !v & 0x8080_8080_8080_8080_u64;
-    if bits != 0 {
+    //
+    let bits = PackedU64::new(v).may_have_zero_quick();
+    if !bits.is_zeros() {
         Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
@@ -336,7 +336,7 @@ fn _rchr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> 
 
 #[inline(always)]
 fn _c4_value(c: u8) -> u32 {
-    (c as u32) * 0x0101_0101_u32
+    (c as u32) * PackedU32::ONES
 }
 
 #[inline(always)]
@@ -346,8 +346,9 @@ fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> 
         crate::utils::_read_a_big_endian_u32(slice)
     };
     let v = v0 ^ c4;
-    let bits = v.wrapping_sub(0x0101_0101_u32) & !v & 0x8080_8080_u32;
-    if bits != 0 {
+    //
+    let bits = PackedU32::new(v).may_have_zero_quick();
+    if !bits.is_zeros() {
         Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
@@ -361,8 +362,9 @@ fn _rchr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> 
         crate::utils::_read_a_big_endian_u16(slice)
     };
     let v = v0 ^ c2;
-    let bits = v.wrapping_sub(0x0101_u16) & !v & 0x8080_u16;
-    if bits != 0 {
+    //
+    let bits = PackedU16::new(v).may_have_zero_quick();
+    if !bits.is_zeros() {
         Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.trailing_zeros() / 8) as usize)
     } else {
         None
@@ -379,12 +381,6 @@ fn _rchr_c1(buf_ptr: *const u8, c1: u8, start_ptr: *const u8) -> Option<usize> {
         None
     }
 }
-
-/*
- * Reference.
- * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
- * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
-*/
 
 /*
  * The simple implement:

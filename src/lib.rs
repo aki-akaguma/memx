@@ -207,34 +207,3 @@ pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
     0, 39, 7, 20, 19, 69, 11, 9, 18, 39, 0, 2, 18, 12, 38, 38,
     12, 1, 34, 35, 50, 13, 5, 5, 2, 7, 0, 0, 2, 0, 0, 0,
 ];
-
-#[inline(always)]
-pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
-    (ptr as usize) - (origin as usize)
-}
-
-#[inline(always)]
-pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
-where
-    T: core::ops::Div<Output = T> + core::ops::Mul<Output = T> + From<u8>,
-{
-    /*
-    // a hight bit propagation: bits: 0b_1000_0000
-    let bits = bits | (bits >> 1); // 0b_1100_0000
-    let bits = bits | (bits >> 2); // 0b_1111_0000
-    let bits = bits | (bits >> 4); // 0b_1111_1111
-    */
-    /*
-    // a hight bit propagation:
-    // ------------------------ bits: 0b_0000_0000_1000_0000
-    let bits = bits / 0x80.into(); // 0b_0000_0000_0000_0001
-    let bits = bits * 0xFF.into(); // 0b_0000_0000_1111_1111
-    */
-    (bits / 0x80.into()) * 0xFF.into()
-}
-
-/*
- * Refer.
- *   https://mmi.hatenablog.com/entry/2017/07/27/230005
- *   you should have memcpy(), memcmp(), memset() on nostd environments
-*/
