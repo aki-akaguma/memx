@@ -337,10 +337,7 @@ fn _c16_value(c: u8) -> u128 {
 
 #[inline(always)]
 fn _nechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe {
-        let slice = core::slice::from_raw_parts(buf_ptr, 16);
-        crate::utils::_read_a_native_endian_u128(slice)
-    };
+    let v0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
     let v = v0 ^ c16;
     //
     let bits = PackedU128::new(v).may_have_zero_byte();
@@ -359,10 +356,7 @@ fn _c8_value(c: u8) -> u64 {
 
 #[inline(always)]
 fn _nechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe {
-        let slice = core::slice::from_raw_parts(buf_ptr, 8);
-        crate::utils::_read_a_native_endian_u64(slice)
-    };
+    let v0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
     let v = v0 ^ c8;
     //
     let bits = PackedU64::new(v).may_have_zero_byte();
@@ -381,10 +375,7 @@ fn _c4_value(c: u8) -> u32 {
 
 #[inline(always)]
 fn _nechr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe {
-        let slice = core::slice::from_raw_parts(buf_ptr, 4);
-        crate::utils::_read_a_native_endian_u32(slice)
-    };
+    let v0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
     let v = v0 ^ c4;
     //
     let bits = PackedU32::new(v).may_have_zero_byte();
@@ -398,10 +389,7 @@ fn _nechr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize>
 
 #[inline(always)]
 fn _nechr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe {
-        let slice = core::slice::from_raw_parts(buf_ptr, 2);
-        crate::utils::_read_a_native_endian_u16(slice)
-    };
+    let v0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) };
     let v = v0 ^ c2;
     //
     let bits = PackedU16::new(v).may_have_zero_byte();

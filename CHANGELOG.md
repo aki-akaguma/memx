@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] *
 ### Changed
+* refactor function: `_read_a_native_endian_from_ptr_u64()`
 * refactor bit operation : `PackedU64`
 * renewal benchmark
 
