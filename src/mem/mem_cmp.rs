@@ -471,3 +471,28 @@ mod disasm {
         _start_cmp_32(a, b)
     }
 }
+#[cfg(test)]
+mod mini {
+    #[test]
+    fn t01() {
+        use core::cmp::Ordering;
+        use super::*;
+        //
+        let buf_16_1 = "0123456789abcdef".as_bytes().to_vec();
+        let buf_16_2 = "0123456789abcdef".as_bytes().to_vec();
+        let r = _cmp_bytes_16(buf_16_1.as_ptr(), buf_16_2.as_ptr());
+        assert_eq!(r, Ordering::Equal);
+        let buf_8_1 = "01234567".as_bytes().to_vec();
+        let buf_8_2 = "01234567".as_bytes().to_vec();
+        let r = _cmp_bytes_8(buf_8_1.as_ptr(), buf_8_2.as_ptr());
+        assert_eq!(r, Ordering::Equal);
+        let buf_4_1 = "0123".as_bytes().to_vec();
+        let buf_4_2 = "0123".as_bytes().to_vec();
+        let r = _cmp_bytes_4(buf_4_1.as_ptr(), buf_4_2.as_ptr());
+        assert_eq!(r, Ordering::Equal);
+        let buf_2_1 = "01".as_bytes().to_vec();
+        let buf_2_2 = "01".as_bytes().to_vec();
+        let r = _cmp_bytes_2(buf_2_1.as_ptr(), buf_2_2.as_ptr());
+        assert_eq!(r, Ordering::Equal);
+    }
+}
