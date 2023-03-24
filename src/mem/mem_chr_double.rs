@@ -1,4 +1,4 @@
-use crate::plus_offset_from;
+use crate::utils::*;
 
 #[inline(always)]
 pub fn _memchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {

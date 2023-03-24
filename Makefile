@@ -9,6 +9,8 @@ README.md: README.tpl src/lib.rs
 test:
 	cargo test --offline
 	cargo test --offline --features test_pointer_width_128
+	cargo test --offline --features test_pointer_width_64
+	cargo test --offline --features test_pointer_width_32
 
 test-no-default-features:
 	cargo test --offline --no-default-features

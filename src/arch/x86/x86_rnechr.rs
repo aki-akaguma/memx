@@ -1,5 +1,5 @@
 use crate::mem as basic;
-use crate::plus_offset_from;
+use crate::utils::*;
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;

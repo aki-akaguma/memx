@@ -5,17 +5,9 @@ mod x86_rchr;
 pub(crate) use x86_rchr::_memrchr_impl;
 
 mod x86_chr_double;
-#[cfg(all(
-    any(target_arch = "x86_64", target_arch = "x86"),
-    any(target_feature = "sse2", target_feature = "avx2")
-))]
 pub(crate) use x86_chr_double::_memchr_double_impl;
 
 mod x86_rchr_double;
-#[cfg(all(
-    any(target_arch = "x86_64", target_arch = "x86"),
-    any(target_feature = "sse2", target_feature = "avx2")
-))]
 pub(crate) use x86_rchr_double::_memrchr_double_impl;
 
 mod x86_nechr;
