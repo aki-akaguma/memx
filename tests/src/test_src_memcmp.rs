@@ -12,6 +12,30 @@ fn test00() {
     assert_eq!(r, Ordering::Less);
     let r = test_memcmp(&pat_2, &pat_1);
     assert_eq!(r, Ordering::Greater);
+    //
+    let buf_0 = vec![b'A', b'B', b'C', b'D', b'E'];
+    let buf_1 = vec![b'A', b'B', b'C', b'D', b'E', b'F'];
+    let r = test_memcmp(&buf_0, &buf_1);
+    assert_eq!(r, Ordering::Less);
+    let r = test_memcmp(&buf_1, &buf_0);
+    assert_eq!(r, Ordering::Greater);
+    //
+    let buf_16_1 = "0123456789abcdef".as_bytes().to_vec();
+    let buf_16_2 = "0123456789abcdef".as_bytes().to_vec();
+    let r = test_memcmp(&buf_16_1, &buf_16_2);
+    assert_eq!(r, Ordering::Equal);
+    let buf_8_1 = "01234567".as_bytes().to_vec();
+    let buf_8_2 = "01234567".as_bytes().to_vec();
+    let r = test_memcmp(&buf_8_1, &buf_8_2);
+    assert_eq!(r, Ordering::Equal);
+    let buf_4_1 = "0123".as_bytes().to_vec();
+    let buf_4_2 = "0123".as_bytes().to_vec();
+    let r = test_memcmp(&buf_4_1, &buf_4_2);
+    assert_eq!(r, Ordering::Equal);
+    let buf_2_1 = "01".as_bytes().to_vec();
+    let buf_2_2 = "01".as_bytes().to_vec();
+    let r = test_memcmp(&buf_2_1, &buf_2_2);
+    assert_eq!(r, Ordering::Equal);
 }
 
 #[test]
