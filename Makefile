@@ -7,7 +7,7 @@ README.md: README.tpl src/lib.rs
 	cargo readme > $@
 
 test:
-	cargo test --offline
+	cargo test --offline --features test
 	cargo test --offline --features test_pointer_width_128
 	cargo test --offline --features test_pointer_width_64
 	cargo test --offline --features test_pointer_width_32
@@ -31,27 +31,40 @@ fmt:
 doc:
 	cargo doc
 
+TARP_OPT = --offline --tests --engine llvm --line --out lcov --output-dir ./target
+#TARP_OPT = --offline --tests --engine ptrace --line --out lcov --output-dir ./target
+
 tarpaulin:
 	@#cargo tarpaulin --offline --engine llvm --out html --output-dir ./target
 	@#cargo tarpaulin --offline --engine ptrace --out html --output-dir ./target
 	@
-	cargo tarpaulin --offline --tests --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.1
+	cargo tarpaulin $(TARP_OPT) && mv target/lcov.info target/lcov.info.1
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
-	cargo tarpaulin --offline --tests --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.2
+	cargo tarpaulin $(TARP_OPT) && mv target/lcov.info target/lcov.info.2
 	@
-	cargo tarpaulin --offline --tests --features test_pointer_width_128 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.3
+	cargo tarpaulin --features test_pointer_width_128 $(TARP_OPT) && mv target/lcov.info target/lcov.info.3
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
-	cargo tarpaulin --offline --tests --features test_pointer_width_128 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.4
+	cargo tarpaulin --features test_pointer_width_128 $(TARP_OPT) && mv target/lcov.info target/lcov.info.4
 	@
-	cargo tarpaulin --offline --tests --features test_pointer_width_64 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.5
+	cargo tarpaulin --features test_pointer_width_64 $(TARP_OPT) && mv target/lcov.info target/lcov.info.5
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
-	cargo tarpaulin --offline --tests --features test_pointer_width_64 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.6
+	cargo tarpaulin --features test_pointer_width_64 $(TARP_OPT) && mv target/lcov.info target/lcov.info.6
 	@
-	cargo tarpaulin --offline --tests --features test_pointer_width_32 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.7
+	cargo tarpaulin --features test_pointer_width_32 $(TARP_OPT) && mv target/lcov.info target/lcov.info.7
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
-	cargo tarpaulin --offline --tests --features test_pointer_width_32 --engine llvm --line --out lcov --output-dir ./target && mv target/lcov.info target/lcov.info.8
+	cargo tarpaulin --features test_pointer_width_32 $(TARP_OPT) && mv target/lcov.info target/lcov.info.8
 	@
 	genhtml -o target/lcov --demangle-cpp target/lcov.info.*
+
+COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
+COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
+grcov:
+	$(COV_ENV1) cargo test --offline
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_128
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_64
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_32
+	@mkdir -p target/coverage
+	grcov . --binary-path ./target/debug/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
 
 
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \
@@ -66,8 +79,8 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memmem bench-memrmem bench-memcmp bench-memeq bench-memcpy bench-memset
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
-bench_nms = bench-memchr
+bench_nms = bench-memcmp bench-memeq
+#bench_nms = bench-memchr
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
