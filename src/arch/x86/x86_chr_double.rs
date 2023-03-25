@@ -139,6 +139,7 @@ macro_rules! _unroll_one_chr_32_aa_x2 {
 
 #[inline(always)]
 fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    /*
     if buf.is_empty() {
         return None;
     }
@@ -146,6 +147,7 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         return Some(0);
     }
     //
+    */
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -203,6 +205,7 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 #[inline(always)]
 fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    /*
     if buf.is_empty() {
         return None;
     }
@@ -210,6 +213,7 @@ fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         return Some(0);
     }
     //
+    */
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -543,7 +547,7 @@ unsafe fn _chr_c32_dbl_aa(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m25
 unsafe fn _chr_c32_dbl_aa_x2(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_b = _mm256_load_si256(buf_ptr.add(16) as *const __m256i);
+    let mm_b = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
     //
     let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
     let mm_a_eq_2 = _mm256_cmpeq_epi8(mm_a, mm_c32_2);
@@ -576,15 +580,15 @@ unsafe fn _chr_c32_dbl_aa_x2(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __
             let idx1 = mask_b_1.trailing_zeros() as usize;
             let idx2 = mask_b_2.trailing_zeros() as usize;
             if idx1 < idx2 {
-                Some(base + idx1 + 16)
+                Some(base + idx1 + 32)
             } else {
-                Some(base + idx2 + 16)
+                Some(base + idx2 + 32)
             }
         } else {
-            Some(plus_offset_from(buf_ptr, start_ptr) + mask_b_1.trailing_zeros() as usize + 16)
+            Some(plus_offset_from(buf_ptr, start_ptr) + mask_b_1.trailing_zeros() as usize + 32)
         }
     } else if mask_b_2 != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + mask_b_2.trailing_zeros() as usize + 16)
+        Some(plus_offset_from(buf_ptr, start_ptr) + mask_b_2.trailing_zeros() as usize + 32)
     } else {
         None
     }
