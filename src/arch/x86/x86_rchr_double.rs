@@ -15,22 +15,20 @@ use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
 use mmx::_mm256_cmpeq_epi8;
+use mmx::_mm256_load_si256;
 use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
-#[cfg(target_arch = "x86_64")]
-use super::cpuid_avx2;
-
-#[cfg(target_arch = "x86")]
-use super::{cpuid_avx2, cpuid_sse2};
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+use super::cpuid;
 
 #[inline(always)]
 #[cfg(target_arch = "x86_64")]
 pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx2::get() {
+    if cpuid::has_avx2() {
         unsafe { _memrchr_double_avx2(buf, c1, c2) }
     } else {
         unsafe { _memrchr_double_sse2(buf, c1, c2) }
@@ -42,9 +40,9 @@ pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> 
 pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
     // after stabilization
-    if cpuid_avx2::get() {
+    if cpuid::has_avx2() {
         unsafe { _memrchr_double_avx2(buf, c1, c2) }
-    } else if cpuid_sse2::get() {
+    } else if cpuid::has_sse2() {
         unsafe { _memrchr_double_sse2(buf, c1, c2) }
     } else {
         _memrchr_double_basic(buf, c1, c2)
@@ -62,23 +60,19 @@ pub unsafe fn _memrchr_double_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> 
     _memrchr_double_sse2_impl(buf, c1, c2)
 }
 
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+#[target_feature(enable = "avx2")]
+#[allow(clippy::missing_safety_doc)]
+pub unsafe fn _memrchr_double_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    _memrchr_double_avx2_impl(buf, c1, c2)
+}
+
 macro_rules! _unroll_one_rchr_16_uu {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = unsafe { _rchr_c16_uu(aa_ptr, $cc1, $start_ptr) };
-        let r2 = unsafe { _rchr_c16_uu(aa_ptr, $cc2, $start_ptr) };
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = unsafe { _rchr_c16_dbl_uu(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -86,33 +80,65 @@ macro_rules! _unroll_one_rchr_16_uu {
 macro_rules! _unroll_one_rchr_16_aa {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = unsafe { _rchr_c16_aa(aa_ptr, $cc1, $start_ptr) };
-        let r2 = unsafe { _rchr_c16_aa(aa_ptr, $cc2, $start_ptr) };
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = unsafe { _rchr_c16_dbl_aa(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rchr_16_aa_x2 {
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _rchr_c16_dbl_aa_x2(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rchr_16_aa_x4 {
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _rchr_c16_dbl_aa_x4(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rchr_32_uu {
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _rchr_c32_dbl_uu(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rchr_32_aa {
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _rchr_c32_dbl_aa(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rchr_32_aa_x2 {
+    ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        let r = unsafe { _rchr_c32_dbl_aa_x2(aa_ptr, $cc1, $cc2, $start_ptr) };
+        if !r.is_none() {
+            return r;
         }
     }};
 }
 
 #[inline(always)]
 fn _memrchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    if buf.is_empty() {
-        return None;
-    }
-    if buf[buf.len() - 1] == c1 || buf[buf.len() - 1] == c2 {
-        return Some(buf.len() - 1);
-    }
-    //
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
@@ -138,14 +164,38 @@ fn _memrchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                 if buf_ptr >= min_ptr {
                     while buf_ptr >= min_ptr {
                         buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 7);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 6);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 5);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
-                        _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                        _unroll_one_rchr_16_aa_x4!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
+                        _unroll_one_rchr_16_aa_x4!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    }
+                    buf_ptr_cur = buf_ptr;
+                }
+            }
+        }
+        {
+            let unroll = 4;
+            let loop_size = 16;
+            let mut buf_ptr = buf_ptr_cur;
+            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
+                if buf_ptr >= min_ptr {
+                    while buf_ptr >= min_ptr {
+                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                        _unroll_one_rchr_16_aa_x4!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    }
+                    buf_ptr_cur = buf_ptr;
+                }
+            }
+        }
+        {
+            let unroll = 2;
+            let loop_size = 16;
+            let mut buf_ptr = buf_ptr_cur;
+            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
+                if buf_ptr >= min_ptr {
+                    while buf_ptr >= min_ptr {
+                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                        _unroll_one_rchr_16_aa_x2!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
                     }
                     buf_ptr_cur = buf_ptr;
                 }
@@ -170,41 +220,86 @@ fn _memrchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     basic::_memrchr_double_remaining_15_bytes_impl(buf_ptr_cur, cc1, cc2, start_ptr)
 }
 
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[target_feature(enable = "avx2")]
-#[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_double_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memrchr_double_sse2_impl(buf, c1, c2)
-}
-/*
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-#[target_feature(enable = "avx")]
-pub unsafe fn _memrchr_avx(buf: &[u8], c: u8) -> Option<usize> {
-    //
+#[inline(always)]
+fn _memrchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let buf_len = buf.len();
-    let mut buf_ptr = buf.as_ptr();
-    let start_ptr = buf_ptr;
-    let end_ptr = buf_ptr.add(buf_len);
+    let start_ptr = buf.as_ptr();
+    let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
-    let loop_size = 32;
-    let c32: __m256i = _c32_value(c);
-    while buf_ptr <= end_ptr.sub(loop_size) {
-        let r = _check_c32_uu(buf_ptr, c32, start_ptr);
-        if !r.is_none() {
-            return r;
+    if buf_len >= 32 {
+        let cc1: __m256i = unsafe { _c32_value(c1) };
+        let cc2: __m256i = unsafe { _c32_value(c2) };
+        {
+            let loop_size = 32;
+            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
+            let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+            _unroll_one_rchr_32_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+            //
+            buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
         }
-        buf_ptr = buf_ptr.add(loop_size);
+        //
+        {
+            let unroll = 2;
+            let loop_size = 32;
+            let mut buf_ptr = buf_ptr_cur;
+            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
+                if buf_ptr >= min_ptr {
+                    while buf_ptr >= min_ptr {
+                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                        _unroll_one_rchr_32_aa_x2!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    }
+                    buf_ptr_cur = buf_ptr;
+                }
+            }
+        }
+        {
+            let loop_size = 32;
+            let mut buf_ptr = buf_ptr_cur;
+            let min_ptr = unsafe { start_ptr.add(loop_size) };
+            if buf_ptr >= min_ptr {
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rchr_32_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let cc1: __m128i = unsafe { _c16_value(c1) };
+            let cc2: __m128i = unsafe { _c16_value(c2) };
+            let loop_size = 16;
+            let mut buf_ptr = buf_ptr_cur;
+            let min_ptr = unsafe { start_ptr.add(loop_size) };
+            if buf_ptr >= min_ptr {
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rchr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+    } else if buf_len >= 16 {
+        {
+            let cc1: __m128i = unsafe { _c16_value(c1) };
+            let cc2: __m128i = unsafe { _c16_value(c2) };
+            let loop_size = 16;
+            let mut buf_ptr = buf_ptr_cur;
+            let min_ptr = unsafe { start_ptr.add(loop_size) };
+            if buf_ptr >= min_ptr {
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rchr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
     }
     //
-    let next_idx = plus_offset_from(buf_ptr, start_ptr);
-    let r = _memrchr_sse2(&buf[next_idx..], c);
-    if let Some(pos) = r {
-        Some(pos + next_idx)
-    } else {
-        None
-    }
+    let cc1 = (c1 as u64) * 0x0101_0101_0101_0101_u64;
+    let cc2 = (c2 as u64) * 0x0101_0101_0101_0101_u64;
+    basic::_memrchr_double_remaining_15_bytes_impl(buf_ptr_cur, cc1, cc2, start_ptr)
 }
-*/
 
 #[inline(always)]
 unsafe fn _c16_value(c: u8) -> __m128i {
@@ -212,26 +307,200 @@ unsafe fn _c16_value(c: u8) -> __m128i {
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_uu(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_dbl_uu(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mask = _mm_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_zeros() as usize)
+    let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
+    let mm_a_eq_2 = _mm_cmpeq_epi8(mm_a, mm_c16_2);
+    let mask_a_1 = _mm_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm_movemask_epi8(mm_a_eq_2);
+    let base = plus_offset_from(buf_ptr, start_ptr) + 16 - 1;
+    //
+    if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u16).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u16).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa(buf_ptr: *const u8, mm_c16: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_dbl_aa(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mask = _mm_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (mask as u16).leading_zeros() as usize)
+    let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
+    let mm_a_eq_2 = _mm_cmpeq_epi8(mm_a, mm_c16_2);
+    let mask_a_1 = _mm_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm_movemask_epi8(mm_a_eq_2);
+    let base = plus_offset_from(buf_ptr, start_ptr) + 16 - 1;
+    //
+    if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u16).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u16).leading_zeros() as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
+unsafe fn _rchr_c16_dbl_aa_x2(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+    //
+    let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
+    let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
+    //
+    let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
+    let mm_a_eq_2 = _mm_cmpeq_epi8(mm_a, mm_c16_2);
+    let mask_a_1 = _mm_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm_movemask_epi8(mm_a_eq_2);
+    //
+    let mm_b_eq_1 = _mm_cmpeq_epi8(mm_b, mm_c16_1);
+    let mm_b_eq_2 = _mm_cmpeq_epi8(mm_b, mm_c16_2);
+    let mask_b_1 = _mm_movemask_epi8(mm_b_eq_1);
+    let mask_b_2 = _mm_movemask_epi8(mm_b_eq_2);
+    //
+    let base = plus_offset_from(buf_ptr, start_ptr) + 16 - 1;
+    //
+    if mask_b_1 != 0 {
+        if mask_b_2 != 0 {
+            let idx1 = (mask_b_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_b_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1 + 16)
+            } else {
+                Some(base - idx2 + 16)
+            }
+        } else {
+            Some(base - (mask_b_1 as u16).leading_zeros() as usize + 16)
+        }
+    } else if mask_b_2 != 0 {
+        Some(base - (mask_b_2 as u16).leading_zeros() as usize + 16)
+    } else if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u16).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u16).leading_zeros() as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
+unsafe fn _rchr_c16_dbl_aa_x4(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+    //
+    let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
+    let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
+    let mm_c = _mm_load_si128(buf_ptr.add(16 * 2) as *const __m128i);
+    let mm_d = _mm_load_si128(buf_ptr.add(16 * 3) as *const __m128i);
+    //
+    let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
+    let mm_a_eq_2 = _mm_cmpeq_epi8(mm_a, mm_c16_2);
+    let mask_a_1 = _mm_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm_movemask_epi8(mm_a_eq_2);
+    //
+    let mm_b_eq_1 = _mm_cmpeq_epi8(mm_b, mm_c16_1);
+    let mm_b_eq_2 = _mm_cmpeq_epi8(mm_b, mm_c16_2);
+    let mask_b_1 = _mm_movemask_epi8(mm_b_eq_1);
+    let mask_b_2 = _mm_movemask_epi8(mm_b_eq_2);
+    //
+    let mm_c_eq_1 = _mm_cmpeq_epi8(mm_c, mm_c16_1);
+    let mm_c_eq_2 = _mm_cmpeq_epi8(mm_c, mm_c16_2);
+    let mask_c_1 = _mm_movemask_epi8(mm_c_eq_1);
+    let mask_c_2 = _mm_movemask_epi8(mm_c_eq_2);
+    //
+    let mm_d_eq_1 = _mm_cmpeq_epi8(mm_d, mm_c16_1);
+    let mm_d_eq_2 = _mm_cmpeq_epi8(mm_d, mm_c16_2);
+    let mask_d_1 = _mm_movemask_epi8(mm_d_eq_1);
+    let mask_d_2 = _mm_movemask_epi8(mm_d_eq_2);
+    //
+    let base = plus_offset_from(buf_ptr, start_ptr) + 16 - 1;
+    //
+    if mask_d_1 != 0 {
+        if mask_d_2 != 0 {
+            let idx1 = (mask_d_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_d_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1 + 16 * 3)
+            } else {
+                Some(base - idx2 + 16 * 3)
+            }
+        } else {
+            Some(base - (mask_d_1 as u16).leading_zeros() as usize + 16 * 3)
+        }
+    } else if mask_d_2 != 0 {
+        Some(base - (mask_d_2 as u16).leading_zeros() as usize + 16 * 3)
+    } else if mask_c_1 != 0 {
+        if mask_c_2 != 0 {
+            let idx1 = (mask_c_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_c_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1 + 16 * 2)
+            } else {
+                Some(base - idx2 + 16 * 2)
+            }
+        } else {
+            Some(base - (mask_c_1 as u16).leading_zeros() as usize + 16 * 2)
+        }
+    } else if mask_c_2 != 0 {
+        Some(base - (mask_c_2 as u16).leading_zeros() as usize + 16 * 2)
+    } else if mask_b_1 != 0 {
+        if mask_b_2 != 0 {
+            let idx1 = (mask_b_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_b_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1 + 16)
+            } else {
+                Some(base - idx2 + 16)
+            }
+        } else {
+            Some(base - (mask_b_1 as u16).leading_zeros() as usize + 16)
+        }
+    } else if mask_b_2 != 0 {
+        Some(base - (mask_b_2 as u16).leading_zeros() as usize + 16)
+    } else if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u16).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u16).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u16).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u16).leading_zeros() as usize)
     } else {
         None
     }
@@ -243,17 +512,109 @@ unsafe fn _c32_value(c: u8) -> __m256i {
 }
 
 #[inline(always)]
-unsafe fn _check_c32_uu(
-    buf_ptr: *const u8,
-    mm_c32: __m256i,
-    start_ptr: *const u8,
-) -> Option<usize> {
+unsafe fn _rchr_c32_dbl_uu(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
-    let mask = _mm256_movemask_epi8(mm_eq);
-    if mask != 0 {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 32 - 1 - (mask as u32).leading_zeros() as usize)
+    let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
+    let mm_a_eq_2 = _mm256_cmpeq_epi8(mm_a, mm_c32_2);
+    let mask_a_1 = _mm256_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm256_movemask_epi8(mm_a_eq_2);
+    let base = plus_offset_from(buf_ptr, start_ptr) + 32 - 1;
+    //
+    if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u32).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u32).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u32).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u32).leading_zeros() as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
+unsafe fn _rchr_c32_dbl_aa(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
+    //
+    let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
+    let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
+    let mm_a_eq_2 = _mm256_cmpeq_epi8(mm_a, mm_c32_2);
+    let mask_a_1 = _mm256_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm256_movemask_epi8(mm_a_eq_2);
+    let base = plus_offset_from(buf_ptr, start_ptr) + 32 - 1;
+    //
+    if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u32).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u32).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u32).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u32).leading_zeros() as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
+unsafe fn _rchr_c32_dbl_aa_x2(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
+    //
+    let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
+    let mm_b = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
+    //
+    let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
+    let mm_a_eq_2 = _mm256_cmpeq_epi8(mm_a, mm_c32_2);
+    let mask_a_1 = _mm256_movemask_epi8(mm_a_eq_1);
+    let mask_a_2 = _mm256_movemask_epi8(mm_a_eq_2);
+    //
+    let mm_b_eq_1 = _mm256_cmpeq_epi8(mm_b, mm_c32_1);
+    let mm_b_eq_2 = _mm256_cmpeq_epi8(mm_b, mm_c32_2);
+    let mask_b_1 = _mm256_movemask_epi8(mm_b_eq_1);
+    let mask_b_2 = _mm256_movemask_epi8(mm_b_eq_2);
+    //
+    let base = plus_offset_from(buf_ptr, start_ptr) + 32 - 1;
+    //
+    if mask_b_1 != 0 {
+        if mask_b_2 != 0 {
+            let idx1 = (mask_b_1 as u32).leading_zeros() as usize;
+            let idx2 = (mask_b_2 as u32).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1 + 32)
+            } else {
+                Some(base - idx2 + 32)
+            }
+        } else {
+            Some(base - (mask_b_1 as u32).leading_zeros() as usize + 32)
+        }
+    } else if mask_b_2 != 0 {
+        Some(base - (mask_b_2 as u32).leading_zeros() as usize + 32)
+    } else if mask_a_1 != 0 {
+        if mask_a_2 != 0 {
+            let idx1 = (mask_a_1 as u32).leading_zeros() as usize;
+            let idx2 = (mask_a_2 as u32).leading_zeros() as usize;
+            if idx1 < idx2 {
+                Some(base - idx1)
+            } else {
+                Some(base - idx2)
+            }
+        } else {
+            Some(base - (mask_a_1 as u32).leading_zeros() as usize)
+        }
+    } else if mask_a_2 != 0 {
+        Some(base - (mask_a_2 as u32).leading_zeros() as usize)
     } else {
         None
     }
