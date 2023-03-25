@@ -139,15 +139,6 @@ macro_rules! _unroll_one_chr_32_aa_x2 {
 
 #[inline(always)]
 fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    /*
-    if buf.is_empty() {
-        return None;
-    }
-    if buf[0] == c1 || buf[0] == c2 {
-        return Some(0);
-    }
-    //
-    */
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -205,15 +196,6 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 #[inline(always)]
 fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    /*
-    if buf.is_empty() {
-        return None;
-    }
-    if buf[0] == c1 || buf[0] == c2 {
-        return Some(0);
-    }
-    //
-    */
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
