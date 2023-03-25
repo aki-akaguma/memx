@@ -13,7 +13,10 @@ pub fn std_memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 }
 
 #[inline(never)]
-fn statistics_std_memrchr_double(texts: &[&str], pat: (u8, u8)) -> std::collections::HashMap<usize, usize> {
+fn statistics_std_memrchr_double(
+    texts: &[&str],
+    pat: (u8, u8),
+) -> std::collections::HashMap<usize, usize> {
     #[inline(never)]
     fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         std_memrchr_double_impl(buf, c1, c2)

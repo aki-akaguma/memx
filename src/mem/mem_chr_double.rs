@@ -310,7 +310,12 @@ fn _c16_value(c: u8) -> u128 {
 }
 
 #[inline(always)]
-fn _chr_dbl_c16(buf_ptr: *const u8, c16_1: u128, c16_2: u128, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c16(
+    buf_ptr: *const u8,
+    c16_1: u128,
+    c16_2: u128,
+    start_ptr: *const u8,
+) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
     let v_1 = v0 ^ c16_1;
     let v_2 = v0 ^ c16_2;

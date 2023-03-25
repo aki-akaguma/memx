@@ -165,7 +165,6 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
     (v, bb, match_cnt)
 }
 
-
 pub fn create_data_chr_double_en_1() -> (Vec<String>, (u8, u8), usize) {
     let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();

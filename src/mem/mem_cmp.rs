@@ -475,8 +475,8 @@ mod disasm {
 mod mini {
     #[test]
     fn t01() {
-        use core::cmp::Ordering;
         use super::*;
+        use core::cmp::Ordering;
         //
         let buf_16_1 = "0123456789abcdef".as_bytes().to_vec();
         let buf_16_2 = "0123456789abcdef".as_bytes().to_vec();
