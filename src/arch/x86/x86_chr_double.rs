@@ -64,7 +64,7 @@ pub unsafe fn _memchr_double_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 #[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
 pub unsafe fn _memchr_double_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memchr_double_sse2_impl(buf, c1, c2)
+    _memchr_double_avx2_impl(buf, c1, c2)
 }
 
 macro_rules! _unroll_one_chr_16_uu {
@@ -265,7 +265,12 @@ unsafe fn _c16_value(c: u8) -> __m128i {
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_dbl_uu(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_dbl_uu(
+    buf_ptr: *const u8,
+    mm_c16_1: __m128i,
+    mm_c16_2: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
@@ -293,7 +298,12 @@ unsafe fn _chr_c16_dbl_uu(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m12
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_dbl_aa(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_dbl_aa(
+    buf_ptr: *const u8,
+    mm_c16_1: __m128i,
+    mm_c16_2: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_a_eq_1 = _mm_cmpeq_epi8(mm_a, mm_c16_1);
@@ -321,7 +331,12 @@ unsafe fn _chr_c16_dbl_aa(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m12
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_dbl_aa_x2(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_dbl_aa_x2(
+    buf_ptr: *const u8,
+    mm_c16_1: __m128i,
+    mm_c16_2: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
@@ -372,7 +387,12 @@ unsafe fn _chr_c16_dbl_aa_x2(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_dbl_aa_x4(buf_ptr: *const u8, mm_c16_1: __m128i, mm_c16_2: __m128i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_dbl_aa_x4(
+    buf_ptr: *const u8,
+    mm_c16_1: __m128i,
+    mm_c16_2: __m128i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
@@ -470,7 +490,12 @@ unsafe fn _c32_value(c: u8) -> __m256i {
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_dbl_uu(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_dbl_uu(
+    buf_ptr: *const u8,
+    mm_c32_1: __m256i,
+    mm_c32_2: __m256i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
@@ -498,7 +523,12 @@ unsafe fn _chr_c32_dbl_uu(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m25
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_dbl_aa(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_dbl_aa(
+    buf_ptr: *const u8,
+    mm_c32_1: __m256i,
+    mm_c32_2: __m256i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_a_eq_1 = _mm256_cmpeq_epi8(mm_a, mm_c32_1);
@@ -526,7 +556,12 @@ unsafe fn _chr_c32_dbl_aa(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m25
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_dbl_aa_x2(buf_ptr: *const u8, mm_c32_1: __m256i, mm_c32_2: __m256i, start_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_dbl_aa_x2(
+    buf_ptr: *const u8,
+    mm_c32_1: __m256i,
+    mm_c32_2: __m256i,
+    start_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_b = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);

@@ -47,7 +47,6 @@ read_little_integer_impl! {
     _read_a_little_endian_from_ptr_u128: u128,
 }
 
-
 macro_rules! read_big_integer_impl {
     ($($fn_name:ident: $ty:ident,)+) => {$(
         #[inline(always)]
