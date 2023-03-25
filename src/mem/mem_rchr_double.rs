@@ -53,23 +53,6 @@ macro_rules! _unroll_one_rchr_16 {
         if !r.is_none() {
             return r;
         }
-        /*
-        let r1 = _rchr_c16(aa_ptr, $cc1, $start_ptr);
-        let r2 = _rchr_c16(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
-        }
-        */
     }};
 }
 
@@ -80,23 +63,6 @@ macro_rules! _unroll_one_rchr_8 {
         if !r.is_none() {
             return r;
         }
-        /*
-        let r1 = _rchr_c8(aa_ptr, $cc1, $start_ptr);
-        let r2 = _rchr_c8(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
-        }
-        */
     }};
 }
 
@@ -107,23 +73,6 @@ macro_rules! _unroll_one_rchr_4 {
         if !r.is_none() {
             return r;
         }
-        /*
-        let r1 = _rchr_c4(aa_ptr, $cc1, $start_ptr);
-        let r2 = _rchr_c4(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
-        }
-        */
     }};
 }
 
@@ -134,23 +83,6 @@ macro_rules! _unroll_one_rchr_2 {
         if !r.is_none() {
             return r;
         }
-        /*
-        let r1 = _rchr_c2(aa_ptr, $cc1, $start_ptr);
-        let r2 = _rchr_c2(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
-        }
-        */
     }};
 }
 
@@ -161,23 +93,6 @@ macro_rules! _unroll_one_rchr_1 {
         if !r.is_none() {
             return r;
         }
-        /*
-        let r1 = _rchr_c1(aa_ptr, $cc1, $start_ptr);
-        let r2 = _rchr_c1(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 > idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
-        }
-        */
     }};
 }
 
@@ -248,6 +163,34 @@ fn _start_rchr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 4);
                 _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
                 _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 4;
+        let loop_size = 8;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
+                _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+            }
+            buf_ptr_cur = buf_ptr;
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 8;
+        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
                 _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
                 _unroll_one_rchr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
             }
@@ -387,20 +330,7 @@ pub(crate) fn _memrchr_double_remaining_3_bytes_impl(
 fn _c16_value(c: u8) -> u128 {
     (c as u128) * PackedU128::ONES
 }
-/*
-#[inline(always)]
-fn _rchr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) };
-    let v = v0 ^ c16;
-    //
-    let bits = PackedU128::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 16 - 1 - (bits.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
-}
-*/
+
 #[inline(always)]
 fn _rchr_dbl_c16(buf_ptr: *const u8, c16_1: u128, c16_2: u128, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) };
@@ -434,20 +364,7 @@ fn _rchr_dbl_c16(buf_ptr: *const u8, c16_1: u128, c16_2: u128, start_ptr: *const
 fn _c8_value(c: u8) -> u64 {
     (c as u64) * PackedU64::ONES
 }
-/*
-#[inline(always)]
-fn _rchr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) };
-    let v = v0 ^ c8;
-    //
-    let bits = PackedU64::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 8 - 1 - (bits.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
-}
-*/
+
 #[inline(always)]
 fn _rchr_dbl_c8(buf_ptr: *const u8, c8_1: u64, c8_2: u64, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) };
@@ -481,20 +398,7 @@ fn _rchr_dbl_c8(buf_ptr: *const u8, c8_1: u64, c8_2: u64, start_ptr: *const u8) 
 fn _c4_value(c: u8) -> u32 {
     (c as u32) * PackedU32::ONES
 }
-/*
-#[inline(always)]
-fn _rchr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) };
-    let v = v0 ^ c4;
-    //
-    let bits = PackedU32::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 4 - 1 - (bits.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
-}
-*/
+
 #[inline(always)]
 fn _rchr_dbl_c4(buf_ptr: *const u8, c4_1: u32, c4_2: u32, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) };
@@ -524,31 +428,6 @@ fn _rchr_dbl_c4(buf_ptr: *const u8, c4_1: u32, c4_2: u32, start_ptr: *const u8) 
     }
 }
 
-/*
-#[inline(always)]
-fn _rchr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
-    let v0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) };
-    let v = v0 ^ c2;
-    //
-    let bits = PackedU16::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + 2 - 1 - (bits.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
-}
-
-#[inline(always)]
-fn _rchr_c1(buf_ptr: *const u8, c1: u8, start_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u8;
-    let aac = unsafe { *aa_ptr };
-    if aac == c1 {
-        Some(plus_offset_from(buf_ptr, start_ptr))
-    } else {
-        None
-    }
-}
-*/
 #[inline(always)]
 fn _rchr_dbl_c2(buf_ptr: *const u8, c2_1: u16, c2_2: u16, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) };

@@ -49,20 +49,9 @@ pub fn _memchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 macro_rules! _unroll_one_chr_16 {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = _chr_c16(aa_ptr, $cc1, $start_ptr);
-        let r2 = _chr_c16(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 < idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = _chr_dbl_c16(aa_ptr, $cc1, $cc2, $start_ptr);
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -70,20 +59,9 @@ macro_rules! _unroll_one_chr_16 {
 macro_rules! _unroll_one_chr_8 {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = _chr_c8(aa_ptr, $cc1, $start_ptr);
-        let r2 = _chr_c8(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 < idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = _chr_dbl_c8(aa_ptr, $cc1, $cc2, $start_ptr);
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -91,20 +69,9 @@ macro_rules! _unroll_one_chr_8 {
 macro_rules! _unroll_one_chr_4 {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = _chr_c4(aa_ptr, $cc1, $start_ptr);
-        let r2 = _chr_c4(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 < idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = _chr_dbl_c4(aa_ptr, $cc1, $cc2, $start_ptr);
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -112,20 +79,9 @@ macro_rules! _unroll_one_chr_4 {
 macro_rules! _unroll_one_chr_2 {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = _chr_c2(aa_ptr, $cc1, $start_ptr);
-        let r2 = _chr_c2(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 < idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = _chr_dbl_c2(aa_ptr, $cc1, $cc2, $start_ptr);
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -133,20 +89,9 @@ macro_rules! _unroll_one_chr_2 {
 macro_rules! _unroll_one_chr_1 {
     ($a_ptr:expr, $cc1:expr, $cc2:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let r1 = _chr_c1(aa_ptr, $cc1, $start_ptr);
-        let r2 = _chr_c1(aa_ptr, $cc2, $start_ptr);
-        if !r1.is_none() && r2.is_none() {
-            return r1;
-        } else if r1.is_none() && !r2.is_none() {
-            return r2;
-        } else if !r1.is_none() && !r2.is_none() {
-            let idx1 = r1.map(|a| a).unwrap();
-            let idx2 = r2.map(|a| a).unwrap();
-            if idx1 < idx2 {
-                return Some(idx1);
-            } else {
-                return Some(idx2);
-            }
+        let r = _chr_dbl_c1(aa_ptr, $cc1, $cc2, $start_ptr);
+        if !r.is_none() {
+            return r;
         }
     }};
 }
@@ -213,6 +158,28 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
             _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 5);
             _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 6);
             _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 7);
+            //
+            buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+        }
+    }
+    {
+        let unroll = 4;
+        let loop_size = 8;
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 2);
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 3);
+            //
+            buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 8;
+        while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+            _unroll_one_chr_8!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
             //
             buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
         }
@@ -343,13 +310,29 @@ fn _c16_value(c: u8) -> u128 {
 }
 
 #[inline(always)]
-fn _chr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c16(buf_ptr: *const u8, c16_1: u128, c16_2: u128, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
-    let v = v0 ^ c16;
+    let v_1 = v0 ^ c16_1;
+    let v_2 = v0 ^ c16_2;
     //
-    let bits = PackedU128::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
+    let bits_1 = PackedU128::new(v_1).may_have_zero_quick();
+    let bits_2 = PackedU128::new(v_2).may_have_zero_quick();
+    let base = plus_offset_from(buf_ptr, start_ptr);
+    //
+    if !bits_1.is_zeros() {
+        if !bits_2.is_zeros() {
+            let idx1 = (bits_1.trailing_zeros() / 8) as usize;
+            let idx2 = (bits_2.trailing_zeros() / 8) as usize;
+            if idx1 < idx2 {
+                Some(base + idx1)
+            } else {
+                Some(base + idx2)
+            }
+        } else {
+            Some(base + (bits_1.trailing_zeros() / 8) as usize)
+        }
+    } else if !bits_2.is_zeros() {
+        Some(base + (bits_2.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -361,13 +344,29 @@ fn _c8_value(c: u8) -> u64 {
 }
 
 #[inline(always)]
-fn _chr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c8(buf_ptr: *const u8, c8_1: u64, c8_2: u64, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
-    let v = v0 ^ c8;
+    let v_1 = v0 ^ c8_1;
+    let v_2 = v0 ^ c8_2;
     //
-    let bits = PackedU64::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
+    let bits_1 = PackedU64::new(v_1).may_have_zero_quick();
+    let bits_2 = PackedU64::new(v_2).may_have_zero_quick();
+    let base = plus_offset_from(buf_ptr, start_ptr);
+    //
+    if !bits_1.is_zeros() {
+        if !bits_2.is_zeros() {
+            let idx1 = (bits_1.trailing_zeros() / 8) as usize;
+            let idx2 = (bits_2.trailing_zeros() / 8) as usize;
+            if idx1 < idx2 {
+                Some(base + idx1)
+            } else {
+                Some(base + idx2)
+            }
+        } else {
+            Some(base + (bits_1.trailing_zeros() / 8) as usize)
+        }
+    } else if !bits_2.is_zeros() {
+        Some(base + (bits_2.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -379,36 +378,84 @@ fn _c4_value(c: u8) -> u32 {
 }
 
 #[inline(always)]
-fn _chr_c4(buf_ptr: *const u8, c4: u32, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c4(buf_ptr: *const u8, c4_1: u32, c4_2: u32, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
-    let v = v0 ^ c4;
+    let v_1 = v0 ^ c4_1;
+    let v_2 = v0 ^ c4_2;
     //
-    let bits = PackedU32::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
+    let bits_1 = PackedU32::new(v_1).may_have_zero_quick();
+    let bits_2 = PackedU32::new(v_2).may_have_zero_quick();
+    let base = plus_offset_from(buf_ptr, start_ptr);
+    //
+    if !bits_1.is_zeros() {
+        if !bits_2.is_zeros() {
+            let idx1 = (bits_1.trailing_zeros() / 8) as usize;
+            let idx2 = (bits_2.trailing_zeros() / 8) as usize;
+            if idx1 < idx2 {
+                Some(base + idx1)
+            } else {
+                Some(base + idx2)
+            }
+        } else {
+            Some(base + (bits_1.trailing_zeros() / 8) as usize)
+        }
+    } else if !bits_2.is_zeros() {
+        Some(base + (bits_2.trailing_zeros() / 8) as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-fn _chr_c2(buf_ptr: *const u8, c2: u16, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c2(buf_ptr: *const u8, c2_1: u16, c2_2: u16, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) };
-    let v = v0 ^ c2;
+    let v_1 = v0 ^ c2_1;
+    let v_2 = v0 ^ c2_2;
     //
-    let bits = PackedU16::new(v).may_have_zero_quick();
-    if !bits.is_zeros() {
-        Some(plus_offset_from(buf_ptr, start_ptr) + (bits.trailing_zeros() / 8) as usize)
+    let bits_1 = PackedU16::new(v_1).may_have_zero_quick();
+    let bits_2 = PackedU16::new(v_2).may_have_zero_quick();
+    let base = plus_offset_from(buf_ptr, start_ptr);
+    //
+    if !bits_1.is_zeros() {
+        if !bits_2.is_zeros() {
+            let idx1 = (bits_1.trailing_zeros() / 8) as usize;
+            let idx2 = (bits_2.trailing_zeros() / 8) as usize;
+            if idx1 < idx2 {
+                Some(base + idx1)
+            } else {
+                Some(base + idx2)
+            }
+        } else {
+            Some(base + (bits_1.trailing_zeros() / 8) as usize)
+        }
+    } else if !bits_2.is_zeros() {
+        Some(base + (bits_2.trailing_zeros() / 8) as usize)
     } else {
         None
     }
 }
 
+/*
 #[inline(always)]
-fn _chr_c1(buf_ptr: *const u8, c1: u8, start_ptr: *const u8) -> Option<usize> {
+fn _chr_dbl_c2(buf_ptr: *const u8, c2_1: u16, c2_2: u16, start_ptr: *const u8) -> Option<usize> {
+    let aa_ptr = buf_ptr as *const u8;
+    let r = _chr_dbl_c1(aa_ptr, c2_1 as u8, c2_2 as u8, start_ptr);
+    if !r.is_none() {
+        return r;
+    }
+    let aa_ptr = unsafe { buf_ptr.add(1) } as *const u8;
+    let r = _chr_dbl_c1(aa_ptr, c2_1 as u8, c2_2 as u8, start_ptr);
+    if !r.is_none() {
+        return r;
+    }
+    None
+}
+*/
+#[inline(always)]
+fn _chr_dbl_c1(buf_ptr: *const u8, c1: u8, c2: u8, start_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
-    if aac == c1 {
+    if aac == c1 || aac == c2 {
         Some(plus_offset_from(buf_ptr, start_ptr))
     } else {
         None
