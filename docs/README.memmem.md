@@ -1,49 +1,50 @@
 ## Benchmark results
 
-- compile by rustc 1.68.0 (2c8cc3432 2023-03-06)
+- compile by rustc 1.68.1 (8460ca823 2023-03-20)
 
   0. x86_64-unknown-linux- @Broadwell:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  278.030 µs |  208.700 µs |  271.660 µs |  202.990 µs |
-| libc_memmem             |  105.090 µs |   95.090 µs |  157.460 µs |  165.850 µs |
-| memchr_memmem           |   91.249 µs |   88.535 µs |   94.208 µs |   95.364 µs |
-| memx_memmem             |   49.344 µs |   49.042 µs |   50.024 µs |   55.130 µs |
-| memx_memmem_basic       |   54.149 µs |   51.810 µs |   57.750 µs |   61.667 µs |
-| memx_memmem_sse2        |   48.481 µs |   51.661 µs |   50.996 µs |   57.258 µs |
+| std_memmem              |   11.715 µs |   10.271 µs |   11.748 µs |   10.183 µs |
+| libc_memmem             |    3.112 µs |    5.701 µs |    5.835 µs |    9.899 µs |
+| memchr_memmem           |   13.182 µs |   12.585 µs |   13.095 µs |   12.733 µs |
+| memx_memmem             |    0.989 µs |    1.545 µs |    0.937 µs |    1.539 µs |
+| memx_memmem_basic       |    2.109 µs |    3.787 µs |    2.105 µs |    3.796 µs |
+| memx_memmem_sse2        |    1.185 µs |    1.970 µs |    1.186 µs |    2.002 µs |
+| memx_memmem_avx2        |    0.933 µs |    1.481 µs |    0.881 µs |    1.489 µs |
 
-  1. x86_64-unknown-linux-:
-
-|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
-|:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  471.990 µs |  437.020 µs |  468.750 µs |  432.500 µs |
-| libc_memmem             |  125.490 µs |  116.130 µs |  221.430 µs |  267.870 µs |
-| memchr_memmem           |  157.740 µs |  174.280 µs |  161.380 µs |  177.930 µs |
-| memx_memmem             |   97.555 µs |   97.045 µs |   97.257 µs |   96.883 µs |
-| memx_memmem_basic       |   98.635 µs |   99.485 µs |   96.792 µs |   99.694 µs |
-| memx_memmem_sse2        |   97.512 µs |   97.141 µs |   97.275 µs |   96.935 µs |
-
-  2. i686-unknown-linux-:
+  1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  650.190 µs |  547.930 µs |  711.140 µs |  524.760 µs |
-| libc_memmem             |  171.640 µs |  121.360 µs |  237.370 µs |  246.230 µs |
-| memchr_memmem           |  436.360 µs |  434.400 µs |  431.230 µs |  430.750 µs |
-| memx_memmem             |  107.950 µs |  106.680 µs |  110.800 µs |  112.130 µs |
-| memx_memmem_basic       |  121.560 µs |  123.300 µs |  128.720 µs |  125.170 µs |
-| memx_memmem_sse2        |  107.850 µs |  106.720 µs |  110.710 µs |  112.240 µs |
+| std_memmem              |   24.819 µs |   26.406 µs |   24.182 µs |   25.942 µs |
+| libc_memmem             |    4.580 µs |   10.722 µs |    8.950 µs |   14.891 µs |
+| memchr_memmem           |   26.248 µs |   29.273 µs |   26.216 µs |   30.181 µs |
+| memx_memmem             |    2.141 µs |    4.075 µs |    2.100 µs |    3.955 µs |
+| memx_memmem_basic       |    4.019 µs |    9.095 µs |    3.816 µs |    9.093 µs |
+| memx_memmem_sse2        |    1.996 µs |    3.961 µs |    1.973 µs |    3.832 µs |
 
-  3. i586-unknown-linux-:
+  2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memmem              |  774.790 µs |  590.860 µs |  719.420 µs |  578.450 µs |
-| libc_memmem             |  131.180 µs |  120.850 µs |  229.420 µs |  248.290 µs |
-| memchr_memmem           |  447.310 µs |  494.390 µs |  502.910 µs |  541.760 µs |
-| memx_memmem             |  128.130 µs |  132.340 µs |  127.420 µs |  126.980 µs |
-| memx_memmem_basic       |  128.110 µs |  132.060 µs |  127.370 µs |  127.020 µs |
+| std_memmem              |   34.311 µs |   35.968 µs |   32.926 µs |   35.390 µs |
+| libc_memmem             |    6.063 µs |   11.411 µs |   10.979 µs |   15.209 µs |
+| memchr_memmem           |   34.732 µs |   60.941 µs |   33.805 µs |   63.770 µs |
+| memx_memmem             |    2.338 µs |    3.910 µs |    2.308 µs |    3.908 µs |
+| memx_memmem_basic       |    6.311 µs |   12.821 µs |    6.382 µs |   12.908 µs |
+| memx_memmem_sse2        |    2.139 µs |    3.762 µs |    2.234 µs |    3.845 µs |
+
+  3. i586-unknown-linux- @Q6600:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memmem              |   33.955 µs |   39.174 µs |   34.093 µs |   44.297 µs |
+| libc_memmem             |    5.463 µs |   11.189 µs |   10.689 µs |   17.141 µs |
+| memchr_memmem           |   33.321 µs |   63.579 µs |   36.500 µs |   69.005 µs |
+| memx_memmem             |    2.402 µs |    4.026 µs |    2.334 µs |    4.049 µs |
+| memx_memmem_basic       |    6.363 µs |   12.722 µs |    6.287 µs |   13.018 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
@@ -90,9 +91,9 @@
 | memx_memmem             | 2243.900 us | 2005.800 us |  546.910 us |  582.020 us |
 | memx_memmem_basic       | 2244.100 us | 2122.200 us |  570.210 us |  549.610 us |
 
-
-- `us` is micro seconds
-- `:en` is english haystack.
-- `:ja` is japanese haystack.
+- `µs` is micro seconds
+- `:en` is english haystack or short length.
+- `:ja` is japanese haystack or long length.
+- `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
 - bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz

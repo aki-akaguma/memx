@@ -1,45 +1,46 @@
 ## Benchmark results
 
-- compile by rustc 1.68.0 (2c8cc3432 2023-03-06)
+- compile by rustc 1.68.1 (8460ca823 2023-03-20)
 
   0. x86_64-unknown-linux- @Broadwell:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |   51.116 µs |   75.029 µs |  115.650 µs |  324.560 µs |
-| libc_memcmp             |   58.160 µs |   75.467 µs |  118.320 µs |  326.130 µs |
-| memx_memcmp             |   49.451 µs |   73.042 µs |   49.989 µs |   74.839 µs |
-| memx_memcmp_basic       |   49.219 µs |   73.485 µs |   50.039 µs |   73.462 µs |
-| memx_memcmp_sse2        |   49.254 µs |   73.860 µs |   50.058 µs |   72.620 µs |
+| std_memcmp              |    9.206 µs |   13.009 µs |   12.456 µs |   41.429 µs |
+| libc_memcmp             |    8.504 µs |   12.186 µs |   12.556 µs |   42.673 µs |
+| memx_memcmp             |    7.976 µs |   12.712 µs |    8.485 µs |   12.945 µs |
+| memx_memcmp_basic       |    8.391 µs |   13.061 µs |    8.059 µs |   12.645 µs |
+| memx_memcmp_sse2        |    7.909 µs |   12.663 µs |    8.632 µs |   12.952 µs |
+| memx_memcmp_avx2        |    8.753 µs |   13.362 µs |    8.552 µs |   14.860 µs |
 
-  1. x86_64-unknown-linux-:
+  1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  148.390 µs |  261.870 µs |  247.550 µs |  432.000 µs |
-| libc_memcmp             |  155.350 µs |  268.120 µs |  249.140 µs |  429.910 µs |
-| memx_memcmp             |   92.252 µs |  143.800 µs |   93.866 µs |  139.320 µs |
-| memx_memcmp_basic       |   92.243 µs |  143.570 µs |   93.853 µs |  139.290 µs |
-| memx_memcmp_sse2        |   92.256 µs |  143.600 µs |   93.877 µs |  139.300 µs |
+| std_memcmp              |   21.283 µs |   50.419 µs |   26.478 µs |   61.473 µs |
+| libc_memcmp             |   21.914 µs |   50.101 µs |   26.236 µs |   61.064 µs |
+| memx_memcmp             |   17.002 µs |   28.701 µs |   16.734 µs |   30.325 µs |
+| memx_memcmp_basic       |   15.779 µs |   27.268 µs |   16.231 µs |   27.943 µs |
+| memx_memcmp_sse2        |   17.092 µs |   28.277 µs |   18.139 µs |   30.390 µs |
 
-  2. i686-unknown-linux-:
+  2. i686-unknown-linux- @Q6600:
   
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  161.650 µs |  281.780 µs |  222.800 µs |  447.690 µs |
-| libc_memcmp             |  167.270 µs |  292.110 µs |  211.960 µs |  456.110 µs |
-| memx_memcmp             |  113.280 µs |  218.720 µs |  117.340 µs |  275.910 µs |
-| memx_memcmp_basic       |  112.510 µs |  219.870 µs |  116.340 µs |  275.990 µs |
-| memx_memcmp_sse2        |  113.390 µs |  219.080 µs |  116.390 µs |  276.030 µs |
+| std_memcmp              |   22.985 µs |   52.392 µs |   28.305 µs |   63.462 µs |
+| libc_memcmp             |   22.283 µs |   50.046 µs |   28.242 µs |   64.040 µs |
+| memx_memcmp             |   16.612 µs |   34.187 µs |   19.503 µs |   37.988 µs |
+| memx_memcmp_basic       |   16.729 µs |   32.967 µs |   19.580 µs |   38.129 µs |
+| memx_memcmp_sse2        |   17.602 µs |   32.624 µs |   19.210 µs |   40.641 µs |
 
-  3. i586-unknown-linux-:
+  3. i586-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcmp              |  167.380 µs |  285.700 µs |  255.440 µs |  450.610 µs |
-| libc_memcmp             |  164.010 µs |  288.090 µs |  261.260 µs |  467.470 µs |
-| memx_memcmp             |  117.730 µs |  226.440 µs |  121.390 µs |  239.380 µs |
-| memx_memcmp_basic       |  117.760 µs |  226.590 µs |  121.020 µs |  253.740 µs |
+| std_memcmp              |   25.117 µs |   55.438 µs |   29.250 µs |   65.438 µs |
+| libc_memcmp             |   23.589 µs |   52.018 µs |   28.100 µs |   63.683 µs |
+| memx_memcmp             |   18.484 µs |   37.211 µs |   20.130 µs |   37.754 µs |
+| memx_memcmp_basic       |   17.538 µs |   35.694 µs |   20.169 µs |   38.847 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
@@ -82,9 +83,9 @@
 | memx_memcmp             |  652.500 us |  671.780 us |  681.010 us |  707.360 us |
 | memx_memcmp_basic       |  673.990 us |  723.850 us |  904.490 us |  679.730 us |
 
-
-- `us` is micro seconds
-- `:en` is english haystack.
-- `:ja` is japanese haystack.
+- `µs` is micro seconds
+- `:en` is english haystack or short length.
+- `:ja` is japanese haystack or long length.
+- `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
 - bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
