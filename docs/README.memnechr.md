@@ -1,42 +1,42 @@
 ## Benchmark results
 
-- compile by rustc 1.68.0 (2c8cc3432 2023-03-06)
+- compile by rustc 1.68.1 (8460ca823 2023-03-20)
 
   0. x86_64-unknown-linux- @Broadwell:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |   11.687 µs |   22.876 µs |   11.709 µs |   22.744 µs |
-| memx_memnechr           |    7.379 µs |    8.729 µs |    7.261 µs |    8.653 µs |
-| memx_memnechr_basic     |    8.991 µs |   11.467 µs |    8.972 µs |   11.314 µs |
-| memx_memnechr_sse2      |    6.920 µs |    8.411 µs |    6.893 µs |    8.536 µs |
-| memx_memnechr_avx2      |    7.064 µs |    8.516 µs |    7.020 µs |    8.274 µs |
+| std_memnechr            |   12.040 µs |   22.940 µs |   11.792 µs |   21.245 µs |
+| memx_memnechr           |    7.231 µs |    8.670 µs |    7.287 µs |    8.504 µs |
+| memx_memnechr_basic     |    8.980 µs |   11.508 µs |    8.915 µs |   11.251 µs |
+| memx_memnechr_sse2      |    6.931 µs |    8.528 µs |    6.893 µs |    8.589 µs |
+| memx_memnechr_avx2      |    7.052 µs |    8.666 µs |    6.908 µs |    8.241 µs |
 
-  1. x86_64-unknown-linux-:
-
-|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
-|:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |   25.934 µs |   39.434 µs |   25.971 µs |   39.421 µs |
-| memx_memnechr           |   15.403 µs |   17.277 µs |   15.024 µs |   17.731 µs |
-| memx_memnechr_basic     |   13.745 µs |   17.050 µs |   13.908 µs |   17.178 µs |
-| memx_memnechr_sse2      |   10.901 µs |   13.402 µs |   10.522 µs |   12.987 µs |
-
-  2. i686-unknown-linux-:
+  1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |   24.157 µs |   37.753 µs |   24.286 µs |   37.790 µs |
-| memx_memnechr           |   19.690 µs |   22.497 µs |   20.501 µs |   25.767 µs |
-| memx_memnechr_basic     |   13.967 µs |   21.106 µs |   14.571 µs |   20.944 µs |
-| memx_memnechr_sse2      |   13.705 µs |   15.522 µs |   14.776 µs |   15.987 µs |
+| std_memnechr            |   25.726 µs |   39.420 µs |   25.424 µs |   38.903 µs |
+| memx_memnechr           |   15.421 µs |   17.265 µs |   15.375 µs |   17.884 µs |
+| memx_memnechr_basic     |   13.716 µs |   17.291 µs |   13.744 µs |   17.229 µs |
+| memx_memnechr_sse2      |   10.682 µs |   12.825 µs |   10.648 µs |   13.085 µs |
 
-  3. i586-unknown-linux-:
+  2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memnechr            |   24.518 µs |   38.062 µs |   25.661 µs |   38.271 µs |
-| memx_memnechr           |   20.409 µs |   23.143 µs |   20.196 µs |   22.747 µs |
-| memx_memnechr_basic     |   14.127 µs |   20.698 µs |   14.371 µs |   20.730 µs |
+| std_memnechr            |   24.141 µs |   37.665 µs |   24.110 µs |   37.694 µs |
+| memx_memnechr           |   19.652 µs |   22.502 µs |   21.253 µs |   25.225 µs |
+| memx_memnechr_basic     |   13.489 µs |   21.146 µs |   15.651 µs |   21.786 µs |
+| memx_memnechr_sse2      |   14.315 µs |   15.277 µs |   15.178 µs |   17.145 µs |
+
+  3. i586-unknown-linux- @Q6600:
+
+|         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
+|:------------------------|------------:|------------:|------------:|------------:|
+| std_memnechr            |   24.519 µs |   37.926 µs |   24.630 µs |   38.024 µs |
+| memx_memnechr           |   19.851 µs |   21.594 µs |   19.882 µs |   22.694 µs |
+| memx_memnechr_basic     |   14.003 µs |   21.203 µs |   15.442 µs |   21.703 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)
@@ -77,8 +77,9 @@
 | memx_memchr             | 1042.000 us |  555.030 us | 1129.400 us |  519.740 us |
 | memx_memchr_basic       | 1005.600 us |  573.360 us | 1095.400 us |  525.020 us |
 
-- `us` is micro seconds
-- `:en` is english haystack.
-- `:ja` is japanese haystack.
+- `µs` is micro seconds
+- `:en` is english haystack or short length.
+- `:ja` is japanese haystack or long length.
+- `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
 - bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
