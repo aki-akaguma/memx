@@ -3,33 +3,43 @@ use crate::mem as basic;
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub(crate) fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memmem_avx2(haystack, needle) }
-    } else {
-        unsafe { _memmem_sse2(haystack, needle) }
-    }
-}
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering;
+type FuncType = fn(&[u8], &[u8]) -> Option<usize>;
 
-#[inline(always)]
-#[cfg(target_arch = "x86")]
-pub(crate) fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memmem_avx2(haystack, needle) }
+const FUNC: FuncType = fnptr_setup_func;
+static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
+
+#[inline(never)]
+fn fnptr_setup_func(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memmem_avx2
+    } else {
+        _memmem_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memmem_avx2
     } else if cpuid::has_sse2() {
-        unsafe { _memmem_sse2(haystack, needle) }
+        _memmem_sse2
     } else {
-        _memmem_basic(haystack, needle)
-    }
+        _memmem_basic
+    };
+    //
+    FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
+    unsafe { func(haystack, needle) }
 }
 
-fn _memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+#[inline(always)]
+pub(crate) fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: FuncType = unsafe { core::mem::transmute(func_u) };
+    func(haystack, needle)
+}
+
+unsafe fn _memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     basic::_memmem_impl(haystack, needle)
 }
 

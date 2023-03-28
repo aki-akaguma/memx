@@ -59,6 +59,7 @@ tarpaulin:
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 grcov:
+	@rm -f z.cargo-test-*.profraw
 	$(COV_ENV1) cargo test --offline
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_128
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_64
@@ -80,12 +81,12 @@ endef
 
 bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memchr_double bench-memrchr_double
-#bench_nms = bench-memchr_double
+#bench_nms = bench-memcpy
 
-target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
+#target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
 #target_base = i686-unknown-linux i586-unknown-linux
-#target_base = x86_64-unknown-linux
+target_base = x86_64-unknown-linux
 
 define build-templ =
 target/stamp.build/stamp.build.$(1).$(2):

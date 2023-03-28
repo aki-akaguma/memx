@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `grcov` target into `Makefile`
 
 ### Changed
+* The `avx2` switch was rewritten using a function pointer.
 * update benchmark results
 * refactor function: `_read_a_native_endian_from_ptr_u64()`
 * refactor bit operation : `PackedU64`

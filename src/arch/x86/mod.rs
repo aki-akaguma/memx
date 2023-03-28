@@ -31,6 +31,7 @@ mod x86_eq;
 pub(crate) use x86_eq::_memeq_impl;
 
 mod x86_cpy;
+#[allow(unused_imports)]
 pub(crate) use x86_cpy::_memcpy_impl;
 
 mod x86_set;

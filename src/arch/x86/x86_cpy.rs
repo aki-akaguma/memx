@@ -1,39 +1,46 @@
 use crate::mem as basic;
 use crate::RangeError;
 
-#[cfg(target_arch = "x86_64")]
-use super::cpuid_avx2;
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+use super::cpuid;
 
-#[cfg(target_arch = "x86")]
-use super::{cpuid_avx2, cpuid_sse2};
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering;
+type _FuncType = fn(&mut [u8], &[u8]) -> Result<(), RangeError>;
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid_avx2::get() {
-        unsafe { _memcpy_avx2(dst, src) }
+const _FUNC: _FuncType = _fnptr_setup_func;
+static _FUNC_PTR_ATOM: AtomicPtr<_FuncType> = AtomicPtr::new(_FUNC as *mut _FuncType);
+
+#[inline(never)]
+fn _fnptr_setup_func(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memcpy_avx2
     } else {
-        unsafe { _memcpy_sse2(dst, src) }
-    }
+        _memcpy_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memcpy_avx2
+    } else if cpuid::has_sse2() {
+        _memcpy_sse2
+    } else {
+        _memcpy_basic
+    };
+    //
+    _FUNC_PTR_ATOM.store(func as *mut _FuncType, Ordering::Relaxed);
+    unsafe { func(dst, src) }
 }
 
 #[inline(always)]
-#[cfg(target_arch = "x86")]
-pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid_avx2::get() {
-        unsafe { _memcpy_avx2(dst, src) }
-    } else if cpuid_sse2::get() {
-        unsafe { _memcpy_sse2(dst, src) }
-    } else {
-        _memcpy_basic(dst, src)
-    }
+pub(crate) fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    let func_u = _FUNC_PTR_ATOM.load(Ordering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: _FuncType = unsafe { core::mem::transmute(func_u) };
+    func(dst, src)
 }
 
-fn _memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+unsafe fn _memcpy_basic(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     basic::_memcpy_impl(dst, src)
 }
 
@@ -67,7 +74,7 @@ mod disasm {
     }
     #[inline(never)]
     fn do_proc_basic(a: &mut [u8], b: &[u8]) -> Result<(), RangeError> {
-        _memcpy_basic(a, b)
+        unsafe { _memcpy_basic(a, b) }
     }
     #[inline(never)]
     fn do_proc_sse2(a: &mut [u8], b: &[u8]) -> Result<(), RangeError> {
