@@ -3,33 +3,43 @@ use crate::mem as basic;
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memeq_avx2(a, b) }
-    } else {
-        unsafe { _memeq_sse2(a, b) }
-    }
-}
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering as AtomicOrdering;
+type _FuncType = fn(&[u8], &[u8]) -> bool;
 
-#[inline(always)]
-#[cfg(target_arch = "x86")]
-pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memeq_avx2(a, b) }
+const _FUNC: _FuncType = _fnptr_setup_func;
+static _FUNC_PTR_ATOM: AtomicPtr<_FuncType> = AtomicPtr::new(_FUNC as *mut _FuncType);
+
+#[inline(never)]
+fn _fnptr_setup_func(a: &[u8], b: &[u8]) -> bool {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memeq_avx2
+    } else {
+        _memeq_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memeq_avx2
     } else if cpuid::has_sse2() {
-        unsafe { _memeq_sse2(a, b) }
+        _memeq_sse2
     } else {
-        _memeq_basic(a, b)
-    }
+        _memeq_basic
+    };
+    //
+    _FUNC_PTR_ATOM.store(func as *mut _FuncType, AtomicOrdering::Relaxed);
+    unsafe { func(a, b) }
 }
 
-fn _memeq_basic(a: &[u8], b: &[u8]) -> bool {
+#[inline(always)]
+pub(crate) fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
+    let func_u = _FUNC_PTR_ATOM.load(AtomicOrdering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: _FuncType = unsafe { core::mem::transmute(func_u) };
+    func(a, b)
+}
+
+unsafe fn _memeq_basic(a: &[u8], b: &[u8]) -> bool {
     basic::_memeq_impl(a, b)
 }
 
@@ -62,7 +72,7 @@ mod disasm {
         assert!(do_proc_avx2(a, b));
     }
     fn do_proc_basic(a: &[u8], b: &[u8]) -> bool {
-        _memeq_basic(a, b)
+        unsafe { _memeq_basic(a, b) }
     }
     fn do_proc_sse2(a: &[u8], b: &[u8]) -> bool {
         unsafe { _memeq_sse2(a, b) }

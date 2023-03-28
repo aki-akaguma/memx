@@ -139,13 +139,27 @@ fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
     {
-        let unroll = 3;
+        let unroll = 4;
         let loop_size = 16;
         if min_len >= loop_size * unroll {
             while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
                 _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 0);
                 _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 1);
                 _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 2);
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 3);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 16;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_16!(a_ptr, b_ptr, loop_size, 1);
                 //
                 a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
                 b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
@@ -184,13 +198,27 @@ fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
     {
-        let unroll = 3;
+        let unroll = 4;
         let loop_size = 8;
         if min_len >= loop_size * unroll {
             while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
                 _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 0);
                 _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 1);
                 _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 2);
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 3);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 8;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_8!(a_ptr, b_ptr, loop_size, 1);
                 //
                 a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
                 b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
@@ -229,13 +257,27 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
     let end_ptr = unsafe { a_ptr.add(min_len) };
     //
     {
-        let unroll = 3;
+        let unroll = 4;
         let loop_size = 4;
         if min_len >= loop_size * unroll {
             while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
                 _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 0);
                 _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 1);
                 _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 2);
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 3);
+                //
+                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            }
+        }
+    }
+    {
+        let unroll = 2;
+        let loop_size = 4;
+        if min_len >= loop_size * unroll {
+            while unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 0);
+                _unroll_one_cmp_4!(a_ptr, b_ptr, loop_size, 1);
                 //
                 a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
                 b_ptr = unsafe { b_ptr.add(loop_size * unroll) };

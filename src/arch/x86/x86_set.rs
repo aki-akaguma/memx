@@ -15,43 +15,46 @@ use mmx::_mm256_set1_epi8;
 use mmx::_mm256_store_si256;
 use mmx::_mm256_storeu_si256;
 
-#[cfg(target_arch = "x86_64")]
-use super::cpuid_avx2;
+#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+use super::cpuid;
 
-#[cfg(target_arch = "x86")]
-use super::{cpuid_avx2, cpuid_sse2};
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering;
+type FuncType = fn(&mut [u8], u8);
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub fn _memset_impl(buf: &mut [u8], c: u8) {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid_avx2::get() {
-        unsafe { _memset_avx2(buf, c) };
+const FUNC: FuncType = fnptr_setup_func;
+static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
+
+#[inline(never)]
+fn fnptr_setup_func(buf: &mut [u8], c: u8) {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memset_avx2
     } else {
-        #[rustfmt::skip]
-        #[cfg(not(miri))]
-        unsafe { _memset_sse2(buf, c) };
-        #[cfg(miri)]
-        _memset_basic(buf, c);
-    }
+        _memset_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memset_avx2
+    } else if cpuid::has_sse2() {
+        _memset_sse2
+    } else {
+        _memset_basic
+    };
+    //
+    FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
+    unsafe { func(buf, c) }
 }
 
 #[inline(always)]
-#[cfg(target_arch = "x86")]
-pub fn _memset_impl(buf: &mut [u8], c: u8) {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid_avx2::get() {
-        unsafe { _memset_avx2(buf, c) };
-    } else if cpuid_sse2::get() {
-        unsafe { _memset_sse2(buf, c) };
-    } else {
-        _memset_basic(buf, c);
-    }
+pub(crate) fn _memset_impl(buf: &mut [u8], c: u8) {
+    let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: FuncType = unsafe { core::mem::transmute(func_u) };
+    func(buf, c)
 }
 
-fn _memset_basic(buf: &mut [u8], c: u8) {
+unsafe fn _memset_basic(buf: &mut [u8], c: u8) {
     basic::_memset_impl(buf, c)
 }
 
@@ -188,7 +191,7 @@ mod disasm {
     }
     #[inline(never)]
     fn do_proc_basic(a: &mut [u8], c: u8) {
-        _memset_basic(a, c)
+        unsafe { _memset_basic(a, c) }
     }
     #[inline(never)]
     fn do_proc_sse2(a: &mut [u8], c: u8) {

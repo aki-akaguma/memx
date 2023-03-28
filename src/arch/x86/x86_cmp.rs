@@ -4,33 +4,43 @@ use core::cmp::Ordering;
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memcmp_avx2(a, b) }
-    } else {
-        unsafe { _memcmp_sse2(a, b) }
-    }
-}
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering as AtomicOrdering;
+type _FuncType = fn(&[u8], &[u8]) -> Ordering;
 
-#[inline(always)]
-#[cfg(target_arch = "x86")]
-pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memcmp_avx2(a, b) }
+const _FUNC: _FuncType = _fnptr_setup_func;
+static _FUNC_PTR_ATOM: AtomicPtr<_FuncType> = AtomicPtr::new(_FUNC as *mut _FuncType);
+
+#[inline(never)]
+fn _fnptr_setup_func(a: &[u8], b: &[u8]) -> Ordering {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memcmp_avx2
+    } else {
+        _memcmp_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memcmp_avx2
     } else if cpuid::has_sse2() {
-        unsafe { _memcmp_sse2(a, b) }
+        _memcmp_sse2
     } else {
-        _memcmp_basic(a, b)
-    }
+        _memcmp_basic
+    };
+    //
+    _FUNC_PTR_ATOM.store(func as *mut _FuncType, AtomicOrdering::Relaxed);
+    unsafe { func(a, b) }
 }
 
-fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
+#[inline(always)]
+pub(crate) fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
+    let func_u = _FUNC_PTR_ATOM.load(AtomicOrdering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: _FuncType = unsafe { core::mem::transmute(func_u) };
+    func(a, b)
+}
+
+unsafe fn _memcmp_basic(a: &[u8], b: &[u8]) -> Ordering {
     basic::_memcmp_impl(a, b)
 }
 
@@ -64,7 +74,7 @@ mod disasm {
         assert_eq!(do_proc_avx2(a, b), Ordering::Equal);
     }
     fn do_proc_basic(a: &[u8], b: &[u8]) -> Ordering {
-        _memcmp_basic(a, b)
+        unsafe { _memcmp_basic(a, b) }
     }
     fn do_proc_sse2(a: &[u8], b: &[u8]) -> Ordering {
         unsafe { _memcmp_sse2(a, b) }

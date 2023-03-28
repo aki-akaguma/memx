@@ -23,33 +23,43 @@ use mmx::_mm256_set1_epi8;
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
 
-#[inline(always)]
-#[cfg(target_arch = "x86_64")]
-pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memchr_avx2(buf, c) }
-    } else {
-        unsafe { _memchr_sse2(buf, c) }
-    }
-}
+use core::sync::atomic::AtomicPtr;
+use core::sync::atomic::Ordering;
+type FuncType = fn(&[u8], u8) -> Option<usize>;
 
-#[inline(always)]
-#[cfg(target_arch = "x86")]
-pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if cpuid::has_avx2() {
-        unsafe { _memchr_avx2(buf, c) }
+const FUNC: FuncType = fnptr_setup_func;
+static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
+
+#[inline(never)]
+fn fnptr_setup_func(buf: &[u8], c: u8) -> Option<usize> {
+    #[cfg(target_arch = "x86_64")]
+    let func = if cpuid::has_avx2() {
+        _memchr_avx2
+    } else {
+        _memchr_sse2
+    };
+    #[cfg(target_arch = "x86")]
+    let func = if cpuid::has_avx2() {
+        _memchr_avx2
     } else if cpuid::has_sse2() {
-        unsafe { _memchr_sse2(buf, c) }
+        _memchr_sse2
     } else {
-        _memchr_basic(buf, c)
-    }
+        _memchr_basic
+    };
+    //
+    FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
+    unsafe { func(buf, c) }
 }
 
-fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
+#[inline(always)]
+pub(crate) fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+    let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
+    #[allow(clippy::crosspointer_transmute)]
+    let func: FuncType = unsafe { core::mem::transmute(func_u) };
+    func(buf, c)
+}
+
+unsafe fn _memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     basic::_memchr_impl(buf, c)
 }
 
