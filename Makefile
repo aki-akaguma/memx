@@ -56,10 +56,11 @@ tarpaulin:
 	@
 	genhtml -o target/lcov --demangle-cpp target/lcov.info.*
 
-COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
-COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='z.cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
+COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='./target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
+COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='./target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 grcov:
-	@rm -f z.cargo-test-*.profraw
+	@mkdir -p target/profraw
+	@rm -f target/profraw/cargo-test-*.profraw
 	$(COV_ENV1) cargo test --offline
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_128
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_64
@@ -67,6 +68,12 @@ grcov:
 	@mkdir -p target/coverage
 	grcov . --binary-path ./target/debug/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
 
+bench-grcov:
+	@mkdir -p target/profraw
+	@rm -f target/profraw/cargo-test-*.profraw
+	$(COV_ENV1) cargo xbench --bench=bench-memnechr
+	@mkdir -p target/coverage
+	grcov . --binary-path ./target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
 
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \
 	1.64.0 1.65.0 1.66.1
