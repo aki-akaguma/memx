@@ -16,9 +16,13 @@ default = []
 
 # for test and tarpaulin
 test = []
-test_pointer_width_128 = ["test"]
-test_pointer_width_64 = ["test"]
-test_pointer_width_32 = ["test"]
+
+test_pointer_width = ["test"]
+test_pointer_width_128 = ["test_pointer_width"]
+test_pointer_width_64 = ["test_pointer_width"]
+test_pointer_width_32 = ["test_pointer_width"]
+
+test_alignment_check = ["test"]
 
 [dependencies]
 
@@ -27,6 +31,10 @@ cpufeatures = "0.2"
 
 [dev-dependencies]
 rustversion = "1.0"
+cfg-iif = "0.2"
+
+[target.'cfg(any(target_arch = "x86_64", target_arch = "x86"))'.dev-dependencies]
+x86-alignment-check = "0.1"
 
 [build-dependencies]
 rustc_version = "0.4"

@@ -53,14 +53,26 @@ fn test02() {
         let buf = {
             let mut buf: Vec<u8> = buf_g.clone();
             buf.append(&mut buf_0.repeat(x));
+            buf.append(&mut buf_0.repeat(x));
             buf.push(b'G');
             buf.append(&mut buf_0.repeat(1 + x));
             buf
         };
         //
-        let r = test_memrchr_double(&buf, b'G', b'g');
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            x86_alignment_check::ac_call_once(|| { test_memrchr_double(&buf[x..], b'G', b'g') })
+        } else {
+            test_memrchr_double(&buf[x..], b'G', b'g')
+        });
         assert_eq!(r, Some(1 + x));
-        let r = test_memrchr_double(&buf, b'g', b'G');
+        //
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            x86_alignment_check::ac_call_once(|| { test_memrchr_double(&buf[x..], b'g', b'G') })
+        } else {
+            test_memrchr_double(&buf[x..], b'g', b'G')
+        });
         assert_eq!(r, Some(1 + x));
     };
     if cfg!(miri) {

@@ -1,6 +1,92 @@
 #[cfg(features = "test")]
 use core::convert::TryInto;
 
+pub trait PtrOps {
+    fn prefetch_read_data(&self);
+    fn is_aligned_u256(&self) -> bool;
+    fn is_aligned_u128(&self) -> bool;
+    fn is_aligned_u64(&self) -> bool;
+    fn is_aligned_u32(&self) -> bool;
+    fn is_aligned_u16(&self) -> bool;
+}
+impl PtrOps for *const u8 {
+    #[inline(always)]
+    fn prefetch_read_data(&self) {
+        // TODO: Replace with core::intrinsics::prefetch_read_data
+        // after stabilization
+        // The cache line size of x86_64 is 64 bytes.
+        #[cfg(not(miri))]
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        {
+            #[cfg(target_arch = "x86")]
+            use core::arch::x86 as mmx;
+            #[cfg(target_arch = "x86_64")]
+            use core::arch::x86_64 as mmx;
+            //
+            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
+        }
+    }
+    #[inline(always)]
+    fn is_aligned_u256(&self) -> bool {
+        ((*self as usize) & 0x1F_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u128(&self) -> bool {
+        ((*self as usize) & 0x0F_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u64(&self) -> bool {
+        ((*self as usize) & 0x07_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u32(&self) -> bool {
+        ((*self as usize) & 0x03_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u16(&self) -> bool {
+        ((*self as usize) & 0x01_usize) == 0
+    }
+}
+
+impl PtrOps for *mut u8 {
+    #[inline(always)]
+    fn prefetch_read_data(&self) {
+        // TODO: Replace with core::intrinsics::prefetch_read_data
+        // after stabilization
+        // The cache line size of x86_64 is 64 bytes.
+        #[cfg(not(miri))]
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        {
+            #[cfg(target_arch = "x86")]
+            use core::arch::x86 as mmx;
+            #[cfg(target_arch = "x86_64")]
+            use core::arch::x86_64 as mmx;
+            //
+            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
+        }
+    }
+    #[inline(always)]
+    fn is_aligned_u256(&self) -> bool {
+        ((*self as usize) & 0x1F_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u128(&self) -> bool {
+        ((*self as usize) & 0x0F_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u64(&self) -> bool {
+        ((*self as usize) & 0x07_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u32(&self) -> bool {
+        ((*self as usize) & 0x03_usize) == 0
+    }
+    #[inline(always)]
+    fn is_aligned_u16(&self) -> bool {
+        ((*self as usize) & 0x01_usize) == 0
+    }
+}
+
 macro_rules! read_native_integer_impl {
     ($($fn_name:ident: $ty:ident,)+) => {$(
         #[inline(always)]
@@ -108,6 +194,7 @@ macro_rules! packed_integers {
 
         #[allow(dead_code)]
         impl $packed {
+            // ONES: 0x0101_0101_0101_0101_u64;
             pub const ONES: $ty = $ty::MAX / (u8::MAX as $ty);
             pub const HIGHS: $ty = Self::ONES * (u8::MAX / 2 + 1) as $ty;
             pub const LOWS: $ty = Self::ONES * (u8::MAX / 2) as $ty;
@@ -163,47 +250,17 @@ packed_integers! {
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */
 
-/* for rust playground
-fn main() {
-    const ONES: u32 = u32::MAX/(u8::MAX as u32);
-    const HIGHS: u32 = ONES * (u8::MAX/2+1) as u32;
-    const LOWS: u32 = ONES * (u8::MAX/2) as u32;
-    println!("ONES: 0x{:08x}", ONES);
-    println!("HIGHS: 0x{:08x}", HIGHS);
-    println!("LOWS: 0x{:08x}", LOWS);
-    println!();
-    fn has_zero(x: u32) -> u32 {
-        x.wrapping_sub(ONES) & !x & HIGHS
-    }
-    fn has_zero_byte(x: u32) -> u32 {
-        !((((x & LOWS).wrapping_add(LOWS)) | x) | LOWS)
-    }
-    let v0 = 0x43424242_u32;
-    let c2 = 0x42424242_u32;
-    let v = v0 ^ c2;
-    println!("v:             0x{:08x}", v);
-    println!("has_zero:      0x{:08x}", has_zero(v));
-    println!("has_zero_byte: 0x{:08x}", has_zero_byte(v));
-    println!();
-    let v0 = 0x42424242_u32;
-    let c2 = 0x42424242_u32;
-    let v = v0 ^ c2;
-    println!("v:             0x{:08x}", v);
-    println!("has_zero:      0x{:08x}", has_zero(v));
-    println!("has_zero_byte: 0x{:08x}", has_zero_byte(v));
-    println!();
+#[inline(always)]
+pub(crate) fn _c16_value(c: u8) -> u128 {
+    (c as u128) * PackedU128::ONES
 }
 
-results>
-ONES: 0x01010101
-HIGHS: 0x80808080
-LOWS: 0x7f7f7f7f
+#[inline(always)]
+pub(crate) fn _c8_value(c: u8) -> u64 {
+    (c as u64) * PackedU64::ONES
+}
 
-v:             0x01000000
-has_zero:      0x80808080
-has_zero_byte: 0x00808080
-
-v:             0x00000000
-has_zero:      0x80808080
-has_zero_byte: 0x80808080
-*/
+#[inline(always)]
+pub(crate) fn _c4_value(c: u8) -> u32 {
+    (c as u32) * PackedU32::ONES
+}

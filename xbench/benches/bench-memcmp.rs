@@ -15,7 +15,7 @@ pub fn std_memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
 
 macro_rules! j_bool {
     ($j: expr) => {
-        $j < 16 || $j % 4 == 0 || $j % 7 == 0
+        $j < 16 || $j % 8 == 0 || $j % 10 == 0
     };
 }
 
@@ -279,7 +279,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     let pat_string = pat_string_s.to_string();
     //
     if let Ok(_val) = std::env::var("AKI_TEST_DAT_CHECK") {
-        let (n_eq, n_le, n_gr) = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
+        let (n_eq, n_le, n_gr) = process_std_memcmp(black_box(&vv), black_box(&pat_string));
         assert_eq!(n_eq, match_cnt);
         assert_eq!(n_le, less_cnt);
         assert_eq!(n_gr, greater_count);
@@ -329,7 +329,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     c.bench_function("std_memcmp", |b| {
         b.iter(|| {
-            let _r = process_std_memcmp(black_box(&vv), black_box(pat_string_s));
+            let _r = process_std_memcmp(black_box(&vv), black_box(&pat_string));
         })
     });
     cache_flush(&vv, &pat_string);
@@ -379,7 +379,7 @@ criterion_group! {
     config = Criterion::default()
         .sample_size(200)
         .warm_up_time(std::time::Duration::from_millis(100))
-        .measurement_time(std::time::Duration::from_millis(1000));
+        .measurement_time(std::time::Duration::from_millis(1300));
     targets = criterion_benchmark
 }
 //criterion_group!(benches, criterion_benchmark);

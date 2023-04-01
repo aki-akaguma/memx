@@ -71,8 +71,8 @@ fn _memrmem_sse2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let byte_1st = needle[0];
     let byte_last = needle[nee_len - 1];
     if byte_1st.is_ascii() && byte_last.is_ascii() {
-        let weight_1st = crate::_ASCII_STOCHAS[byte_1st as usize];
-        let weight_last = crate::_ASCII_STOCHAS[byte_last as usize];
+        let weight_1st = crate::_ascii_stochas(byte_1st);
+        let weight_last = crate::_ascii_stochas(byte_last);
         if weight_1st <= weight_last {
             _memrmem_sse2_impl_1st(haystack, needle)
         } else {
@@ -146,8 +146,8 @@ fn _memrmem_avx2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let byte_1st = needle[0];
     let byte_last = needle[nee_len - 1];
     if byte_1st.is_ascii() && byte_last.is_ascii() {
-        let weight_1st = crate::_ASCII_STOCHAS[byte_1st as usize];
-        let weight_last = crate::_ASCII_STOCHAS[byte_last as usize];
+        let weight_1st = crate::_ascii_stochas(byte_1st);
+        let weight_last = crate::_ascii_stochas(byte_last);
         if weight_1st <= weight_last {
             _memrmem_avx2_impl_1st(haystack, needle)
         } else {

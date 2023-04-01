@@ -12,11 +12,21 @@ test:
 	cargo test --offline --features test_pointer_width_64
 	cargo test --offline --features test_pointer_width_32
 
+AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_double -- test memrchr_double
+test-alignment-check:
+	cargo test --offline --features test_alignment_check $(AC_TESTS)
+	cargo test --offline --features test_alignment_check,test_pointer_width_128 $(AC_TESTS)
+	cargo test --offline --features test_alignment_check,test_pointer_width_64 $(AC_TESTS)
+	cargo test --offline --features test_alignment_check,test_pointer_width_32 $(AC_TESTS)
+
 test-no-default-features:
 	cargo test --offline --no-default-features
 
 miri:
-	cargo +nightly miri test --offline
+	cargo +nightly miri test --features test_pointer_width_128
+	cargo +nightly miri test --features test_pointer_width_64
+	cargo +nightly miri test --features test_pointer_width_32
+	cargo +nightly miri test
 
 clean:
 	@cargo clean
@@ -56,24 +66,26 @@ tarpaulin:
 	@
 	genhtml -o target/lcov --demangle-cpp target/lcov.info.*
 
-COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='./target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
-COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='./target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
+COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
+COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 grcov:
-	@mkdir -p target/profraw
-	@rm -f target/profraw/cargo-test-*.profraw
+	@rm -rf $(CURDIR)/target/profraw
 	$(COV_ENV1) cargo test --offline
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_128
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_64
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_32
-	@mkdir -p target/coverage
-	grcov . --binary-path ./target/debug/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
+	@mkdir -p $(CURDIR)/target/coverage
+	grcov $(CURDIR)/target/profraw --binary-path ./target/debug/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
 
+BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
+BG_PROF=
+BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
 bench-grcov:
-	@mkdir -p target/profraw
-	@rm -f target/profraw/cargo-test-*.profraw
-	$(COV_ENV1) cargo xbench --bench=bench-memnechr
-	@mkdir -p target/coverage
-	grcov . --binary-path ./target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
+	@rm -rf $(CURDIR)/target/profraw
+	@rm -rf $(CURDIR)/target/coverage
+	$(COV_ENV1) $(BG_PROF) cargo xbench --bench=bench-memcmp
+	@mkdir -p $(CURDIR)/target/coverage
+	grcov $(CURDIR)/target/profraw --binary-path $(CURDIR)/target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o $(CURDIR)/target/coverage/html
 
 rustc_vers = 1.56.1 1.57.0 1.58.1 1.59.0 1.60.0 1.61.0 1.62.1 1.63.0 \
 	1.64.0 1.65.0 1.66.1
@@ -86,9 +98,11 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memchr_double bench-memrchr_double
-#bench_nms = bench-memcpy
+#bench_nms = bench-memcmp bench-memeq
+#bench_nms = bench-memcpy bench-memset
+bench_nms = bench-memset
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux

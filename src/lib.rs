@@ -45,10 +45,15 @@ pub struct RangeError;
 
 /// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == c)`.
 pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memchr_impl(buf, c);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memchr_impl(buf, c) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memchr_impl(buf, c) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memchr_impl(buf, c);
     //
     r
@@ -56,10 +61,15 @@ pub fn memchr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == c)`.
 pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memrchr_impl(buf, c);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrchr_impl(buf, c) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrchr_impl(buf, c) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrchr_impl(buf, c);
     //
     r
@@ -67,10 +77,15 @@ pub fn memrchr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().position(|&x| x != c)`, not included libc.
 pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memnechr_impl(buf, c);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memnechr_impl(buf, c) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memnechr_impl(buf, c) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memnechr_impl(buf, c);
     //
     r
@@ -78,10 +93,15 @@ pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().rposition(|&x| x != c)`, not included libc.
 pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memrnechr_impl(buf, c);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrnechr_impl(buf, c) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrnechr_impl(buf, c) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrnechr_impl(buf, c);
     //
     r
@@ -89,10 +109,15 @@ pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
 pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memchr_double_impl(buf, c1, c2);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memchr_double_impl(buf, c1, c2) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memchr_double_impl(buf, c1, c2) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memchr_double_impl(buf, c1, c2);
     //
     r
@@ -100,10 +125,15 @@ pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 /// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2)`.
 pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memrchr_double_impl(buf, c1, c2);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrchr_double_impl(buf, c1, c2) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrchr_double_impl(buf, c1, c2) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrchr_double_impl(buf, c1, c2);
     //
     r
@@ -114,10 +144,15 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     mem::_memcmp_impl(a, b)
     /*
     sse2 or avx2 are slower, but I don't know why.
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memcmp_impl(a, b);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memcmp_impl(a, b) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memcmp_impl(a, b) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memcmp_impl(a, b);
     //
     r
@@ -129,10 +164,15 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     mem::_memeq_impl(a, b)
     /*
     sse2 or avx2 are slower, but I don't know why.
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memeq_impl(a, b);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memeq_impl(a, b) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memeq_impl(a, b) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memeq_impl(a, b);
     //
     r
@@ -145,10 +185,15 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
 ///
 pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memmem_impl(haystack, needle);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memmem_impl(haystack, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memmem_impl(haystack, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memmem_impl(haystack, needle);
     //
     r
@@ -160,10 +205,15 @@ pub fn memmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 /// ref.) [The optimized naive string-search algorithm](https://crates.io/crates/naive_opt)
 ///
 pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memrmem_impl(haystack, needle);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrmem_impl(haystack, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrmem_impl(haystack, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrmem_impl(haystack, needle);
     //
     r
@@ -192,16 +242,21 @@ pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 ///
 /// The `memset()` function fills `buf` with the `c`.
 pub fn memset(buf: &mut [u8], c: u8) {
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    arch::x86::_memset_impl(buf, c);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        arch::x86::_memset_impl(buf, c);
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        mem::_memset_impl(buf, c);
+    };
+    #[cfg(feature = "test_pointer_width")]
     mem::_memset_impl(buf, c);
 }
 
 // ascii stochastics
 #[rustfmt::skip]
-pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
+const _ASCII_STOCHAS: [u8; 128] = [
     // 0x00: NUL,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     // 0x10: DEL,
@@ -219,3 +274,10 @@ pub(crate) const _ASCII_STOCHAS: [u8; 128] = [
     // 0x70: b'p', 0x7a: b'z'
     12, 1, 34, 35, 50, 13, 5, 5, 2, 7, 0, 0, 2, 0, 0, 0,
 ];
+
+#[inline(always)]
+pub(crate) fn _ascii_stochas(idx: u8) -> u8 {
+    //_ASCII_STOCHAS[idx as usize]
+    assert!(idx < 128);
+    unsafe { *(_ASCII_STOCHAS.as_ptr().add(idx as usize)) }
+}

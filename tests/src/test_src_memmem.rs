@@ -56,11 +56,21 @@ fn test02() {
     let f = |x: usize| {
         let buf = {
             let mut buf: Vec<u8> = buf_0.repeat(1 + x);
+            buf.append(&mut buf_0.repeat(x));
             buf.extend_from_slice(&pat);
             buf
         };
         //
-        let r = test_memmem(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memmem(&buf[x..], &pat) })
+            } else {
+                test_memmem(&buf[x..], &pat)
+            }
+        } else {
+            test_memmem(&buf[x..], &pat)
+        });
         assert_eq!(r, Some(1 + x));
     };
     if cfg!(miri) {
