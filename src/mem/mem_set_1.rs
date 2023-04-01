@@ -277,7 +277,7 @@ pub(crate) fn _start_set_64(buf: &mut [u8], c: u8) {
     let mut a_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
-    let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
+    let cc: u64 = _c8_value(c);
     if buf_len >= 8 {
         a_ptr = _align_8(a_ptr, cc);
         {
@@ -321,7 +321,7 @@ fn _start_set_64_no_unroll(buf: &mut [u8], c: u8) {
     let mut a_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { a_ptr.add(buf_len) };
     //
-    let cc: u64 = c as u64 * 0x0101_0101_0101_0101_u64;
+    let cc: u64 = _c8_value(c);
     a_ptr = _align_8(a_ptr, cc);
     if buf_len > 7 {
         let loop_size = 8;

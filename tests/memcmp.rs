@@ -5,6 +5,7 @@ mod test_std_memcmp {
         buf.cmp(pat_bytes)
     }
     //
+    const _RT_AC: bool = false;
     include!("./src/test_src_memcmp.rs");
 }
 mod test_memx_memcmp {
@@ -14,6 +15,7 @@ mod test_memx_memcmp {
         memx::memcmp(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memcmp.rs");
 }
 mod test_memx_memcmp_basic {
@@ -23,5 +25,6 @@ mod test_memx_memcmp_basic {
         memx::mem::memcmp_basic(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memcmp.rs");
 }

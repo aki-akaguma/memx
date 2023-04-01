@@ -1,4 +1,5 @@
 use crate::mem as basic;
+use crate::utils::*;
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;
@@ -72,51 +73,126 @@ pub unsafe fn _memset_avx2(buf: &mut [u8], c: u8) {
     _memset_avx2_impl(buf, c)
 }
 
+macro_rules! _unroll_one_set_16_uu {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c16_uu(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_16_aa {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c16_aa(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_16_aa_x2 {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c16_aa_x2(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_16_aa_x4 {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c16_aa_x4(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_32_uu {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c32_uu(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_32_aa {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c32_aa(aa_ptr, $cc) };
+    }};
+}
+
+macro_rules! _unroll_one_set_32_aa_x2 {
+    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
+        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
+        unsafe { _set_c32_aa_x2(aa_ptr, $cc) };
+    }};
+}
+
 #[inline(always)]
 fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
     let buf_len = buf.len();
     if buf_len == 0 {
         return;
     }
-    //
-    let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(buf_len) };
+    let buf_len = buf.len();
+    let mut buf_ptr = buf.as_mut_ptr();
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let mcc: __m128i = unsafe { _mm_set1_epi8(c as i8) };
+        let cc: __m128i = unsafe { _c16_value(c) };
         {
-            let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
+            let loop_size = 16;
             //
-            let aa_ptr = a_ptr as *mut __m128i;
-            unsafe { _mm_storeu_si128(aa_ptr, mcc) };
-            //
-            a_ptr = unsafe { a_ptr.add(remaining_align) };
+            #[cfg(not(feature = "test_alignment_check"))]
+            {
+                if buf_ptr.is_aligned_u128() {
+                    _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                } else {
+                    _unroll_one_set_16_uu!(buf_ptr, cc, loop_size, 0);
+                }
+                let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            }
+            #[cfg(feature = "test_alignment_check")]
+            {
+                if buf_ptr.is_aligned_u128() {
+                    _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                } else {
+                    buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
+                }
+            }
+        }
+        //
+        {
+            let unroll = 4;
+            let loop_size = 16;
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16_x4 {
+                    _unroll_one_set_16_aa_x4!(buf_ptr, cc, loop_size, 0);
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
+            }
         }
         {
-            let unroll = 8;
+            let unroll = 2;
             let loop_size = 16;
-            let end_ptr_16_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-            while a_ptr <= end_ptr_16_8 {
-                for i in 0..unroll {
-                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut __m128i;
-                    unsafe { _mm_store_si128(aa_ptr, mcc) };
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16_x2 {
+                    _unroll_one_set_16_aa_x2!(buf_ptr, cc, loop_size, 0);
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
-                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
             }
         }
         {
             let loop_size = 16;
-            let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-            while a_ptr <= end_ptr_8 {
-                let aa_ptr = a_ptr as *mut __m128i;
-                unsafe { _mm_store_si128(aa_ptr, mcc) };
-                a_ptr = unsafe { a_ptr.add(loop_size) };
+            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
+            while buf_ptr <= end_ptr_16 {
+                _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
     }
-    let cc: u128 = c as u128 * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128;
+    let cc: u64 = _c8_value(c);
     // the remaining data is the max: 15 bytes.
-    basic::_memset_remaining_15_bytes_impl(a_ptr, cc, end_ptr)
+    basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
 }
 
 #[inline(always)]
@@ -125,55 +201,150 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
     if buf_len == 0 {
         return;
     }
-    //
-    let mut a_ptr = buf.as_mut_ptr();
-    let end_ptr = unsafe { a_ptr.add(buf_len) };
+    let buf_len = buf.len();
+    let mut buf_ptr = buf.as_mut_ptr();
+    let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let mcc: __m256i = unsafe { _mm256_set1_epi8(c as i8) };
+        let cc: __m256i = unsafe { _c32_value(c) };
         {
-            let remaining_align = 0x20_usize - ((a_ptr as usize) & 0x1F_usize);
-            //
-            let aa_ptr = a_ptr as *mut __m256i;
-            unsafe { _mm256_storeu_si256(aa_ptr, mcc) };
-            //
-            a_ptr = unsafe { a_ptr.add(remaining_align) };
-        }
-        {
-            let unroll = 8;
             let loop_size = 32;
-            let end_ptr_32_8 = unsafe { end_ptr.sub(loop_size * unroll) };
-            while a_ptr <= end_ptr_32_8 {
-                for i in 0..unroll {
-                    let aa_ptr = unsafe { a_ptr.add(loop_size * i) } as *mut __m256i;
-                    unsafe { _mm256_store_si256(aa_ptr, mcc) };
+            //
+            #[cfg(not(feature = "test_alignment_check"))]
+            {
+                if buf_ptr.is_aligned_u256() {
+                    _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
+                } else {
+                    _unroll_one_set_32_uu!(buf_ptr, cc, loop_size, 0);
                 }
-                a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            }
+            #[cfg(feature = "test_alignment_check")]
+            {
+                if buf_ptr.is_aligned_u256() {
+                    _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
+                    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                } else {
+                    buf_ptr = basic::_set_to_aligned_u256(buf_ptr, c);
+                }
+            }
+        }
+        {
+            let unroll = 2;
+            let loop_size = 32;
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_32_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_32_x2 {
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_set_32_aa_x2!(buf_ptr, cc, loop_size, 0);
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
             }
         }
         {
             let loop_size = 32;
+            let end_ptr_32 = unsafe { end_ptr.sub(loop_size) };
+            while buf_ptr <= end_ptr_32 {
+                _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            }
+        }
+        {
+            let cc: __m128i = unsafe { _c16_value(c) };
+            let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-            while a_ptr <= end_ptr_16 {
-                let aa_ptr = a_ptr as *mut __m256i;
-                unsafe { _mm256_store_si256(aa_ptr, mcc) };
-                a_ptr = unsafe { a_ptr.add(loop_size) };
+            while buf_ptr <= end_ptr_16 {
+                _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            }
+        }
+    } else if buf_len >= 16 {
+        {
+            let cc: __m128i = unsafe { _c16_value(c) };
+            let loop_size = 16;
+            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
+            if buf_ptr <= end_ptr_16 {
+                //
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    if buf_ptr.is_aligned_u128() {
+                        while buf_ptr <= end_ptr_16 {
+                            _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                        }
+                    } else {
+                        while buf_ptr <= end_ptr_16 {
+                            _unroll_one_set_16_uu!(buf_ptr, cc, loop_size, 0);
+                            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                        }
+                    }
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
+                    while buf_ptr <= end_ptr_16 {
+                        _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
+                        buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                    }
+                }
             }
         }
     }
-    if buf_len >= 16 {
-        let loop_size = 16;
-        let end_ptr_8 = unsafe { end_ptr.sub(loop_size) };
-        if a_ptr <= end_ptr_8 {
-            let mcc: __m128i = unsafe { _mm_set1_epi8(c as i8) };
-            let aa_ptr = a_ptr as *mut __m128i;
-            unsafe { _mm_storeu_si128(aa_ptr, mcc) };
-            a_ptr = unsafe { a_ptr.add(loop_size) };
-        }
-    }
-    let cc: u128 = c as u128 * 0x0101_0101_0101_0101_0101_0101_0101_0101_u128;
+    let cc: u64 = _c8_value(c);
     // the remaining data is the max: 15 bytes.
-    basic::_memset_remaining_15_bytes_impl(a_ptr, cc, end_ptr)
+    basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
+}
+
+#[inline(always)]
+unsafe fn _c16_value(c: u8) -> __m128i {
+    _mm_set1_epi8(c as i8)
+}
+
+#[inline(always)]
+unsafe fn _set_c16_uu(buf_ptr: *mut u8, mm_c16: __m128i) {
+    _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16);
+}
+
+#[inline(always)]
+unsafe fn _set_c16_aa(buf_ptr: *mut u8, mm_c16: __m128i) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
+}
+
+#[inline(always)]
+unsafe fn _set_c16_aa_x2(buf_ptr: *mut u8, mm_c16: __m128i) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16);
+}
+
+#[inline(always)]
+unsafe fn _set_c16_aa_x4(buf_ptr: *mut u8, mm_c16: __m128i) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16);
+    _mm_store_si128(buf_ptr.add(16 * 2) as *mut __m128i, mm_c16);
+    _mm_store_si128(buf_ptr.add(16 * 3) as *mut __m128i, mm_c16);
+}
+
+#[inline(always)]
+unsafe fn _c32_value(c: u8) -> __m256i {
+    _mm256_set1_epi8(c as i8)
+}
+
+#[inline(always)]
+unsafe fn _set_c32_uu(buf_ptr: *mut u8, mm_c32: __m256i) {
+    _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32);
+}
+
+#[inline(always)]
+unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: __m256i) {
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32);
+}
+
+#[inline(always)]
+unsafe fn _set_c32_aa_x2(buf_ptr: *mut u8, mm_c32: __m256i) {
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32);
+    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32);
 }
 
 #[cfg(test)]

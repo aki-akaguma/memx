@@ -46,6 +46,99 @@ pub fn _memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
 }
 
+macro_rules! _unroll_one_rnechr_to_align {
+    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
+        if $buf_ptr_2 <= $buf_ptr_min {
+            break;
+        }
+        $buf_ptr_2 = unsafe { $buf_ptr_2.sub(1) };
+        if unsafe { *$buf_ptr_2 } != $c {
+            return (None, Some(plus_offset_from($buf_ptr_2, $start_ptr)));
+        }
+    }};
+}
+
+macro_rules! _unroll_one_rnechr_to_align_x4 {
+    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
+        _unroll_one_rnechr_to_align!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
+        _unroll_one_rnechr_to_align!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
+        _unroll_one_rnechr_to_align!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
+        _unroll_one_rnechr_to_align!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
+    }};
+}
+
+pub(crate) fn _rnechr_to_aligned_u256(
+    buf_ptr_cur: *const u8,
+    c: u8,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let buf_ptr_end = buf_ptr_cur;
+    let remaining_align = (buf_ptr_end as usize) & 0x1F_usize;
+    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
+    let mut buf_ptr_2 = buf_ptr_end;
+    loop {
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        //
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+    }
+    (Some(buf_ptr_min), None)
+}
+
+pub(crate) fn _rnechr_to_aligned_u128(
+    buf_ptr_cur: *const u8,
+    c: u8,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let buf_ptr_end = buf_ptr_cur;
+    let remaining_align = (buf_ptr_end as usize) & 0x0F_usize;
+    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
+    let mut buf_ptr_2 = buf_ptr_end;
+    loop {
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+    }
+    (Some(buf_ptr_min), None)
+}
+
+fn _rnechr_to_aligned_u64(
+    buf_ptr_cur: *const u8,
+    c: u8,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let buf_ptr_end = buf_ptr_cur;
+    let remaining_align = (buf_ptr_end as usize) & 0x07_usize;
+    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
+    let mut buf_ptr_2 = buf_ptr_end;
+    loop {
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+    }
+    (Some(buf_ptr_min), None)
+}
+
+fn _rnechr_to_aligned_u32(
+    buf_ptr_cur: *const u8,
+    c: u8,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let buf_ptr_end = buf_ptr_cur;
+    let remaining_align = (buf_ptr_end as usize) & 0x03_usize;
+    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
+    let mut buf_ptr_2 = buf_ptr_end;
+    loop {
+        _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
+    }
+    (Some(buf_ptr_min), None)
+}
+
 macro_rules! _unroll_one_rnechr_16 {
     ($a_ptr:expr, $cc:expr, $start_ptr:expr, $loop_size:expr, $idx:expr) => {{
         let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
@@ -105,64 +198,82 @@ fn _start_rnechr_128(buf: &[u8], c: u8) -> Option<usize> {
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     let cc: u128 = _c16_value(c);
     //
-    {
-        let unroll = 8;
-        let loop_size = 16;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 7);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 6);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 5);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 4);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+    if buf_len >= 16 {
+        {
+            let loop_size = 16;
+            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
+            buf_ptr.prefetch_read_data();
+            if !buf_ptr_cur.is_aligned_u128() {
+                let r = _rnechr_to_aligned_u128(buf_ptr_cur, c, start_ptr);
+                if let Some(p) = r.0 {
+                    buf_ptr_cur = p;
+                } else if let Some(v) = r.1 {
+                    return Some(v);
+                }
             }
-            buf_ptr_cur = buf_ptr;
+        }
+        {
+            let unroll = 8;
+            let loop_size = 16;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 7);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 6);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 5);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 4);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let unroll = 4;
+            let loop_size = 16;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let unroll = 2;
+            let loop_size = 16;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let loop_size = 16;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
         }
     }
-    {
-        let unroll = 4;
-        let loop_size = 16;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
-    {
-        let unroll = 2;
-        let loop_size = 16;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
-    {
-        let loop_size = 16;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                _unroll_one_rnechr_16!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
+    start_ptr.prefetch_read_data();
     // the remaining data is the max: 15 bytes.
     _memrnechr_remaining_15_bytes_impl(buf_ptr_cur, cc as u64, start_ptr)
 }
@@ -176,64 +287,82 @@ fn _start_rnechr_64(buf: &[u8], c: u8) -> Option<usize> {
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     let cc: u64 = _c8_value(c);
     //
-    {
-        let unroll = 8;
-        let loop_size = 8;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 7);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 6);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 5);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 4);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+    if buf_len >= 8 {
+        {
+            let loop_size = 8;
+            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
+            buf_ptr.prefetch_read_data();
+            if !buf_ptr_cur.is_aligned_u64() {
+                let r = _rnechr_to_aligned_u64(buf_ptr_cur, c, start_ptr);
+                if let Some(p) = r.0 {
+                    buf_ptr_cur = p;
+                } else if let Some(v) = r.1 {
+                    return Some(v);
+                }
             }
-            buf_ptr_cur = buf_ptr;
+        }
+        {
+            let unroll = 8;
+            let loop_size = 8;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 7);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 6);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 5);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 4);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let unroll = 4;
+            let loop_size = 8;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let unroll = 2;
+            let loop_size = 8;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
+        }
+        {
+            let loop_size = 8;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
         }
     }
-    {
-        let unroll = 4;
-        let loop_size = 8;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
-    {
-        let unroll = 2;
-        let loop_size = 8;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
-    {
-        let loop_size = 8;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                _unroll_one_rnechr_8!(buf_ptr, cc, start_ptr, loop_size, 0);
-            }
-            buf_ptr_cur = buf_ptr;
-        }
-    }
+    start_ptr.prefetch_read_data();
     // the remaining data is the max: 7 bytes.
     _memrnechr_remaining_7_bytes_impl(buf_ptr_cur, cc as u32, start_ptr)
 }
@@ -247,62 +376,79 @@ fn _start_rnechr_32(buf: &[u8], c: u8) -> Option<usize> {
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     let cc: u32 = _c4_value(c);
     //
-    {
-        let unroll = 8;
-        let loop_size = 4;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 7);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 6);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 5);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 4);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+    if buf_len >= 4 {
+        {
+            let loop_size = 4;
+            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
+            buf_ptr.prefetch_read_data();
+            if !buf_ptr_cur.is_aligned_u32() {
+                let r = _rnechr_to_aligned_u32(buf_ptr_cur, c, start_ptr);
+                if let Some(p) = r.0 {
+                    buf_ptr_cur = p;
+                } else if let Some(v) = r.1 {
+                    return Some(v);
+                }
             }
-            buf_ptr_cur = buf_ptr;
         }
-    }
-    {
-        let unroll = 4;
-        let loop_size = 4;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+        {
+            let unroll = 8;
+            let loop_size = 4;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 7);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 6);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 5);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 4);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
             }
-            buf_ptr_cur = buf_ptr;
         }
-    }
-    {
-        let unroll = 2;
-        let loop_size = 4;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+        {
+            let unroll = 4;
+            let loop_size = 4;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 3);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 2);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
             }
-            buf_ptr_cur = buf_ptr;
         }
-    }
-    {
-        let loop_size = 4;
-        if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
-            let mut buf_ptr = buf_ptr_cur;
-            while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+        {
+            let unroll = 2;
+            let loop_size = 4;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 1);
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
             }
-            buf_ptr_cur = buf_ptr;
+        }
+        {
+            let loop_size = 4;
+            if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
+                let mut buf_ptr = buf_ptr_cur;
+                while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    _unroll_one_rnechr_4!(buf_ptr, cc, start_ptr, loop_size, 0);
+                }
+                buf_ptr_cur = buf_ptr;
+            }
         }
     }
     // the remaining data is the max: 3 bytes.
@@ -316,7 +462,7 @@ pub(crate) fn _memrnechr_remaining_15_bytes_impl(
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
-    {
+    if buf_ptr_cur.is_aligned_u64() {
         let loop_size = 8;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
             let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
@@ -336,7 +482,7 @@ pub(crate) fn _memrnechr_remaining_7_bytes_impl(
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
-    {
+    if buf_ptr_cur.is_aligned_u32() {
         let loop_size = 4;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
             let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
@@ -356,7 +502,7 @@ pub(crate) fn _memrnechr_remaining_3_bytes_impl(
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
-    {
+    if buf_ptr_cur.is_aligned_u16() {
         let loop_size = 2;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
             let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
@@ -367,19 +513,16 @@ pub(crate) fn _memrnechr_remaining_3_bytes_impl(
     }
     {
         let loop_size = 1;
-        let cc: u8 = cc as u8;
         if unsafe { buf_ptr_cur.offset_from(start_ptr) } >= loop_size as isize {
-            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
-            _unroll_one_rnechr_1!(buf_ptr, cc, start_ptr, loop_size, 0);
+            let mut buf_ptr = buf_ptr_cur;
+            while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                _unroll_one_rnechr_1!(buf_ptr, cc as u8, start_ptr, loop_size, 0);
+            }
         }
     }
     //
     None
-}
-
-#[inline(always)]
-fn _c16_value(c: u8) -> u128 {
-    (c as u128) * PackedU128::ONES
 }
 
 #[inline(always)]
@@ -397,11 +540,6 @@ fn _rnechr_c16(buf_ptr: *const u8, c16: u128, start_ptr: *const u8) -> Option<us
 }
 
 #[inline(always)]
-fn _c8_value(c: u8) -> u64 {
-    (c as u64) * PackedU64::ONES
-}
-
-#[inline(always)]
 fn _rnechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize> {
     let v0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
     let v = v0 ^ c8;
@@ -413,11 +551,6 @@ fn _rnechr_c8(buf_ptr: *const u8, c8: u64, start_ptr: *const u8) -> Option<usize
     } else {
         None
     }
-}
-
-#[inline(always)]
-fn _c4_value(c: u8) -> u32 {
-    (c as u32) * PackedU32::ONES
 }
 
 #[inline(always)]

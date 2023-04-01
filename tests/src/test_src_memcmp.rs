@@ -57,7 +57,8 @@ fn test02() {
     let buf_0 = vec![0_u8];
     let f = |x: usize| {
         let buf_1 = {
-            let buf: Vec<u8> = buf_0.repeat(1 + x);
+            let mut buf: Vec<u8> = buf_0.repeat(1 + x);
+            buf.append(&mut buf_0.repeat(x));
             buf
         };
         //
@@ -65,33 +66,78 @@ fn test02() {
         buf.push(b'5');
         let mut pat = buf_1.clone();
         pat.push(b'5');
-        let r = test_memcmp(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memcmp(&buf[x..], &pat[x..]) })
+            } else {
+                test_memcmp(&buf[x..], &pat[x..])
+            }
+        } else {
+            test_memcmp(&buf[x..], &pat[x..])
+        });
         assert_eq!(r, Ordering::Equal);
         //
         let mut buf = buf_1.clone();
         buf.push(b'5');
         let mut pat = buf_1.clone();
         pat.push(b'9');
-        let r = test_memcmp(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memcmp(&buf[x..], &pat[x..]) })
+            } else {
+                test_memcmp(&buf[x..], &pat[x..])
+            }
+        } else {
+            test_memcmp(&buf[x..], &pat[x..])
+        });
         assert_eq!(r, Ordering::Less);
         //
         let mut buf = buf_1.clone();
         buf.push(b'5');
         let mut pat = buf_1.clone();
         pat.push(b'0');
-        let r = test_memcmp(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memcmp(&buf[x..], &pat[x..]) })
+            } else {
+                test_memcmp(&buf[x..], &pat[x..])
+            }
+        } else {
+            test_memcmp(&buf[x..], &pat[x..])
+        });
         assert_eq!(r, Ordering::Greater);
         //
         let buf = buf_1.clone();
         let mut pat = buf_1.clone();
         pat.push(b'0');
-        let r = test_memcmp(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memcmp(&buf[x..], &pat[x..]) })
+            } else {
+                test_memcmp(&buf[x..], &pat[x..])
+            }
+        } else {
+            test_memcmp(&buf[x..], &pat[x..])
+        });
         assert_eq!(r, Ordering::Less);
         //
         let mut buf = buf_1.clone();
         buf.push(b'5');
         let pat = buf_1;
-        let r = test_memcmp(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memcmp(&buf[x..], &pat[x..]) })
+            } else {
+                test_memcmp(&buf[x..], &pat[x..])
+            }
+        } else {
+            test_memcmp(&buf[x..], &pat[x..])
+        });
         assert_eq!(r, Ordering::Greater);
     };
     if cfg!(miri) {

@@ -57,11 +57,22 @@ fn test02() {
         let buf = {
             let mut buf = pat.clone();
             buf.extend_from_slice(&buf_0.repeat(1 + x));
+            buf.append(&mut buf_0.repeat(x));
             buf.extend_from_slice(&pat);
+            buf.append(&mut buf_0.repeat(x));
             buf
         };
         //
-        let r = test_memrmem(&buf, &pat);
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            if _RT_AC {
+                x86_alignment_check::ac_call_once(|| { test_memrmem(&buf[x..], &pat) })
+            } else {
+                test_memrmem(&buf[x..], &pat)
+            }
+        } else {
+            test_memrmem(&buf[x..], &pat)
+        });
         assert_eq!(r, Some(pat.len() + 1 + x));
     };
     if cfg!(miri) {

@@ -15,6 +15,7 @@ mod test_std_memrmem {
         None
     }
     //
+    const _RT_AC: bool = false;
     include!("./src/test_src_memrmem.rs");
 }
 mod test_memx_memrmem {
@@ -22,6 +23,7 @@ mod test_memx_memrmem {
         memx::memrmem(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memrmem.rs");
 }
 mod test_memx_memrmem_basic {
@@ -29,5 +31,6 @@ mod test_memx_memrmem_basic {
         memx::mem::memrmem_basic(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memrmem.rs");
 }

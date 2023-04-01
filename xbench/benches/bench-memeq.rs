@@ -14,7 +14,7 @@ pub fn std_memeq_impl(a: &[u8], b: &[u8]) -> bool {
 
 macro_rules! j_bool {
     ($j: expr) => {
-        $j < 16 || $j % 4 == 0 || $j % 7 == 0
+        $j < 16 || $j % 8 == 0 || $j % 10 == 0
     };
 }
 
@@ -248,11 +248,11 @@ fn criterion_benchmark(c: &mut Criterion) {
     let pat_string = pat_string_s.to_string();
     //
     if let Ok(_val) = std::env::var("AKI_TEST_DAT_CHECK") {
-        let n = process_std_memeq(black_box(&vv), black_box(pat_string_s));
+        let n = process_std_memeq(black_box(&vv), black_box(&pat_string));
         assert_eq!(n, match_cnt);
         #[cfg(not(target_os = "android"))]
         {
-            let n = process_libc_memeq(black_box(&vv), black_box(pat_string_s));
+            let n = process_libc_memeq(black_box(&vv), black_box(&pat_string));
             assert_eq!(n, match_cnt);
         }
         let n = process_memx_memeq(black_box(&vv), black_box(&pat_string));
@@ -287,7 +287,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     c.bench_function("std_memeq", |b| {
         b.iter(|| {
-            let _r = process_std_memeq(black_box(&vv), black_box(pat_string_s));
+            let _r = process_std_memeq(black_box(&vv), black_box(&pat_string));
         })
     });
     cache_flush(&vv, &pat_string);
@@ -338,7 +338,7 @@ criterion_group! {
     config = Criterion::default()
         .sample_size(200)
         .warm_up_time(std::time::Duration::from_millis(100))
-        .measurement_time(std::time::Duration::from_millis(1000));
+        .measurement_time(std::time::Duration::from_millis(1300));
     targets = criterion_benchmark
 }
 //criterion_group!(benches, criterion_benchmark);

@@ -3,6 +3,7 @@ mod test_std_memeq {
         buf == pat_bytes
     }
     //
+    const _RT_AC: bool = false;
     include!("./src/test_src_memeq.rs");
 }
 mod test_memx_memeq {
@@ -10,6 +11,7 @@ mod test_memx_memeq {
         memx::memeq(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memeq.rs");
 }
 mod test_memx_memeq_basic {
@@ -17,5 +19,6 @@ mod test_memx_memeq_basic {
         memx::mem::memeq_basic(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memeq.rs");
 }

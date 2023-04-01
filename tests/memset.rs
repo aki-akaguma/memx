@@ -10,6 +10,7 @@ mod test_std_memset {
         }
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memset.rs");
 }
 mod test_memx_memset {
@@ -17,6 +18,7 @@ mod test_memx_memset {
         memx::memset(dst, byte);
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memset.rs");
 }
 mod test_memx_memset_basic {
@@ -24,5 +26,6 @@ mod test_memx_memset_basic {
         memx::mem::memset_basic(dst, byte);
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memset.rs");
 }

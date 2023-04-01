@@ -153,16 +153,39 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
+    buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
         let cc1: __m128i = unsafe { _c16_value(c1) };
         let cc2: __m128i = unsafe { _c16_value(c2) };
         {
-            let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
             let loop_size = 16;
-            _unroll_one_chr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
             //
-            buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            #[cfg(not(feature = "test_alignment_check"))]
+            {
+                if buf_ptr.is_aligned_u128() {
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                } else {
+                    _unroll_one_chr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                }
+                let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            }
+            #[cfg(feature = "test_alignment_check")]
+            {
+                if buf_ptr.is_aligned_u128() {
+                    _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                } else {
+                    let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, c1, c2, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                }
+            }
         }
         //
         {
@@ -171,6 +194,7 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_16_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_16_x4 {
+                    buf_ptr.prefetch_read_data();
                     _unroll_one_chr_16_aa_x4!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
@@ -199,8 +223,8 @@ fn _memchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
     }
     //
-    let cc1 = (c1 as u64) * 0x0101_0101_0101_0101_u64;
-    let cc2 = (c2 as u64) * 0x0101_0101_0101_0101_u64;
+    let cc1: u64 = _c8_value(c1);
+    let cc2: u64 = _c8_value(c2);
     basic::_memchr_double_remaining_15_bytes_impl(buf_ptr, cc1, cc2, start_ptr, end_ptr)
 }
 
@@ -210,15 +234,39 @@ fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
+    buf_ptr.prefetch_read_data();
     //
     if buf_len >= 32 {
         let cc1: __m256i = unsafe { _c32_value(c1) };
         let cc2: __m256i = unsafe { _c32_value(c2) };
         {
-            let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
             let loop_size = 32;
-            _unroll_one_chr_32_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
-            buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            //
+            #[cfg(not(feature = "test_alignment_check"))]
+            {
+                if buf_ptr.is_aligned_u256() {
+                    _unroll_one_chr_32_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                } else {
+                    _unroll_one_chr_32_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                }
+                let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+            }
+            #[cfg(feature = "test_alignment_check")]
+            {
+                if buf_ptr.is_aligned_u256() {
+                    _unroll_one_chr_32_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                } else {
+                    let r = basic::_chr_dbl_to_aligned_u256(buf_ptr, c1, c2, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                }
+            }
         }
         //
         {
@@ -227,8 +275,8 @@ fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_32_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_32_x2 {
+                    buf_ptr.prefetch_read_data();
                     _unroll_one_chr_32_aa_x2!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
-                    //_unroll_one_chr_32_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 1);
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
             }
@@ -257,15 +305,41 @@ fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
             let cc2: __m128i = unsafe { _c16_value(c2) };
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-            while buf_ptr <= end_ptr_16 {
-                _unroll_one_chr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            if buf_ptr <= end_ptr_16 {
+                //
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    if buf_ptr.is_aligned_u128() {
+                        while buf_ptr <= end_ptr_16 {
+                            _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                        }
+                    } else {
+                        while buf_ptr <= end_ptr_16 {
+                            _unroll_one_chr_16_uu!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                            buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                        }
+                    }
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, c1, c2, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                    while buf_ptr <= end_ptr_16 {
+                        _unroll_one_chr_16_aa!(buf_ptr, cc1, cc2, start_ptr, loop_size, 0);
+                        buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                    }
+                }
             }
         }
     }
     //
-    let cc1 = (c1 as u64) * 0x0101_0101_0101_0101_u64;
-    let cc2 = (c2 as u64) * 0x0101_0101_0101_0101_u64;
+    let cc1: u64 = _c8_value(c1);
+    let cc2: u64 = _c8_value(c2);
     basic::_memchr_double_remaining_15_bytes_impl(buf_ptr, cc1, cc2, start_ptr, end_ptr)
 }
 

@@ -282,9 +282,9 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 304;
-    let less_cnt = 237;
-    let greater_cnt = 176;
+    let match_cnt = 166;
+    let less_cnt = 135;
+    let greater_cnt = 124;
     let match_s = "rrrrrrrrrrrrrrr"; // 15 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
@@ -321,10 +321,14 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 161;
-    let less_cnt = 388;
-    let greater_cnt = 518;
-    let match_s = "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"; // 72 bytes
+    let match_cnt = 8;
+    let less_cnt = 246;
+    let greater_cnt = 324;
+    #[rustfmt::skip]
+    let match_s = concat!(
+        "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr",
+        "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr",
+    ); // 144 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
 

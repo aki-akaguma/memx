@@ -6,6 +6,7 @@ mod test_std_memmem {
         (0..=(buf.len() - pat_bytes.len())).find(|&i| &buf[i..(i + pat_bytes.len())] == pat_bytes)
     }
     //
+    const _RT_AC: bool = false;
     include!("./src/test_src_memmem.rs");
 }
 mod test_memx_memmem {
@@ -13,6 +14,7 @@ mod test_memx_memmem {
         memx::memmem(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memmem.rs");
 }
 mod test_memx_memmem_basic {
@@ -20,5 +22,6 @@ mod test_memx_memmem_basic {
         memx::mem::memmem_basic(buf, pat_bytes)
     }
     //
+    const _RT_AC: bool = true;
     include!("./src/test_src_memmem.rs");
 }
