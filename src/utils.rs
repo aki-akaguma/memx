@@ -1,15 +1,10 @@
 #[cfg(features = "test")]
 use core::convert::TryInto;
 
-pub trait PtrOps {
+pub trait PtrOpsPrefetch {
     fn prefetch_read_data(&self);
-    fn is_aligned_u256(&self) -> bool;
-    fn is_aligned_u128(&self) -> bool;
-    fn is_aligned_u64(&self) -> bool;
-    fn is_aligned_u32(&self) -> bool;
-    fn is_aligned_u16(&self) -> bool;
 }
-impl PtrOps for *const u8 {
+impl PtrOpsPrefetch for *const u8 {
     #[inline(always)]
     fn prefetch_read_data(&self) {
         // TODO: Replace with core::intrinsics::prefetch_read_data
@@ -26,6 +21,16 @@ impl PtrOps for *const u8 {
             unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
         }
     }
+}
+
+pub trait PtrOps {
+    fn is_aligned_u256(&self) -> bool;
+    fn is_aligned_u128(&self) -> bool;
+    fn is_aligned_u64(&self) -> bool;
+    fn is_aligned_u32(&self) -> bool;
+    fn is_aligned_u16(&self) -> bool;
+}
+impl PtrOps for *const u8 {
     #[inline(always)]
     fn is_aligned_u256(&self) -> bool {
         ((*self as usize) & 0x1F_usize) == 0
@@ -49,22 +54,6 @@ impl PtrOps for *const u8 {
 }
 
 impl PtrOps for *mut u8 {
-    #[inline(always)]
-    fn prefetch_read_data(&self) {
-        // TODO: Replace with core::intrinsics::prefetch_read_data
-        // after stabilization
-        // The cache line size of x86_64 is 64 bytes.
-        #[cfg(not(miri))]
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        {
-            #[cfg(target_arch = "x86")]
-            use core::arch::x86 as mmx;
-            #[cfg(target_arch = "x86_64")]
-            use core::arch::x86_64 as mmx;
-            //
-            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
-        }
-    }
     #[inline(always)]
     fn is_aligned_u256(&self) -> bool {
         ((*self as usize) & 0x1F_usize) == 0

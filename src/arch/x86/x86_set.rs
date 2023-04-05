@@ -237,7 +237,6 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_32_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_32_x2 {
-                    buf_ptr.prefetch_read_data();
                     _unroll_one_set_32_aa_x2!(buf_ptr, cc, loop_size, 0);
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
