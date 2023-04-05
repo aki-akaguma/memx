@@ -98,16 +98,16 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
+bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memset
+#bench_nms = bench-memset
 
-#target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
+target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
 #target_base = i686-unknown-linux i586-unknown-linux
-target_base = x86_64-unknown-linux
+#target_base = x86_64-unknown-linux
 
 define build-templ =
 target/stamp.build/stamp.build.$(1).$(2):

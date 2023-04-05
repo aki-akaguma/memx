@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] *
+## [Unreleased]
+
+
+## [0.1.29] (2023-04-06)
 ### Added
 * support `prefetch` and `alignment check` for good performance.
 * `memchr_double()`, `memrchr_double()` into `bench`
@@ -22,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * some bug: cargo test --features test_pointer_width_128
 * sometimes returns incorrect values: `mem::_memrchr_impl()`
 * sometimes returns incorrect values: `mem::_memnechr_impl()`
-
 
 ## [0.1.28] (2023-03-15)
 ### Added
@@ -192,7 +194,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 * fine tune memcpy() ... etc
 
-## 0.1.10] (2021-06-14)
+## [0.1.10] (2021-06-14)
 ### Changed
 * rename memx_mem_memXXX to memx_memXXX_basic
 * update bench results
@@ -258,7 +260,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] (2021-05-12)
 * first commit
 
-[Unreleased]: https://github.com/aki-akaguma/memx/compare/v0.1.28..HEAD
+[Unreleased]: https://github.com/aki-akaguma/memx/compare/v0.1.29..HEAD
+[0.1.29]: https://github.com/aki-akaguma/memx/compare/v0.1.28..v0.1.29
 [0.1.28]: https://github.com/aki-akaguma/memx/compare/v0.1.27..v0.1.28
 [0.1.27]: https://github.com/aki-akaguma/memx/compare/v0.1.26..v0.1.27
 [0.1.26]: https://github.com/aki-akaguma/memx/compare/v0.1.25..v0.1.26
