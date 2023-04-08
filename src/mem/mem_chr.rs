@@ -1,6 +1,6 @@
 use crate::utils::*;
 
-#[inline(always)]
+#[inline(never)]
 pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     if buf.is_empty() {
         return None;
