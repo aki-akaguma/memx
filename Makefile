@@ -55,8 +55,7 @@ tarpaulin:
 	cargo tarpaulin --features test_pointer_width_128 $(TARP_OPT) && mv target/lcov.info target/lcov.info.3
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
 	cargo tarpaulin --features test_pointer_width_128 $(TARP_OPT) && mv target/lcov.info target/lcov.info.4
-	@
-	cargo tarpaulin --features test_pointer_width_64 $(TARP_OPT) && mv target/lcov.info target/lcov.info.5
+	@ cargo tarpaulin --features test_pointer_width_64 $(TARP_OPT) && mv target/lcov.info target/lcov.info.5
 	RUSTFLAGS="-C target-feature=-sse2,-avx2" \
 	cargo tarpaulin --features test_pointer_width_64 $(TARP_OPT) && mv target/lcov.info target/lcov.info.6
 	@
@@ -68,12 +67,19 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
+GRCOV_TEST=
+GRCOV_TEST=--test memchr
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
-	$(COV_ENV1) cargo test --offline
-	$(COV_ENV1) cargo test --offline --features test_pointer_width_128
-	$(COV_ENV1) cargo test --offline --features test_pointer_width_64
-	$(COV_ENV1) cargo test --offline --features test_pointer_width_32
+	@rm -rf $(CURDIR)/target/coverage
+	$(COV_ENV1) cargo test --offline $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_128 $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_64 $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_pointer_width_32 $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_alignment_check $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_alignment_check,test_pointer_width_128 $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_alignment_check,test_pointer_width_64 $(GRCOV_TEST)
+	$(COV_ENV1) cargo test --offline --features test_alignment_check,test_pointer_width_32 $(GRCOV_TEST)
 	@mkdir -p $(CURDIR)/target/coverage
 	grcov $(CURDIR)/target/profraw --binary-path ./target/debug/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/html
 
@@ -83,7 +89,7 @@ BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
-	$(COV_ENV1) $(BG_PROF) cargo xbench --bench=bench-memcmp
+	$(COV_ENV1) $(BG_PROF) cargo xbench --bench=bench-memchr
 	@mkdir -p $(CURDIR)/target/coverage
 	grcov $(CURDIR)/target/profraw --binary-path $(CURDIR)/target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o $(CURDIR)/target/coverage/html
 
@@ -98,16 +104,16 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memset
+bench_nms = bench-memchr
 
-target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
+#target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
 #target_base = i686-unknown-linux i586-unknown-linux
-#target_base = x86_64-unknown-linux
+target_base = x86_64-unknown-linux
 
 define build-templ =
 target/stamp.build/stamp.build.$(1).$(2):
