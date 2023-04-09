@@ -482,7 +482,7 @@ unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 
 #[inline(always)]
 unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, mm_c16, st_ptr);
+    let r = _rchr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
     if r.is_some() {
         return r;
     }
@@ -547,7 +547,7 @@ unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 
 #[inline(always)]
 unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_c32_aa_x2(unsafe { buf_ptr.add(32 * 2) }, mm_c32, st_ptr);
+    let r = _rchr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr);
     if r.is_some() {
         return r;
     }
@@ -560,7 +560,7 @@ unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 
 #[inline(always)]
 unsafe fn _rchr_c32_aa_x8(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_c32_aa_x4(unsafe { buf_ptr.add(32 * 4) }, mm_c32, st_ptr);
+    let r = _rchr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);
     if r.is_some() {
         return r;
     }
