@@ -596,7 +596,7 @@ unsafe fn _rnechr_c32_aa_x8(
     mm_c32: __m256i,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _rnechr_c32_aa_x4(buf_ptr.add(32 * 2), mm_c32, st_ptr);
+    let r = _rnechr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);
     if r.is_some() {
         return r;
     }

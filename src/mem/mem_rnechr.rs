@@ -1,6 +1,6 @@
 use crate::utils::*;
 
-#[inline(always)]
+#[inline(never)]
 pub fn _memrnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
