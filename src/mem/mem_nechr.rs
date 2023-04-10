@@ -45,8 +45,9 @@ macro_rules! _unroll_one_nechr_to_align_x1 {
         if $buf_ptr_2 >= $buf_ptr_end {
             break;
         }
-        if unsafe { *$buf_ptr_2 } != $c {
-            return (None, Some(plus_offset_from($buf_ptr_2, $start_ptr)));
+        let r = _nechr_c1_aa_x1($buf_ptr_2, $c, $start_ptr);
+        if r.is_some() {
+            return (None, r);
         }
         $buf_ptr_2 = unsafe { $buf_ptr_2.add(1) };
     }};
