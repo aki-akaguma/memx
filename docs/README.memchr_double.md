@@ -17,11 +17,12 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr_double       |   33.973 µs |   53.522 µs |   33.864 µs |   53.683 µs |
-| memchr_memchr_double    |   22.679 µs |   27.112 µs |   22.669 µs |   27.963 µs |
-| memx_memchr_double      |   18.898 µs |   20.289 µs |   18.990 µs |   20.707 µs |
-| memx_memchr_w_basic     |   19.132 µs |   24.197 µs |   17.939 µs |   24.858 µs |
-| memx_memchr_w_sse2      |   16.985 µs |   18.948 µs |   17.048 µs |   19.035 µs |
+| std_memchr_double       |   33.626 µs |   53.640 µs |   34.366 µs |   53.648 µs |
+| memchr_memchr_double    |   22.424 µs |   27.248 µs |   22.157 µs |   27.061 µs |
+| memx_memchr_double      |   19.578 µs |   22.493 µs |   19.409 µs |   21.757 µs |
+| memx_memchr_w_basic     |   19.742 µs |   25.372 µs |   19.722 µs |   24.983 µs |
+| memx_memchr_w_sse2      |   17.677 µs |   20.564 µs |   16.775 µs |   20.304 µs |
+
 
   2. i686-unknown-linux- @Q6600:
 
