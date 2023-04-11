@@ -1,5 +1,6 @@
 use crate::mem as basic;
 use crate::utils::*;
+use super::{MMC16Dbl, MMC32Dbl};
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;
@@ -11,14 +12,12 @@ use mmx::_mm_cmpeq_epi8;
 use mmx::_mm_load_si128;
 use mmx::_mm_loadu_si128;
 use mmx::_mm_movemask_epi8;
-use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
 use mmx::_mm256_cmpeq_epi8;
 use mmx::_mm256_load_si256;
 use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
-use mmx::_mm256_set1_epi8;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
@@ -351,11 +350,6 @@ fn _memchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 }
 
 #[inline(always)]
-unsafe fn _c16_value(c: u8) -> __m128i {
-    _mm_set1_epi8(c as i8)
-}
-
-#[inline(always)]
 unsafe fn _chr_dbl_c16_uu_x1(
     buf_ptr: *const u8,
     mm_c16: MMC16Dbl,
@@ -372,11 +366,7 @@ unsafe fn _chr_dbl_c16_uu_x1(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -404,11 +394,7 @@ unsafe fn _chr_dbl_c16_aa_x1(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -444,11 +430,7 @@ unsafe fn _chr_dbl_c16_aa_x2(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -509,11 +491,6 @@ unsafe fn _chr_dbl_c16_aa_x8(
 }
 
 #[inline(always)]
-unsafe fn _c32_value(c: u8) -> __m256i {
-    _mm256_set1_epi8(c as i8)
-}
-
-#[inline(always)]
 unsafe fn _chr_dbl_c32_uu_x1(
     buf_ptr: *const u8,
     mm_c32: MMC32Dbl,
@@ -530,11 +507,7 @@ unsafe fn _chr_dbl_c32_uu_x1(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -562,11 +535,7 @@ unsafe fn _chr_dbl_c32_aa_x1(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -602,11 +571,7 @@ unsafe fn _chr_dbl_c32_aa_x2(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
@@ -617,11 +582,7 @@ unsafe fn _chr_dbl_c32_aa_x2(
             let base = plus_offset_from(buf_ptr, st_ptr);
             let idx1 = mask_1_a.trailing_zeros() as usize;
             let idx2 = mask_1_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1 + 32)
-            } else {
-                Some(base + idx2 + 32)
-            }
+            Some(base + idx1.min(idx2) + 32)
         } else {
             Some(plus_offset_from(buf_ptr, st_ptr) + mask_1_a.trailing_zeros() as usize + 32)
         }
@@ -664,34 +625,4 @@ unsafe fn _chr_dbl_c32_aa_x8(
         return r;
     }
     None
-}
-
-#[derive(Copy, Clone)]
-struct MMC16Dbl {
-    pub a: __m128i,
-    pub b: __m128i,
-}
-impl MMC16Dbl {
-    #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
-        Self {
-            a: unsafe { _c16_value(c1) },
-            b: unsafe { _c16_value(c2) },
-        }
-    }
-}
-
-#[derive(Copy, Clone)]
-struct MMC32Dbl {
-    pub a: __m256i,
-    pub b: __m256i,
-}
-impl MMC32Dbl {
-    #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
-        Self {
-            a: unsafe { _c32_value(c1) },
-            b: unsafe { _c32_value(c2) },
-        }
-    }
 }
