@@ -1,5 +1,6 @@
 use crate::mem as basic;
 use crate::utils::*;
+use super::{_c16_value, _c32_value};
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;
@@ -11,14 +12,12 @@ use mmx::_mm_cmpeq_epi8;
 use mmx::_mm_load_si128;
 use mmx::_mm_loadu_si128;
 use mmx::_mm_movemask_epi8;
-use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
 use mmx::_mm256_cmpeq_epi8;
 use mmx::_mm256_load_si256;
 use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
-use mmx::_mm256_set1_epi8;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
@@ -124,17 +123,15 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        buf_ptr.prefetch_read_data();
-                        let r = unsafe { _rchr_c16_aa_x8(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    let r = unsafe { _rchr_c16_aa_x8(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -143,17 +140,15 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        buf_ptr.prefetch_read_data();
-                        let r = unsafe { _rchr_c16_aa_x4(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    let r = unsafe { _rchr_c16_aa_x4(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -162,16 +157,14 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        let r = unsafe { _rchr_c16_aa_x2(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    let r = unsafe { _rchr_c16_aa_x2(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -180,16 +173,14 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        let r = unsafe { _rchr_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    let r = unsafe { _rchr_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
     }
@@ -247,17 +238,15 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        buf_ptr.prefetch_read_data();
-                        let r = unsafe { _rchr_c32_aa_x8(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    let r = unsafe { _rchr_c32_aa_x8(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -266,17 +255,15 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        buf_ptr.prefetch_read_data();
-                        let r = unsafe { _rchr_c32_aa_x4(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    let r = unsafe { _rchr_c32_aa_x4(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -285,17 +272,15 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        buf_ptr.prefetch_read_data();
-                        let r = unsafe { _rchr_c32_aa_x2(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    buf_ptr.prefetch_read_data();
+                    let r = unsafe { _rchr_c32_aa_x2(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -304,16 +289,14 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                        let r = unsafe { _rchr_c32_aa_x1(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                    let r = unsafe { _rchr_c32_aa_x1(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
         {
@@ -323,16 +306,14 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             let mut buf_ptr = buf_ptr_cur;
             if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
                 let min_ptr = unsafe { start_ptr.add(loop_size) };
-                if buf_ptr >= min_ptr {
-                    while buf_ptr >= min_ptr {
-                        buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                        let r = unsafe { _rchr_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                        if r.is_some() {
-                            return r;
-                        }
+                while buf_ptr >= min_ptr {
+                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                    let r = unsafe { _rchr_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                    if r.is_some() {
+                        return r;
                     }
-                    buf_ptr_cur = buf_ptr;
                 }
+                buf_ptr_cur = buf_ptr;
             }
         }
     } else if buf_len >= 16 {
@@ -389,11 +370,6 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     //
     let cc: u64 = _c8_value(c);
     basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
-}
-
-#[inline(always)]
-unsafe fn _c16_value(c: u8) -> __m128i {
-    _mm_set1_epi8(c as i8)
 }
 
 #[inline(always)]
@@ -491,11 +467,6 @@ unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
         return r;
     }
     None
-}
-
-#[inline(always)]
-unsafe fn _c32_value(c: u8) -> __m256i {
-    _mm256_set1_epi8(c as i8)
 }
 
 #[inline(always)]

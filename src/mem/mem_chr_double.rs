@@ -437,11 +437,6 @@ pub(crate) fn _memchr_double_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
-fn _c16_value(c: u8) -> u128 {
-    (c as u128) * PackedU128::ONES
-}
-
-#[inline(always)]
 fn _chr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
     let v_0_a = v_0 ^ c16.a;
@@ -454,11 +449,7 @@ fn _chr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Opt
         if !bits_0_b.is_zeros() {
             let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
             let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
         }
@@ -509,11 +500,6 @@ fn _chr_dbl_c16_aa_x8(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Opt
 }
 
 #[inline(always)]
-fn _c8_value(c: u8) -> u64 {
-    (c as u64) * PackedU64::ONES
-}
-
-#[inline(always)]
 fn _chr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
     let v_0_a = v_0 ^ c8.a;
@@ -526,11 +512,7 @@ fn _chr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option
         if !bits_0_b.is_zeros() {
             let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
             let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
         }
@@ -581,11 +563,6 @@ fn _chr_dbl_c8_aa_x8(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option
 }
 
 #[inline(always)]
-fn _c4_value(c: u8) -> u32 {
-    (c as u32) * PackedU32::ONES
-}
-
-#[inline(always)]
 fn _chr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
     let v_0_a = v_0 ^ c4.a;
@@ -598,11 +575,7 @@ fn _chr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option
         if !bits_0_b.is_zeros() {
             let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
             let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
         }
@@ -665,11 +638,7 @@ fn _chr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: C2Dbl, st_ptr: *const u8) -> Option
         if !bits_0_b.is_zeros() {
             let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
             let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if idx1 < idx2 {
-                Some(base + idx1)
-            } else {
-                Some(base + idx2)
-            }
+            Some(base + idx1.min(idx2))
         } else {
             Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
         }

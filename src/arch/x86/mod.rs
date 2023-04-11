@@ -147,3 +147,54 @@ mod cpuid {
 
 cpufeatures::new!(cpuid_avx2, "avx2");
 cpufeatures::new!(cpuid_sse2, "sse2");
+
+#[cfg(target_arch = "x86")]
+use core::arch::x86 as mmx;
+#[cfg(target_arch = "x86_64")]
+use core::arch::x86_64 as mmx;
+
+use mmx::__m128i;
+use mmx::_mm_set1_epi8;
+
+use mmx::__m256i;
+use mmx::_mm256_set1_epi8;
+
+#[inline(always)]
+unsafe fn _c16_value(c: u8) -> __m128i {
+    _mm_set1_epi8(c as i8)
+}
+
+#[inline(always)]
+unsafe fn _c32_value(c: u8) -> __m256i {
+    _mm256_set1_epi8(c as i8)
+}
+
+#[derive(Copy, Clone)]
+struct MMC16Dbl {
+    pub a: __m128i,
+    pub b: __m128i,
+}
+impl MMC16Dbl {
+    #[inline(always)]
+    pub fn new(c1: u8, c2: u8) -> Self {
+        Self {
+            a: unsafe { _c16_value(c1) },
+            b: unsafe { _c16_value(c2) },
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
+struct MMC32Dbl {
+    pub a: __m256i,
+    pub b: __m256i,
+}
+impl MMC32Dbl {
+    #[inline(always)]
+    pub fn new(c1: u8, c2: u8) -> Self {
+        Self {
+            a: unsafe { _c32_value(c1) },
+            b: unsafe { _c32_value(c2) },
+        }
+    }
+}
