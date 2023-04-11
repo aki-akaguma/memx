@@ -68,7 +68,7 @@ tarpaulin:
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 GRCOV_TEST=
-GRCOV_TEST=--test memrnechr
+GRCOV_TEST=--test memchr_double
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
@@ -86,10 +86,12 @@ grcov:
 BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
 BG_PROF=
 BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
+BENCH_GRCOV=
+BENCH_GRCOV=--bench bench-memchr_double
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
-	$(COV_ENV1) $(BG_PROF) cargo xbench --bench=bench-memrnechr
+	$(COV_ENV1) $(BG_PROF) cargo xbench $(BENCH_GRCOV)
 	@mkdir -p $(CURDIR)/target/coverage
 	grcov $(CURDIR)/target/profraw --binary-path $(CURDIR)/target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o $(CURDIR)/target/coverage/html
 
@@ -108,7 +110,7 @@ endef
 #bench_nms = bench-memchr_double bench-memrchr_double
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memrnechr
+bench_nms = bench-memchr_double
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
