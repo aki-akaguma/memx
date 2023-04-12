@@ -253,31 +253,3 @@ pub fn memset(buf: &mut [u8], c: u8) {
     #[cfg(feature = "test_pointer_width")]
     mem::_memset_impl(buf, c);
 }
-
-// ascii stochastics
-#[rustfmt::skip]
-const _ASCII_STOCHAS: [u8; 128] = [
-    // 0x00: NUL,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0x10: DEL,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    // 0x20: SP, 0x21: b'!'
-    255, 0, 2, 0, 0, 0, 0, 0, 1, 1, 0, 3, 6, 14, 19, 1,
-    // 0x30: b'0'
-    3, 4, 3, 2, 2, 1, 1, 1, 1, 1, 2, 0, 0, 1, 0, 0,
-    // 0x40: b'@', 0x41: b'A', 0x4f: 'O',
-    0, 4, 1, 5, 2, 4, 3, 0, 1, 5, 0, 0, 2, 3, 3, 2,
-    // 0x50: b'P', 0x5a: b'Z'
-    5, 0, 4, 6, 6, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1,
-    // 0x60: b'`', 0x61: b'a', 0x4f: 'o',
-    0, 39, 7, 20, 19, 69, 11, 9, 18, 39, 0, 2, 18, 12, 38, 38,
-    // 0x70: b'p', 0x7a: b'z'
-    12, 1, 34, 35, 50, 13, 5, 5, 2, 7, 0, 0, 2, 0, 0, 0,
-];
-
-#[inline(always)]
-pub(crate) fn _ascii_stochas(idx: u8) -> u8 {
-    //_ASCII_STOCHAS[idx as usize]
-    assert!(idx < 128);
-    unsafe { *(_ASCII_STOCHAS.as_ptr().add(idx as usize)) }
-}

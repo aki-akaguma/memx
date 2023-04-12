@@ -1,3 +1,5 @@
+use crate::utils::_ascii_stochas;
+
 #[inline(always)]
 pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
@@ -12,8 +14,8 @@ pub fn _memmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let byte_1st = needle[0];
     let byte_last = needle[nee_len - 1];
     if byte_1st.is_ascii() && byte_last.is_ascii() {
-        let weight_1st = crate::_ascii_stochas(byte_1st);
-        let weight_last = crate::_ascii_stochas(byte_last);
+        let weight_1st = _ascii_stochas(byte_1st);
+        let weight_last = _ascii_stochas(byte_last);
         if weight_1st <= weight_last {
             _memmem_impl_1st(haystack, needle)
         } else {
