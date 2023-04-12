@@ -1,18 +1,18 @@
 #[inline]
-pub fn memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDoubleIter {
-    MemchrDoubleIter::new(haystack, needle1, needle2)
+pub fn memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter {
+    MemchrDblIter::new(haystack, needle1, needle2)
 }
 
-pub struct MemchrDoubleIter<'a> {
+pub struct MemchrDblIter<'a> {
     haystack: &'a [u8],
     needle1: u8,
     needle2: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> MemchrDoubleIter<'a> {
+impl<'a> MemchrDblIter<'a> {
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDoubleIter {
-        MemchrDoubleIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter {
+        MemchrDblIter {
             needle1,
             needle2,
             haystack,
@@ -20,7 +20,7 @@ impl<'a> MemchrDoubleIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MemchrDoubleIter<'a> {
+impl<'a> Iterator for MemchrDblIter<'a> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -45,7 +45,7 @@ impl<'a> Iterator for MemchrDoubleIter<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for MemchrDoubleIter<'a> {
+impl<'a> DoubleEndedIterator for MemchrDblIter<'a> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {

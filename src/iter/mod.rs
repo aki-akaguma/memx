@@ -4,7 +4,7 @@ pub use iter_chr::MemchrIter;
 
 mod iter_chr_dbl;
 pub use iter_chr_dbl::memchr_dbl_iter;
-pub use iter_chr_dbl::MemchrDoubleIter;
+pub use iter_chr_dbl::MemchrDblIter;
 
 mod iter_rchr;
 pub use iter_rchr::memrchr_iter;
@@ -12,7 +12,7 @@ pub use iter_rchr::MemrchrIter;
 
 mod iter_rchr_dbl;
 pub use iter_rchr_dbl::memrchr_dbl_iter;
-pub use iter_rchr_dbl::MemrchrDoubleIter;
+pub use iter_rchr_dbl::MemrchrDblIter;
 
 mod iter_mem;
 pub use iter_mem::memmem_iter;
