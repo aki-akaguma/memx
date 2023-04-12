@@ -43,12 +43,15 @@ fn test02() {
         assert_eq!(iter.next(), None);
         assert_eq!(iter.next_back(), Some(1 + x));
     };
-    if cfg!(miri) {
-        for x in [0, 299, 599].into_iter() {
+    #[cfg(not(miri))]
+    {
+        for x in 0..600 {
             f(x);
         }
-    } else {
-        for x in 0..600 {
+    }
+    #[cfg(miri)]
+    {
+        for x in [0, 299, 599].into_iter() {
             f(x);
         }
     }

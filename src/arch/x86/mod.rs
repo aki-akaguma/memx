@@ -154,10 +154,14 @@ use core::arch::x86 as mmx;
 use core::arch::x86_64 as mmx;
 
 use mmx::__m128i;
+use mmx::_mm_cmpeq_epi8;
+use mmx::_mm_movemask_epi8;
 use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
+use mmx::_mm256_cmpeq_epi8;
 use mmx::_mm256_cvtsi256_si32;
+use mmx::_mm256_movemask_epi8;
 use mmx::_mm256_set1_epi8;
 
 #[inline(always)]
@@ -173,6 +177,20 @@ unsafe fn _c32_value(c: u8) -> __m256i {
 #[inline(always)]
 unsafe fn _c16_from_c32(cc: __m256i) -> __m128i {
     _c16_value(_mm256_cvtsi256_si32(cc) as u8)
+}
+
+#[inline(always)]
+unsafe fn _c16_eq(mm_a: __m128i, mm_b: __m128i) -> bool {
+    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_b);
+    let mask = _mm_movemask_epi8(mm_eq);
+    mask == 0xFFFF
+}
+
+#[inline(always)]
+unsafe fn _c32_eq(mm_a: __m256i, mm_b: __m256i) -> bool {
+    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_b);
+    let mask = _mm256_movemask_epi8(mm_eq) as u32;
+    mask == 0xFFFF_FFFF
 }
 
 mod multi;

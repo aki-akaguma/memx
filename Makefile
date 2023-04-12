@@ -67,8 +67,8 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
-GRCOV_TEST=
 GRCOV_TEST=--test memrchr_dbl
+GRCOV_TEST=
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
