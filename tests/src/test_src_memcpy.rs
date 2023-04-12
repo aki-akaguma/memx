@@ -58,12 +58,15 @@ fn test02() {
         assert_eq!(dst[x + src_sl.len() + 3], 0);
         assert_eq!(dst[x + src_sl.len() + 4], 0);
     };
-    if cfg!(miri) {
-        for x in [0, 299, 599].into_iter() {
+    #[cfg(not(miri))]
+    {
+        for x in 0..600 {
             f(x);
         }
-    } else {
-        for x in 0..600 {
+    }
+    #[cfg(miri)]
+    {
+        for x in [0, 299, 599].into_iter() {
             f(x);
         }
     }

@@ -31,7 +31,8 @@ Failed lists:
 - nothing
 
 */
-#![no_std]
+//#![no_std]
+#![cfg_attr(not(test), no_std)]
 use core::cmp::Ordering;
 
 pub mod arch;

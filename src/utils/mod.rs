@@ -254,12 +254,16 @@ pub(crate) fn _c4_value(c: u8) -> u32 {
     (c as u32) * PackedU32::ONES
 }
 
+#[inline(always)]
+pub(crate) fn _c2_value(c: u8) -> u16 {
+    (c as u16) * PackedU16::ONES
+}
+
 mod multi;
 pub(crate) use multi::dbl::{C16Dbl, C1Dbl, C2Dbl, C4Dbl, C8Dbl};
 pub(crate) use multi::sgl::{C16Sgl, C1Sgl, C2Sgl, C4Sgl, C8Sgl};
 //pub(crate) use multi::tpl::{C16Tpl, C8Tpl, C4Tpl, C2Tpl, C1Tpl};
 //pub(crate) use multi::qpl::{C16Qpl, C8Qpl, C4Qpl, C2Qpl, C1Qpl};
-
 
 // ascii stochastics
 #[rustfmt::skip]

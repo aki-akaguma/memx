@@ -140,12 +140,15 @@ fn test02() {
         });
         assert_eq!(r, Ordering::Greater);
     };
-    if cfg!(miri) {
-        for x in [0, 299, 599].into_iter() {
+    #[cfg(not(miri))]
+    {
+        for x in 0..600 {
             f(x);
         }
-    } else {
-        for x in 0..600 {
+    }
+    #[cfg(miri)]
+    {
+        for x in [0, 299, 599].into_iter() {
             f(x);
         }
     }

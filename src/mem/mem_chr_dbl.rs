@@ -76,6 +76,7 @@ macro_rules! _unroll_one_chr_to_aligned_x16 {
     }};
 }
 
+#[inline(always)]
 pub(crate) fn _chr_dbl_to_aligned_u256(
     buf_ptr: *const u8,
     c: C1Dbl,
@@ -91,6 +92,7 @@ pub(crate) fn _chr_dbl_to_aligned_u256(
     (Some(buf_ptr_end), None)
 }
 
+#[inline(always)]
 pub(crate) fn _chr_dbl_to_aligned_u128(
     buf_ptr: *const u8,
     c: C1Dbl,
@@ -105,6 +107,7 @@ pub(crate) fn _chr_dbl_to_aligned_u128(
     (Some(buf_ptr_end), None)
 }
 
+#[inline(always)]
 fn _chr_dbl_to_aligned_u64(
     buf_ptr: *const u8,
     c: C1Dbl,
@@ -119,6 +122,7 @@ fn _chr_dbl_to_aligned_u64(
     (Some(buf_ptr_end), None)
 }
 
+#[inline(always)]
 fn _chr_dbl_to_aligned_u32(
     buf_ptr: *const u8,
     c: C1Dbl,

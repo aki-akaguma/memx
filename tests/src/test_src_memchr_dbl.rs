@@ -47,7 +47,7 @@ fn test01() {
 }
 #[test]
 fn test02() {
-    let buf_a = vec![b'a'];
+    let buf_a = vec![b'X'];
     let buf_0 = vec![0_u8];
     let f = |x: usize| {
         let buf = {
@@ -55,6 +55,7 @@ fn test02() {
             buf.append(&mut buf_0.repeat(x));
             buf.append(&mut buf_0.repeat(x));
             buf.push(b'G');
+            buf.push(b'a');
             buf.append(&mut buf_0.repeat(1 + x));
             buf
         };
@@ -74,13 +75,24 @@ fn test02() {
             test_memchr_dbl(&buf[x..], b'g', b'G')
         });
         assert_eq!(r, Some(1 + x));
+        //
+        let r = cfg_iif::cfg_iif!(all(not(miri), feature = "test_alignment_check",
+        any(target_arch = "x86_64", target_arch = "x86")) {
+            x86_alignment_check::ac_call_once(|| { test_memchr_dbl(&buf[x..], b'A', b'a') })
+        } else {
+            test_memchr_dbl(&buf[x..], b'A', b'a')
+        });
+        assert_eq!(r, Some(2 + x));
     };
-    if cfg!(miri) {
-        for x in [0, 299, 599].into_iter() {
+    #[cfg(not(miri))]
+    {
+        for x in 0..600 {
             f(x);
         }
-    } else {
-        for x in 0..600 {
+    }
+    #[cfg(miri)]
+    {
+        for x in [0, 299, 599].into_iter() {
             f(x);
         }
     }
