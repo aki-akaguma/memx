@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn _memchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -207,7 +207,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         }
     }
     // the remaining data is the max: 15 bytes.
-    _memchr_double_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_dbl_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
@@ -282,7 +282,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memchr_double_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_dbl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
@@ -356,11 +356,11 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memchr_double_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_dbl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_double_remaining_15_bytes_impl(
+pub(crate) fn _memchr_dbl_remaining_15_bytes_impl(
     buf_ptr: *const u8,
     cc: C8Dbl,
     start_ptr: *const u8,
@@ -378,11 +378,11 @@ pub(crate) fn _memchr_double_remaining_15_bytes_impl(
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memchr_double_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_dbl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_double_remaining_7_bytes_impl(
+pub(crate) fn _memchr_dbl_remaining_7_bytes_impl(
     buf_ptr: *const u8,
     cc: C4Dbl,
     start_ptr: *const u8,
@@ -400,11 +400,11 @@ pub(crate) fn _memchr_double_remaining_7_bytes_impl(
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memchr_double_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_dbl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_double_remaining_3_bytes_impl(
+pub(crate) fn _memchr_dbl_remaining_3_bytes_impl(
     buf_ptr: *const u8,
     cc: C2Dbl,
     start_ptr: *const u8,

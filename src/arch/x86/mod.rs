@@ -4,11 +4,11 @@ pub(crate) use x86_chr::_memchr_impl;
 mod x86_rchr;
 pub(crate) use x86_rchr::_memrchr_impl;
 
-mod x86_chr_double;
-pub(crate) use x86_chr_double::_memchr_double_impl;
+mod x86_chr_dbl;
+pub(crate) use x86_chr_dbl::_memchr_dbl_impl;
 
-mod x86_rchr_double;
-pub(crate) use x86_rchr_double::_memrchr_double_impl;
+mod x86_rchr_dbl;
+pub(crate) use x86_rchr_dbl::_memrchr_dbl_impl;
 
 mod x86_nechr;
 pub(crate) use x86_nechr::_memnechr_impl;
@@ -51,11 +51,11 @@ pub use x86_nechr::_memnechr_sse2;
 pub use x86_rnechr::_memrnechr_avx2;
 pub use x86_rnechr::_memrnechr_sse2;
 
-pub use x86_chr_double::_memchr_double_avx2;
-pub use x86_chr_double::_memchr_double_sse2;
+pub use x86_chr_dbl::_memchr_dbl_avx2;
+pub use x86_chr_dbl::_memchr_dbl_sse2;
 
-pub use x86_rchr_double::_memrchr_double_avx2;
-pub use x86_rchr_double::_memrchr_double_sse2;
+pub use x86_rchr_dbl::_memrchr_dbl_avx2;
+pub use x86_rchr_dbl::_memrchr_dbl_sse2;
 
 pub use x86_mem::_memmem_avx2;
 pub use x86_mem::_memmem_sse2;
@@ -157,6 +157,7 @@ use mmx::__m128i;
 use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
+use mmx::_mm256_cvtsi256_si32;
 use mmx::_mm256_set1_epi8;
 
 #[inline(always)]
@@ -169,32 +170,13 @@ unsafe fn _c32_value(c: u8) -> __m256i {
     _mm256_set1_epi8(c as i8)
 }
 
-#[derive(Copy, Clone)]
-struct MMC16Dbl {
-    pub a: __m128i,
-    pub b: __m128i,
-}
-impl MMC16Dbl {
-    #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
-        Self {
-            a: unsafe { _c16_value(c1) },
-            b: unsafe { _c16_value(c2) },
-        }
-    }
+#[inline(always)]
+unsafe fn _c16_from_c32(cc: __m256i) -> __m128i {
+    _c16_value(_mm256_cvtsi256_si32(cc) as u8)
 }
 
-#[derive(Copy, Clone)]
-struct MMC32Dbl {
-    pub a: __m256i,
-    pub b: __m256i,
-}
-impl MMC32Dbl {
-    #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
-        Self {
-            a: unsafe { _c32_value(c1) },
-            b: unsafe { _c32_value(c2) },
-        }
-    }
-}
+mod multi;
+pub(crate) use multi::dbl::{MMC16Dbl, MMC32Dbl};
+pub(crate) use multi::sgl::{MMC16Sgl, MMC32Sgl};
+//pub(crate) use multi::tpl::{MMC16Tpl, MMC32Tpl};
+//pub(crate) use multi::qpl::{MMC16Qpl, MMC32Qpl};

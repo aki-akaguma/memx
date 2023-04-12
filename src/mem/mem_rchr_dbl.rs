@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn _memrchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -228,7 +228,7 @@ fn _start_rchr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 15 bytes.
-    _memrchr_double_remaining_15_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
+    _memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
@@ -322,7 +322,7 @@ fn _start_rchr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 7 bytes.
-    _memrchr_double_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
+    _memrchr_dbl_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
@@ -414,11 +414,11 @@ fn _start_rchr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 3 bytes.
-    _memrchr_double_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
+    _memrchr_dbl_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_double_remaining_15_bytes_impl(
+pub(crate) fn _memrchr_dbl_remaining_15_bytes_impl(
     buf_ptr_cur: *const u8,
     cc: C8Dbl,
     start_ptr: *const u8,
@@ -436,11 +436,11 @@ pub(crate) fn _memrchr_double_remaining_15_bytes_impl(
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memrchr_double_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
+    _memrchr_dbl_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_double_remaining_7_bytes_impl(
+pub(crate) fn _memrchr_dbl_remaining_7_bytes_impl(
     buf_ptr_cur: *const u8,
     cc: C4Dbl,
     start_ptr: *const u8,
@@ -458,11 +458,11 @@ pub(crate) fn _memrchr_double_remaining_7_bytes_impl(
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memrchr_double_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
+    _memrchr_dbl_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_double_remaining_3_bytes_impl(
+pub(crate) fn _memrchr_dbl_remaining_3_bytes_impl(
     buf_ptr_cur: *const u8,
     cc: C2Dbl,
     start_ptr: *const u8,
@@ -523,7 +523,7 @@ fn _rchr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Op
 
 #[inline(always)]
 fn _rchr_dbl_c16_aa_x2(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_dbl_c16_aa_x1(unsafe { buf_ptr.add(16 * 1) }, c16, st_ptr);
+    let r = _rchr_dbl_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
     if r.is_some() {
         return r;
     }
@@ -587,7 +587,7 @@ fn _rchr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Optio
 
 #[inline(always)]
 fn _rchr_dbl_c8_aa_x2(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_dbl_c8_aa_x1(unsafe { buf_ptr.add(8 * 1) }, c8, st_ptr);
+    let r = _rchr_dbl_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
     if r.is_some() {
         return r;
     }
@@ -651,7 +651,7 @@ fn _rchr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Optio
 
 #[inline(always)]
 fn _rchr_dbl_c4_aa_x2(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
-    let r = _rchr_dbl_c4_aa_x1(unsafe { buf_ptr.add(4 * 1) }, c4, st_ptr);
+    let r = _rchr_dbl_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
     if r.is_some() {
         return r;
     }
