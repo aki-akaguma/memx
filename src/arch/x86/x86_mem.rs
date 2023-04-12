@@ -1,4 +1,5 @@
 use crate::mem as basic;
+use crate::utils::_ascii_stochas;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
@@ -71,8 +72,8 @@ fn _memmem_sse2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let byte_1st = needle[0];
     let byte_last = needle[nee_len - 1];
     if byte_1st.is_ascii() && byte_last.is_ascii() {
-        let weight_1st = crate::_ascii_stochas(byte_1st);
-        let weight_last = crate::_ascii_stochas(byte_last);
+        let weight_1st = _ascii_stochas(byte_1st);
+        let weight_last = _ascii_stochas(byte_last);
         if weight_1st <= weight_last {
             _memmem_sse2_impl_1st(haystack, needle)
         } else {
@@ -145,8 +146,8 @@ fn _memmem_avx2_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let byte_1st = needle[0];
     let byte_last = needle[nee_len - 1];
     if byte_1st.is_ascii() && byte_last.is_ascii() {
-        let weight_1st = crate::_ascii_stochas(byte_1st);
-        let weight_last = crate::_ascii_stochas(byte_last);
+        let weight_1st = _ascii_stochas(byte_1st);
+        let weight_last = _ascii_stochas(byte_last);
         if weight_1st <= weight_last {
             _memmem_avx2_impl_1st(haystack, needle)
         } else {
