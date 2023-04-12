@@ -67,11 +67,11 @@ path = "benches/bench-memrmem.rs"
 harness = false
 
 [[bench]]
-name = "bench-memchr_double"
-path = "benches/bench-memchr_double.rs"
+name = "bench-memchr_dbl"
+path = "benches/bench-memchr_dbl.rs"
 harness = false
 
 [[bench]]
-name = "bench-memrchr_double"
-path = "benches/bench-memrchr_double.rs"
+name = "bench-memrchr_dbl"
+path = "benches/bench-memrchr_dbl.rs"
 harness = false

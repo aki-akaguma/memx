@@ -40,25 +40,25 @@ pub(crate) use mem_rnechr::_rnechr_to_aligned_u128;
 #[allow(unused_imports)]
 pub(crate) use mem_rnechr::_rnechr_to_aligned_u256;
 
-mod mem_chr_double;
-pub(crate) use mem_chr_double::_memchr_double_impl;
+mod mem_chr_dbl;
+pub(crate) use mem_chr_dbl::_memchr_dbl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_chr_double::_chr_dbl_to_aligned_u128;
+pub(crate) use mem_chr_dbl::_chr_dbl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_chr_double::_chr_dbl_to_aligned_u256;
+pub(crate) use mem_chr_dbl::_chr_dbl_to_aligned_u256;
 #[allow(unused_imports)]
-pub(crate) use mem_chr_double::_memchr_double_remaining_15_bytes_impl;
+pub(crate) use mem_chr_dbl::_memchr_dbl_remaining_15_bytes_impl;
 
-mod mem_rchr_double;
-pub(crate) use mem_rchr_double::_memrchr_double_impl;
+mod mem_rchr_dbl;
+pub(crate) use mem_rchr_dbl::_memrchr_dbl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_rchr_double::_memrchr_double_remaining_15_bytes_impl;
+pub(crate) use mem_rchr_dbl::_memrchr_dbl_remaining_15_bytes_impl;
 #[allow(unused_imports)]
-pub(crate) use mem_rchr_double::_rchr_dbl_to_aligned_u128;
+pub(crate) use mem_rchr_dbl::_rchr_dbl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_rchr_double::_rchr_dbl_to_aligned_u256;
+pub(crate) use mem_rchr_dbl::_rchr_dbl_to_aligned_u256;
 
 mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
@@ -108,12 +108,12 @@ pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
     crate::mem::_memrchr_impl(buf, c)
 }
 
-pub fn memchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    crate::mem::_memchr_double_impl(buf, c1, c2)
+pub fn memchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    crate::mem::_memchr_dbl_impl(buf, c1, c2)
 }
 
-pub fn memrchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    crate::mem::_memrchr_double_impl(buf, c1, c2)
+pub fn memrchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    crate::mem::_memrchr_dbl_impl(buf, c1, c2)
 }
 
 pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {

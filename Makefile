@@ -12,7 +12,7 @@ test:
 	cargo test --offline --features test_pointer_width_64
 	cargo test --offline --features test_pointer_width_32
 
-AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_double -- test memrchr_double
+AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl -- test memrchr_dbl
 test-alignment-check:
 	cargo test --offline --features test_alignment_check $(AC_TESTS)
 	cargo test --offline --features test_alignment_check,test_pointer_width_128 $(AC_TESTS)
@@ -68,7 +68,7 @@ tarpaulin:
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 GRCOV_TEST=
-GRCOV_TEST=--test memrchr_double
+GRCOV_TEST=--test memrchr_dbl
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
@@ -87,7 +87,7 @@ BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
 BG_PROF=
 BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
 BENCH_GRCOV=
-BENCH_GRCOV=--bench bench-memrchr_double
+BENCH_GRCOV=--bench bench-memrchr_dbl
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
@@ -106,11 +106,11 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_double bench-memrchr_double
-#bench_nms = bench-memchr_double bench-memrchr_double
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl
+#bench_nms = bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memrchr_double
+bench_nms = bench-memchr_dbl
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -184,10 +184,10 @@ bench-dat-check:
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memmem
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
-	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memchr_double
-	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_double
-	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_double
-	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_double
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memchr_dbl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_dbl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_dbl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_dbl
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 

@@ -1,5 +1,5 @@
 #[inline]
-pub fn memchr_double_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDoubleIter {
+pub fn memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDoubleIter {
     MemchrDoubleIter::new(haystack, needle1, needle2)
 }
 
@@ -27,7 +27,7 @@ impl<'a> Iterator for MemchrDoubleIter<'a> {
         if self.position > self.haystack.len() {
             return None;
         }
-        match crate::memchr_double(&self.haystack[self.position..], self.needle1, self.needle2) {
+        match crate::memchr_dbl(&self.haystack[self.position..], self.needle1, self.needle2) {
             Some(idx) => {
                 let found = self.position + idx;
                 self.position = self.position + idx + 1;
@@ -51,7 +51,7 @@ impl<'a> DoubleEndedIterator for MemchrDoubleIter<'a> {
         if self.position == 0 {
             return None;
         }
-        match crate::memrchr_double(
+        match crate::memrchr_dbl(
             &self.haystack[..(self.position - 1)],
             self.needle1,
             self.needle2,

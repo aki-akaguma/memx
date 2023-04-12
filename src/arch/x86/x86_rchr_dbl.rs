@@ -1,6 +1,6 @@
+use super::{MMC16Dbl, MMC32Dbl};
 use crate::mem as basic;
 use crate::utils::*;
-use super::{MMC16Dbl, MMC32Dbl};
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;
@@ -33,17 +33,17 @@ static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType
 fn fnptr_setup_func(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[cfg(target_arch = "x86_64")]
     let func = if cpuid::has_avx2() {
-        _memrchr_double_avx2
+        _memrchr_dbl_avx2
     } else {
-        _memrchr_double_sse2
+        _memrchr_dbl_sse2
     };
     #[cfg(target_arch = "x86")]
     let func = if cpuid::has_avx2() {
-        _memrchr_double_avx2
+        _memrchr_dbl_avx2
     } else if cpuid::has_sse2() {
-        _memrchr_double_sse2
+        _memrchr_dbl_sse2
     } else {
-        _memrchr_double_basic
+        _memrchr_dbl_basic
     };
     //
     FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
@@ -51,33 +51,33 @@ fn fnptr_setup_func(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_double_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub(crate) fn _memrchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
     #[allow(clippy::crosspointer_transmute)]
     let func: FuncType = unsafe { core::mem::transmute(func_u) };
     func(buf, c1, c2)
 }
 
-unsafe fn _memrchr_double_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    basic::_memrchr_double_impl(buf, c1, c2)
+unsafe fn _memrchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    basic::_memrchr_dbl_impl(buf, c1, c2)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_double_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memrchr_double_sse2_impl(buf, c1, c2)
+pub unsafe fn _memrchr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    _memrchr_dbl_sse2_impl(buf, c1, c2)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_double_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memrchr_double_avx2_impl(buf, c1, c2)
+pub unsafe fn _memrchr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    _memrchr_dbl_avx2_impl(buf, c1, c2)
 }
 
 #[inline(always)]
-fn _memrchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
@@ -188,11 +188,11 @@ fn _memrchr_double_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     start_ptr.prefetch_read_data();
     //
     let cc = C8Dbl::new(c1, c2);
-    basic::_memrchr_double_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
+    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[inline(always)]
-fn _memrchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
@@ -369,7 +369,7 @@ fn _memrchr_double_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     start_ptr.prefetch_read_data();
     //
     let cc = C8Dbl::new(c1, c2);
-    basic::_memrchr_double_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
+    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[inline(always)]

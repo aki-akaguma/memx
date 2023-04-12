@@ -16,11 +16,11 @@ pub fn create_data_nechr() -> (Vec<String>, u8, usize) {
     }
 }
 
-pub fn create_data_chr_double() -> (Vec<String>, (u8, u8), usize) {
+pub fn create_data_chr_dbl() -> (Vec<String>, (u8, u8), usize) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
-        "ja.1" => create_data_chr_double_ja_1(),
-        _ => create_data_chr_double_en_1(),
+        "ja.1" => create_data_chr_dbl_ja_1(),
+        _ => create_data_chr_dbl_en_1(),
     }
 }
 
@@ -165,7 +165,7 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
     (v, bb, match_cnt)
 }
 
-pub fn create_data_chr_double_en_1() -> (Vec<String>, (u8, u8), usize) {
+pub fn create_data_chr_dbl_en_1() -> (Vec<String>, (u8, u8), usize) {
     let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();
     let mut v: Vec<String> = Vec::new();
@@ -185,7 +185,7 @@ pub fn create_data_chr_double_en_1() -> (Vec<String>, (u8, u8), usize) {
     (v, (b'r', b'.'), match_cnt)
 }
 
-pub fn create_data_chr_double_ja_1() -> (Vec<String>, (u8, u8), usize) {
+pub fn create_data_chr_dbl_ja_1() -> (Vec<String>, (u8, u8), usize) {
     let s1 = JA_DAT_S1.to_string() + JA_DAT_S2;
     let s2 = JA_DAT_S2.to_string();
 

@@ -1,6 +1,6 @@
+use super::{_c16_value, _c32_value};
 use crate::mem as basic;
 use crate::utils::*;
-use super::{_c16_value, _c32_value};
 
 #[cfg(target_arch = "x86")]
 use core::arch::x86 as mmx;

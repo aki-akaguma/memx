@@ -108,33 +108,33 @@ pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
 }
 
 /// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
-pub fn memchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn memchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memchr_double_impl(buf, c1, c2) }
+        { arch::x86::_memchr_dbl_impl(buf, c1, c2) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memchr_double_impl(buf, c1, c2) }
+        { mem::_memchr_dbl_impl(buf, c1, c2) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memchr_double_impl(buf, c1, c2);
+    let r = mem::_memchr_dbl_impl(buf, c1, c2);
     //
     r
 }
 
 /// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2)`.
-pub fn memrchr_double(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn memrchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memrchr_double_impl(buf, c1, c2) }
+        { arch::x86::_memrchr_dbl_impl(buf, c1, c2) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memrchr_double_impl(buf, c1, c2) }
+        { mem::_memrchr_dbl_impl(buf, c1, c2) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memrchr_double_impl(buf, c1, c2);
+    let r = mem::_memrchr_dbl_impl(buf, c1, c2);
     //
     r
 }
