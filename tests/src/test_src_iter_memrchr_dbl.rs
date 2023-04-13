@@ -1,6 +1,80 @@
 /**/
 
 #[test]
+fn test00() {
+    let buf = vec![];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'G', b'g');
+    assert_eq!(iter.size_hint(), (0, Some(0)));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), None);
+    //
+    let buf = vec![b'A', b'g'];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'G', b'g');
+    assert_eq!(iter.size_hint(), (0, Some(2)));
+    assert_eq!(iter.next(), Some(1));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(1));
+    assert_eq!(iter.next_back(), None);
+    let mut iter = test_memrchr_dbl_iter(&buf, b'g', b'G');
+    assert_eq!(iter.size_hint(), (0, Some(2)));
+    assert_eq!(iter.next(), Some(1));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(1));
+    assert_eq!(iter.next_back(), None);
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'A', b'a');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(0));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(0));
+    assert_eq!(iter.next_back(), None);
+    let mut iter = test_memrchr_dbl_iter(&buf, b'a', b'A');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(0));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(0));
+    assert_eq!(iter.next_back(), None);
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'B', b'b');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(1));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(1));
+    assert_eq!(iter.next_back(), None);
+    let mut iter = test_memrchr_dbl_iter(&buf, b'b', b'B');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(1));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(1));
+    assert_eq!(iter.next_back(), None);
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'C', b'c');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(2));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(2));
+    assert_eq!(iter.next_back(), None);
+    let mut iter = test_memrchr_dbl_iter(&buf, b'c', b'C');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), Some(2));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), Some(2));
+    assert_eq!(iter.next_back(), None);
+    //
+    let buf = vec![b'A', b'B', b'C'];
+    let mut iter = test_memrchr_dbl_iter(&buf, b'a', b'b');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), None);
+    let mut iter = test_memrchr_dbl_iter(&buf, b'b', b'a');
+    assert_eq!(iter.size_hint(), (0, Some(3)));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next_back(), None);
+}
+#[test]
 fn test01() {
     let buf = vec![
         b'A', b'B', b'g', b'D', b'E', b'F', b'G', b'H', b'J', b'K', b'g',
