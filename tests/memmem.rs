@@ -1,9 +1,7 @@
+mod impl_std;
 mod test_std_memmem {
     fn test_memmem(buf: &[u8], pat_bytes: &[u8]) -> Option<usize> {
-        if buf.len() < pat_bytes.len() {
-            return None;
-        }
-        (0..=(buf.len() - pat_bytes.len())).find(|&i| &buf[i..(i + pat_bytes.len())] == pat_bytes)
+        super::impl_std::_std_memmem(buf, pat_bytes)
     }
     //
     const _RT_AC: bool = false;

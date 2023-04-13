@@ -1,13 +1,7 @@
+mod impl_std;
 mod test_std_memset {
-    #[rustversion::since(1.50)]
     fn test_memset(dst: &mut [u8], byte: u8) {
-        dst.fill(byte);
-    }
-    #[rustversion::before(1.50)]
-    fn test_memset(dst: &mut [u8], byte: u8) {
-        for i in 0..dst.len() {
-            dst[i] = byte;
-        }
+        super::impl_std::_std_memset(dst, byte)
     }
     //
     const _RT_AC: bool = true;

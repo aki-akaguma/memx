@@ -1,6 +1,7 @@
+mod impl_std;
 mod test_std_memeq {
     fn test_memeq(buf: &[u8], pat_bytes: &[u8]) -> bool {
-        buf == pat_bytes
+        super::impl_std::_std_memeq(buf, pat_bytes)
     }
     //
     const _RT_AC: bool = false;

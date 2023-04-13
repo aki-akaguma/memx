@@ -1,11 +1,8 @@
+mod impl_std;
 mod test_std_memcpy {
     use memx::RangeError;
     fn test_memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-        if dst.len() < src.len() {
-            return Err(RangeError);
-        }
-        let _ = &(dst[0..src.len()]).copy_from_slice(src);
-        Ok(())
+        super::impl_std::_std_memcpy(dst, src)
     }
     //
     const _RT_AC: bool = false;
