@@ -1,8 +1,9 @@
+mod impl_std;
 mod test_std_memcmp {
     use std::cmp::Ordering;
     //
     fn test_memcmp(buf: &[u8], pat_bytes: &[u8]) -> Ordering {
-        buf.cmp(pat_bytes)
+        super::impl_std::_std_memcmp(buf, pat_bytes)
     }
     //
     const _RT_AC: bool = false;

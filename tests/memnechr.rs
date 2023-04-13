@@ -1,6 +1,7 @@
+mod impl_std;
 mod test_std_memnechr {
     fn test_memnechr(buf: &[u8], byte: u8) -> Option<usize> {
-        buf.iter().position(|&x| x != byte)
+        super::impl_std::_std_memnechr(buf, byte)
     }
     //
     include!("./src/test_src_memnechr.rs");
