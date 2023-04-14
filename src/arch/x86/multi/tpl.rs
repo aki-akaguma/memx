@@ -28,12 +28,12 @@ impl PartialEq for MMB16Tpl {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC32Tpl {
+pub(crate) struct MMB32Tpl {
     pub a: __m256i,
     pub b: __m256i,
     pub c: __m256i,
 }
-impl MMC32Tpl {
+impl MMB32Tpl {
     #[allow(dead_code)]
     #[inline(always)]
     pub fn new(c1: u8, c2: u8, c3: u8) -> Self {
@@ -44,7 +44,7 @@ impl MMC32Tpl {
         }
     }
 }
-impl PartialEq for MMC32Tpl {
+impl PartialEq for MMB32Tpl {
     fn eq(&self, other: &Self) -> bool {
         let a = unsafe { _c32_eq(self.a, other.a) };
         let b = unsafe { _c32_eq(self.b, other.b) };
@@ -53,8 +53,8 @@ impl PartialEq for MMC32Tpl {
     }
 }
 
-impl From<MMC32Tpl> for MMB16Tpl {
-    fn from(cc: MMC32Tpl) -> Self {
+impl From<MMB32Tpl> for MMB16Tpl {
+    fn from(cc: MMB32Tpl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
             b: unsafe { _c16_from_c32(cc.b) },
@@ -74,14 +74,14 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a = MMC32Tpl::new(b'A', b'B', b'C');
+        let a = MMB32Tpl::new(b'A', b'B', b'C');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC32Tpl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418), c: __m256i(4846791580151137091, 4846791580151137091, 4846791580151137091, 4846791580151137091) }"
+            "MMB32Tpl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418), c: __m256i(4846791580151137091, 4846791580151137091, 4846791580151137091, 4846791580151137091) }"
         );
     }
     #[test]
@@ -101,9 +101,9 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a_c32 = MMC32Tpl::new(b'A', b'B', b'C');
+        let a_c32 = MMB32Tpl::new(b'A', b'B', b'C');
         let a_c16: MMB16Tpl = a_c32.into();
-        assert_eq!(a_c32, MMC32Tpl::new(b'A', b'B', b'C'));
+        assert_eq!(a_c32, MMB32Tpl::new(b'A', b'B', b'C'));
         assert_eq!(a_c16, MMB16Tpl::new(b'A', b'B', b'C'));
     }
 }

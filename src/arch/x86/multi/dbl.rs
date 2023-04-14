@@ -24,11 +24,11 @@ impl PartialEq for MMB16Dbl {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC32Dbl {
+pub(crate) struct MMB32Dbl {
     pub a: __m256i,
     pub b: __m256i,
 }
-impl MMC32Dbl {
+impl MMB32Dbl {
     #[inline(always)]
     pub fn new(c1: u8, c2: u8) -> Self {
         Self {
@@ -37,7 +37,7 @@ impl MMC32Dbl {
         }
     }
 }
-impl PartialEq for MMC32Dbl {
+impl PartialEq for MMB32Dbl {
     fn eq(&self, other: &Self) -> bool {
         let a = unsafe { _c32_eq(self.a, other.a) };
         let b = unsafe { _c32_eq(self.b, other.b) };
@@ -45,8 +45,8 @@ impl PartialEq for MMC32Dbl {
     }
 }
 
-impl From<MMC32Dbl> for MMB16Dbl {
-    fn from(cc: MMC32Dbl) -> Self {
+impl From<MMB32Dbl> for MMB16Dbl {
+    fn from(cc: MMB32Dbl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
             b: unsafe { _c16_from_c32(cc.b) },
@@ -65,14 +65,14 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a = MMC32Dbl::new(b'A', b'B');
+        let a = MMB32Dbl::new(b'A', b'B');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC32Dbl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418) }"
+            "MMB32Dbl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418) }"
         );
     }
     #[test]
@@ -92,9 +92,9 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a_c32 = MMC32Dbl::new(b'A', b'B');
+        let a_c32 = MMB32Dbl::new(b'A', b'B');
         let a_c16: MMB16Dbl = a_c32.into();
-        assert_eq!(a_c32, MMC32Dbl::new(b'A', b'B'));
+        assert_eq!(a_c32, MMB32Dbl::new(b'A', b'B'));
         assert_eq!(a_c16, MMB16Dbl::new(b'A', b'B'));
     }
 }

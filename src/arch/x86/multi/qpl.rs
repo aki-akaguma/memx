@@ -31,13 +31,13 @@ impl PartialEq for MMB16Qpl {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC32Qpl {
+pub(crate) struct MMB32Qpl {
     pub a: __m256i,
     pub b: __m256i,
     pub c: __m256i,
     pub d: __m256i,
 }
-impl MMC32Qpl {
+impl MMB32Qpl {
     #[allow(dead_code)]
     #[inline(always)]
     pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
@@ -49,7 +49,7 @@ impl MMC32Qpl {
         }
     }
 }
-impl PartialEq for MMC32Qpl {
+impl PartialEq for MMB32Qpl {
     fn eq(&self, other: &Self) -> bool {
         let a = unsafe { _c32_eq(self.a, other.a) };
         let b = unsafe { _c32_eq(self.b, other.b) };
@@ -59,8 +59,8 @@ impl PartialEq for MMC32Qpl {
     }
 }
 
-impl From<MMC32Qpl> for MMB16Qpl {
-    fn from(cc: MMC32Qpl) -> Self {
+impl From<MMB32Qpl> for MMB16Qpl {
+    fn from(cc: MMB32Qpl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
             b: unsafe { _c16_from_c32(cc.b) },
@@ -81,14 +81,14 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a = MMC32Qpl::new(b'A', b'B', b'C', b'D');
+        let a = MMB32Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC32Qpl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418), c: __m256i(4846791580151137091, 4846791580151137091, 4846791580151137091, 4846791580151137091), d: __m256i(4919131752989213764, 4919131752989213764, 4919131752989213764, 4919131752989213764) }"
+            "MMB32Qpl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418), c: __m256i(4846791580151137091, 4846791580151137091, 4846791580151137091, 4846791580151137091), d: __m256i(4919131752989213764, 4919131752989213764, 4919131752989213764, 4919131752989213764) }"
         );
     }
     #[test]
@@ -108,9 +108,9 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a_c32 = MMC32Qpl::new(b'A', b'B', b'C', b'D');
+        let a_c32 = MMB32Qpl::new(b'A', b'B', b'C', b'D');
         let a_c16: MMB16Qpl = a_c32.into();
-        assert_eq!(a_c32, MMC32Qpl::new(b'A', b'B', b'C', b'D'));
+        assert_eq!(a_c32, MMB32Qpl::new(b'A', b'B', b'C', b'D'));
         assert_eq!(a_c16, MMB16Qpl::new(b'A', b'B', b'C', b'D'));
     }
 }

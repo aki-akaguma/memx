@@ -1,3 +1,4 @@
+use super::{MMB16Sgl, MMB32Sgl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -7,12 +8,10 @@ use core::arch::x86 as mmx;
 use core::arch::x86_64 as mmx;
 
 use mmx::__m128i;
-use mmx::_mm_set1_epi8;
 use mmx::_mm_store_si128;
 use mmx::_mm_storeu_si128;
 
 use mmx::__m256i;
-use mmx::_mm256_set1_epi8;
 use mmx::_mm256_store_si256;
 use mmx::_mm256_storeu_si256;
 
@@ -123,7 +122,7 @@ macro_rules! _unroll_one_set_32_aa_x2 {
 }
 
 #[inline(always)]
-fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
+fn _memset_sse2_impl(buf: &mut [u8], c1: u8) {
     let buf_len = buf.len();
     if buf_len == 0 {
         return;
@@ -133,7 +132,7 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc: __m128i = unsafe { _c16_value(c) };
+        let cc = MMB16Sgl::new(c1);
         {
             let loop_size = 16;
             //
@@ -190,13 +189,14 @@ fn _memset_sse2_impl(buf: &mut [u8], c: u8) {
             }
         }
     }
-    let cc: u64 = _c8_value(c);
+    //
+    let cc = B8Sgl::new(c1);
     // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
 }
 
 #[inline(always)]
-fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
+fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
     let buf_len = buf.len();
     if buf_len == 0 {
         return;
@@ -206,7 +206,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let cc: __m256i = unsafe { _c32_value(c) };
+        let cc = MMB32Sgl::new(c1);
         {
             let loop_size = 32;
             //
@@ -251,7 +251,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
             }
         }
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             while buf_ptr <= end_ptr_16 {
@@ -261,7 +261,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
         }
     } else if buf_len >= 16 {
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let loop_size = 16;
             let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
             if buf_ptr <= end_ptr_16 {
@@ -282,6 +282,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
+                    let c = B1Sgl::new(c1);
                     buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
                     while buf_ptr <= end_ptr_16 {
                         _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
@@ -291,59 +292,49 @@ fn _memset_avx2_impl(buf: &mut [u8], c: u8) {
             }
         }
     }
-    let cc: u64 = _c8_value(c);
+    let cc = B8Sgl::new(c1);
     // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
 }
 
 #[inline(always)]
-unsafe fn _c16_value(c: u8) -> __m128i {
-    _mm_set1_epi8(c as i8)
+unsafe fn _set_c16_uu(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+    _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16.a);
 }
 
 #[inline(always)]
-unsafe fn _set_c16_uu(buf_ptr: *mut u8, mm_c16: __m128i) {
-    _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16);
+unsafe fn _set_c16_aa(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
 }
 
 #[inline(always)]
-unsafe fn _set_c16_aa(buf_ptr: *mut u8, mm_c16: __m128i) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
+unsafe fn _set_c16_aa_x2(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.a);
 }
 
 #[inline(always)]
-unsafe fn _set_c16_aa_x2(buf_ptr: *mut u8, mm_c16: __m128i) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
-    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16);
+unsafe fn _set_c16_aa_x4(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr.add(16 * 2) as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr.add(16 * 3) as *mut __m128i, mm_c16.a);
 }
 
 #[inline(always)]
-unsafe fn _set_c16_aa_x4(buf_ptr: *mut u8, mm_c16: __m128i) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16);
-    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16);
-    _mm_store_si128(buf_ptr.add(16 * 2) as *mut __m128i, mm_c16);
-    _mm_store_si128(buf_ptr.add(16 * 3) as *mut __m128i, mm_c16);
+unsafe fn _set_c32_uu(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+    _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32.a);
 }
 
 #[inline(always)]
-unsafe fn _c32_value(c: u8) -> __m256i {
-    _mm256_set1_epi8(c as i8)
+unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.a);
 }
 
 #[inline(always)]
-unsafe fn _set_c32_uu(buf_ptr: *mut u8, mm_c32: __m256i) {
-    _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32);
-}
-
-#[inline(always)]
-unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: __m256i) {
-    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32);
-}
-
-#[inline(always)]
-unsafe fn _set_c32_aa_x2(buf_ptr: *mut u8, mm_c32: __m256i) {
-    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32);
-    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32);
+unsafe fn _set_c32_aa_x2(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.a);
+    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32.a);
 }
 
 #[cfg(test)]

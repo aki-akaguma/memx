@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub fn _memrchr_impl(buf: &[u8], c1: u8) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -12,11 +12,11 @@ pub fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_rchr_128(buf, c);
+        let r = _start_rchr_128(buf, c1);
         #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_rchr_64(buf, c);
+        let r = _start_rchr_64(buf, c1);
         #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_rchr_32(buf, c);
+        let r = _start_rchr_32(buf, c1);
         //
         r
     }
@@ -30,11 +30,11 @@ pub fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        let r = _start_rchr_128(buf, c);
+        let r = _start_rchr_128(buf, c1);
         #[cfg(target_pointer_width = "64")]
-        let r = _start_rchr_64(buf, c);
+        let r = _start_rchr_64(buf, c1);
         #[cfg(target_pointer_width = "32")]
-        let r = _start_rchr_32(buf, c);
+        let r = _start_rchr_32(buf, c1);
         //
         r
     }
@@ -79,7 +79,7 @@ macro_rules! _unroll_one_rchr_to_aligned_x16 {
 #[inline(always)]
 pub(crate) fn _rchr_to_aligned_u256(
     buf_ptr_cur: *const u8,
-    c: u8,
+    c: B1Sgl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -96,7 +96,7 @@ pub(crate) fn _rchr_to_aligned_u256(
 #[inline(always)]
 pub(crate) fn _rchr_to_aligned_u128(
     buf_ptr_cur: *const u8,
-    c: u8,
+    c: B1Sgl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -112,7 +112,7 @@ pub(crate) fn _rchr_to_aligned_u128(
 #[inline(always)]
 fn _rchr_to_aligned_u64(
     buf_ptr_cur: *const u8,
-    c: u8,
+    c: B1Sgl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -128,7 +128,7 @@ fn _rchr_to_aligned_u64(
 #[inline(always)]
 fn _rchr_to_aligned_u32(
     buf_ptr_cur: *const u8,
-    c: u8,
+    c: B1Sgl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -143,11 +143,12 @@ fn _rchr_to_aligned_u32(
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_rchr_128(buf: &[u8], c: u8) -> Option<usize> {
+fn _start_rchr_128(buf: &[u8], c_1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let cc: u128 = _c16_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B16Sgl::new(c_1);
     //
     if buf_len >= 16 {
         // to a aligned pointer
@@ -231,16 +232,17 @@ fn _start_rchr_128(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 15 bytes.
-    _memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc as u64, start_ptr)
+    _memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_rchr_64(buf: &[u8], c: u8) -> Option<usize> {
+fn _start_rchr_64(buf: &[u8], c_1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let cc: u64 = _c8_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B8Sgl::new(c_1);
     //
     if buf_len >= 8 {
         // to a aligned pointer
@@ -324,16 +326,17 @@ fn _start_rchr_64(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 7 bytes.
-    _memrchr_remaining_7_bytes_impl(buf_ptr_cur, cc as u32, start_ptr)
+    _memrchr_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_rchr_32(buf: &[u8], c: u8) -> Option<usize> {
+fn _start_rchr_32(buf: &[u8], c_1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let cc: u32 = _c4_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B4Sgl::new(c_1);
     //
     if buf_len >= 4 {
         // to a aligned pointer
@@ -415,13 +418,13 @@ fn _start_rchr_32(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     // the remaining data is the max: 3 bytes.
-    _memrchr_remaining_3_bytes_impl(buf_ptr_cur, cc as u16, start_ptr)
+    _memrchr_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _memrchr_remaining_15_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: u64,
+    cc: B8Sgl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -437,13 +440,13 @@ pub(crate) fn _memrchr_remaining_15_bytes_impl(
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memrchr_remaining_7_bytes_impl(buf_ptr_cur, cc as u32, start_ptr)
+    _memrchr_remaining_7_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _memrchr_remaining_7_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: u32,
+    cc: B4Sgl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -459,13 +462,13 @@ pub(crate) fn _memrchr_remaining_7_bytes_impl(
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memrchr_remaining_3_bytes_impl(buf_ptr_cur, cc as u16, start_ptr)
+    _memrchr_remaining_3_bytes_impl(buf_ptr_cur, cc.into(), start_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _memrchr_remaining_3_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: u16,
+    cc: B2Sgl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -486,7 +489,7 @@ pub(crate) fn _memrchr_remaining_3_bytes_impl(
             let mut buf_ptr = buf_ptr_cur;
             while unsafe { buf_ptr.offset_from(start_ptr) } >= loop_size as isize {
                 buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                let r = _rchr_c1_aa_x1(buf_ptr, cc as u8, start_ptr);
+                let r = _rchr_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -497,8 +500,8 @@ pub(crate) fn _memrchr_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
-pub(crate) fn _rchr_c16_aa_x1(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) } ^ c16;
+pub(crate) fn _rchr_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) } ^ c16.a;
     let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -509,7 +512,7 @@ pub(crate) fn _rchr_c16_aa_x1(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) 
 }
 
 #[inline(always)]
-fn _rchr_c16_aa_x2(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c16_aa_x2(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -522,7 +525,7 @@ fn _rchr_c16_aa_x2(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<u
 }
 
 #[inline(always)]
-fn _rchr_c16_aa_x4(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c16_aa_x4(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -535,7 +538,7 @@ fn _rchr_c16_aa_x4(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<u
 }
 
 #[inline(always)]
-fn _rchr_c16_aa_x8(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c16_aa_x8(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -548,8 +551,8 @@ fn _rchr_c16_aa_x8(buf_ptr: *const u8, c16: u128, st_ptr: *const u8) -> Option<u
 }
 
 #[inline(always)]
-fn _rchr_c8_aa_x1(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) } ^ c8;
+fn _rchr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) } ^ c8.a;
     let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -560,7 +563,7 @@ fn _rchr_c8_aa_x1(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c8_aa_x2(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c8_aa_x2(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -573,7 +576,7 @@ fn _rchr_c8_aa_x2(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c8_aa_x4(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c8_aa_x4(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -586,7 +589,7 @@ fn _rchr_c8_aa_x4(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c8_aa_x8(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c8_aa_x8(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -599,8 +602,8 @@ fn _rchr_c8_aa_x8(buf_ptr: *const u8, c8: u64, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c4_aa_x1(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) } ^ c4;
+fn _rchr_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) } ^ c4.a;
     let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -611,7 +614,7 @@ fn _rchr_c4_aa_x1(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c4_aa_x2(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c4_aa_x2(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -624,7 +627,7 @@ fn _rchr_c4_aa_x2(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c4_aa_x4(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c4_aa_x4(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -637,7 +640,7 @@ fn _rchr_c4_aa_x4(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c4_aa_x8(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c4_aa_x8(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -650,8 +653,8 @@ fn _rchr_c4_aa_x8(buf_ptr: *const u8, c4: u32, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c2_aa_x1(buf_ptr: *const u8, c2: u16, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) } ^ c2;
+fn _rchr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) } ^ c2.a;
     let bits_0 = PackedU16::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -662,10 +665,10 @@ fn _rchr_c2_aa_x1(buf_ptr: *const u8, c2: u16, st_ptr: *const u8) -> Option<usiz
 }
 
 #[inline(always)]
-fn _rchr_c1_aa_x1(buf_ptr: *const u8, c1: u8, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
-    if aac == c1 {
+    if aac == c1.a {
         Some(plus_offset_from(buf_ptr, st_ptr))
     } else {
         None

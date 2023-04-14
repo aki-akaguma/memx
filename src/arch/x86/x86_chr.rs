@@ -1,4 +1,4 @@
-use super::{MMB16Sgl, MMC32Sgl};
+use super::{MMB16Sgl, MMB32Sgl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -191,7 +191,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 32 {
-        let cc = MMC32Sgl::new(c1);
+        let cc = MMB32Sgl::new(c1);
         // to a aligned pointer
         {
             let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
@@ -421,7 +421,7 @@ unsafe fn _chr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
@@ -434,7 +434,7 @@ unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
@@ -447,7 +447,7 @@ unsafe fn _chr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
@@ -465,7 +465,7 @@ unsafe fn _chr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _chr_c32_aa_x2(buf_ptr, mm_c32, st_ptr);
     if r.is_some() {
         return r;
@@ -478,7 +478,7 @@ unsafe fn _chr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c32_aa_x8(buf_ptr: *const u8, mm_c32: MMC32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c32_aa_x8(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _chr_c32_aa_x4(buf_ptr, mm_c32, st_ptr);
     if r.is_some() {
         return r;
