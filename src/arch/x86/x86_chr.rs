@@ -1,4 +1,4 @@
-use super::{MMC16Sgl, MMC32Sgl};
+use super::{MMB16Sgl, MMC32Sgl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -85,7 +85,7 @@ fn _memchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
-        let cc = MMC16Sgl::new(c1);
+        let cc = MMB16Sgl::new(c1);
         // to a aligned pointer
         {
             let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
@@ -106,7 +106,7 @@ fn _memchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = C1Sgl::new(c1);
+                    let c = B1Sgl::new(c1);
                     let r = basic::_chr_to_aligned_u128(buf_ptr, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
@@ -177,7 +177,7 @@ fn _memchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = C8Sgl::new(c1);
+    let cc = B8Sgl::new(c1);
     basic::_memchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
@@ -212,7 +212,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = C1Sgl::new(c1);
+                    let c = B1Sgl::new(c1);
                     let r = basic::_chr_to_aligned_u256(buf_ptr, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
@@ -283,7 +283,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             }
         }
         {
-            let cc = MMC16Sgl::new(c1);
+            let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
@@ -299,7 +299,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc = MMC16Sgl::new(c1);
+            let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
@@ -326,7 +326,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
-                        let c = C1Sgl::new(c1);
+                        let c = B1Sgl::new(c1);
                         let r = basic::_chr_to_aligned_u128(buf_ptr, c, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
@@ -346,12 +346,12 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = C8Sgl::new(c1);
+    let cc = B8Sgl::new(c1);
     basic::_memchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
@@ -364,7 +364,7 @@ unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
@@ -377,7 +377,7 @@ unsafe fn _chr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
@@ -395,7 +395,7 @@ unsafe fn _chr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _chr_c16_aa_x2(buf_ptr, mm_c16, st_ptr);
     if r.is_some() {
         return r;
@@ -408,7 +408,7 @@ unsafe fn _chr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _chr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMC16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _chr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _chr_c16_aa_x4(buf_ptr, mm_c16, st_ptr);
     if r.is_some() {
         return r;

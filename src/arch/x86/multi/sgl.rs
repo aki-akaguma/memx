@@ -2,10 +2,10 @@ use super::super::{__m128i, __m256i};
 use super::super::{_c16_eq, _c16_from_c32, _c16_value, _c32_eq, _c32_value};
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC16Sgl {
+pub(crate) struct MMB16Sgl {
     pub a: __m128i,
 }
-impl MMC16Sgl {
+impl MMB16Sgl {
     #[inline(always)]
     pub fn new(c1: u8) -> Self {
         Self {
@@ -13,7 +13,7 @@ impl MMC16Sgl {
         }
     }
 }
-impl PartialEq for MMC16Sgl {
+impl PartialEq for MMB16Sgl {
     fn eq(&self, other: &Self) -> bool {
         unsafe { _c16_eq(self.a, other.a) }
     }
@@ -37,7 +37,7 @@ impl PartialEq for MMC32Sgl {
     }
 }
 
-impl From<MMC32Sgl> for MMC16Sgl {
+impl From<MMC32Sgl> for MMB16Sgl {
     fn from(cc: MMC32Sgl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
@@ -68,14 +68,14 @@ mod mini {
     }
     #[test]
     fn t_c16() {
-        let a = MMC16Sgl::new(b'A');
+        let a = MMB16Sgl::new(b'A');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC16Sgl { a: __m128i(4702111234474983745, 4702111234474983745) }"
+            "MMB16Sgl { a: __m128i(4702111234474983745, 4702111234474983745) }"
         );
     }
     #[test]
@@ -84,8 +84,8 @@ mod mini {
             return;
         }
         let a_c32 = MMC32Sgl::new(b'A');
-        let a_c16: MMC16Sgl = a_c32.into();
+        let a_c16: MMB16Sgl = a_c32.into();
         assert_eq!(a_c32, MMC32Sgl::new(b'A'));
-        assert_eq!(a_c16, MMC16Sgl::new(b'A'));
+        assert_eq!(a_c16, MMB16Sgl::new(b'A'));
     }
 }

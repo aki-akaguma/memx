@@ -194,7 +194,7 @@ unsafe fn _c32_eq(mm_a: __m256i, mm_b: __m256i) -> bool {
 }
 
 mod multi;
-pub(crate) use multi::dbl::{MMC16Dbl, MMC32Dbl};
-pub(crate) use multi::sgl::{MMC16Sgl, MMC32Sgl};
-//pub(crate) use multi::tpl::{MMC16Tpl, MMC32Tpl};
-//pub(crate) use multi::qpl::{MMC16Qpl, MMC32Qpl};
+pub(crate) use multi::dbl::{MMB16Dbl, MMC32Dbl};
+pub(crate) use multi::sgl::{MMB16Sgl, MMC32Sgl};
+//pub(crate) use multi::tpl::{MMB16Tpl, MMC32Tpl};
+//pub(crate) use multi::qpl::{MMB16Qpl, MMC32Qpl};
