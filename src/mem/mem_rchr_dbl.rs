@@ -78,7 +78,7 @@ macro_rules! _unroll_one_rchr_to_aligned_x16 {
 
 pub(crate) fn _rchr_dbl_to_aligned_u256(
     buf_ptr_cur: *const u8,
-    c: C1Dbl,
+    c: B1Dbl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -94,7 +94,7 @@ pub(crate) fn _rchr_dbl_to_aligned_u256(
 
 pub(crate) fn _rchr_dbl_to_aligned_u128(
     buf_ptr_cur: *const u8,
-    c: C1Dbl,
+    c: B1Dbl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -109,7 +109,7 @@ pub(crate) fn _rchr_dbl_to_aligned_u128(
 
 fn _rchr_dbl_to_aligned_u64(
     buf_ptr_cur: *const u8,
-    c: C1Dbl,
+    c: B1Dbl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -124,7 +124,7 @@ fn _rchr_dbl_to_aligned_u64(
 
 fn _rchr_dbl_to_aligned_u32(
     buf_ptr_cur: *const u8,
-    c: C1Dbl,
+    c: B1Dbl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
     let buf_ptr_end = buf_ptr_cur;
@@ -143,8 +143,8 @@ fn _start_rchr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let c = C1Dbl::new(c_1, c_2);
-    let cc = C16Dbl::new(c_1, c_2);
+    let c = B1Dbl::new(c_1, c_2);
+    let cc = B16Dbl::new(c_1, c_2);
     //
     if buf_len >= 16 {
         // to a aligned pointer
@@ -237,8 +237,8 @@ fn _start_rchr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let c = C1Dbl::new(c_1, c_2);
-    let cc = C8Dbl::new(c_1, c_2);
+    let c = B1Dbl::new(c_1, c_2);
+    let cc = B8Dbl::new(c_1, c_2);
     //
     if buf_len >= 8 {
         // to a aligned pointer
@@ -331,8 +331,8 @@ fn _start_rchr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
-    let c = C1Dbl::new(c_1, c_2);
-    let cc = C4Dbl::new(c_1, c_2);
+    let c = B1Dbl::new(c_1, c_2);
+    let cc = B4Dbl::new(c_1, c_2);
     //
     if buf_len >= 4 {
         // to a aligned pointer
@@ -420,7 +420,7 @@ fn _start_rchr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
 #[inline(always)]
 pub(crate) fn _memrchr_dbl_remaining_15_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: C8Dbl,
+    cc: B8Dbl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -442,7 +442,7 @@ pub(crate) fn _memrchr_dbl_remaining_15_bytes_impl(
 #[inline(always)]
 pub(crate) fn _memrchr_dbl_remaining_7_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: C4Dbl,
+    cc: B4Dbl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -464,7 +464,7 @@ pub(crate) fn _memrchr_dbl_remaining_7_bytes_impl(
 #[inline(always)]
 pub(crate) fn _memrchr_dbl_remaining_3_bytes_impl(
     buf_ptr_cur: *const u8,
-    cc: C2Dbl,
+    cc: B2Dbl,
     start_ptr: *const u8,
 ) -> Option<usize> {
     let mut buf_ptr_cur = buf_ptr_cur;
@@ -497,7 +497,7 @@ pub(crate) fn _memrchr_dbl_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
-fn _rchr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) };
     let v_0_a = v_0 ^ c16.a;
     let v_0_b = v_0 ^ c16.b;
@@ -522,7 +522,7 @@ fn _rchr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Op
 }
 
 #[inline(always)]
-fn _rchr_dbl_c16_aa_x2(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c16_aa_x2(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -535,7 +535,7 @@ fn _rchr_dbl_c16_aa_x2(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Op
 }
 
 #[inline(always)]
-fn _rchr_dbl_c16_aa_x4(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c16_aa_x4(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -548,7 +548,7 @@ fn _rchr_dbl_c16_aa_x4(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Op
 }
 
 #[inline(always)]
-fn _rchr_dbl_c16_aa_x8(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c16_aa_x8(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16, st_ptr);
     if r.is_some() {
         return r;
@@ -561,7 +561,7 @@ fn _rchr_dbl_c16_aa_x8(buf_ptr: *const u8, c16: C16Dbl, st_ptr: *const u8) -> Op
 }
 
 #[inline(always)]
-fn _rchr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) };
     let v_0_a = v_0 ^ c8.a;
     let v_0_b = v_0 ^ c8.b;
@@ -586,7 +586,7 @@ fn _rchr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c8_aa_x2(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c8_aa_x2(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -599,7 +599,7 @@ fn _rchr_dbl_c8_aa_x2(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c8_aa_x4(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c8_aa_x4(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -612,7 +612,7 @@ fn _rchr_dbl_c8_aa_x4(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c8_aa_x8(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c8_aa_x8(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8, st_ptr);
     if r.is_some() {
         return r;
@@ -625,7 +625,7 @@ fn _rchr_dbl_c8_aa_x8(buf_ptr: *const u8, c8: C8Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) };
     let v_0_a = v_0 ^ c4.a;
     let v_0_b = v_0 ^ c4.b;
@@ -650,7 +650,7 @@ fn _rchr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c4_aa_x2(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c4_aa_x2(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -663,7 +663,7 @@ fn _rchr_dbl_c4_aa_x2(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c4_aa_x4(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c4_aa_x4(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -676,7 +676,7 @@ fn _rchr_dbl_c4_aa_x4(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c4_aa_x8(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c4_aa_x8(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_dbl_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4, st_ptr);
     if r.is_some() {
         return r;
@@ -689,7 +689,7 @@ fn _rchr_dbl_c4_aa_x8(buf_ptr: *const u8, c4: C4Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: C2Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: B2Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) };
     let v_0_a = v_0 ^ c2.a;
     let v_0_b = v_0 ^ c2.b;
@@ -714,7 +714,7 @@ fn _rchr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: C2Dbl, st_ptr: *const u8) -> Optio
 }
 
 #[inline(always)]
-fn _rchr_dbl_c1_aa_x1(buf_ptr: *const u8, c1: C1Dbl, st_ptr: *const u8) -> Option<usize> {
+fn _rchr_dbl_c1_aa_x1(buf_ptr: *const u8, c1: B1Dbl, st_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac == c1.a || aac == c1.b {

@@ -260,10 +260,10 @@ pub(crate) fn _c2_value(c: u8) -> u16 {
 }
 
 mod multi;
-pub(crate) use multi::dbl::{C16Dbl, C1Dbl, C2Dbl, C4Dbl, C8Dbl};
-pub(crate) use multi::sgl::{C16Sgl, C1Sgl, C2Sgl, C4Sgl, C8Sgl};
-//pub(crate) use multi::tpl::{C16Tpl, C8Tpl, C4Tpl, C2Tpl, C1Tpl};
-//pub(crate) use multi::qpl::{C16Qpl, C8Qpl, C4Qpl, C2Qpl, C1Qpl};
+pub(crate) use multi::dbl::{B16Dbl, B1Dbl, B2Dbl, B4Dbl, B8Dbl};
+//pub(crate) use multi::qpl::{B16Qpl, B1Qpl, B2Qpl, B4Qpl, B8Qpl};
+pub(crate) use multi::sgl::{B16Sgl, B1Sgl, B2Sgl, B4Sgl, B8Sgl};
+//pub(crate) use multi::tpl::{B16Tpl, B1Tpl, B2Tpl, B4Tpl, B8Tpl};
 
 // ascii stochastics
 #[rustfmt::skip]

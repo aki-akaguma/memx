@@ -2,12 +2,12 @@ use super::super::{__m128i, __m256i};
 use super::super::{_c16_eq, _c16_from_c32, _c16_value, _c32_eq, _c32_value};
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC16Tpl {
+pub(crate) struct MMB16Tpl {
     pub a: __m128i,
     pub b: __m128i,
     pub c: __m128i,
 }
-impl MMC16Tpl {
+impl MMB16Tpl {
     #[allow(dead_code)]
     #[inline(always)]
     pub fn new(c1: u8, c2: u8, c3: u8) -> Self {
@@ -18,7 +18,7 @@ impl MMC16Tpl {
         }
     }
 }
-impl PartialEq for MMC16Tpl {
+impl PartialEq for MMB16Tpl {
     fn eq(&self, other: &Self) -> bool {
         let a = unsafe { _c16_eq(self.a, other.a) };
         let b = unsafe { _c16_eq(self.b, other.b) };
@@ -53,7 +53,7 @@ impl PartialEq for MMC32Tpl {
     }
 }
 
-impl From<MMC32Tpl> for MMC16Tpl {
+impl From<MMC32Tpl> for MMB16Tpl {
     fn from(cc: MMC32Tpl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
@@ -86,14 +86,14 @@ mod mini {
     }
     #[test]
     fn t_c16() {
-        let a = MMC16Tpl::new(b'A', b'B', b'C');
+        let a = MMB16Tpl::new(b'A', b'B', b'C');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC16Tpl { a: __m128i(4702111234474983745, 4702111234474983745), b: __m128i(4774451407313060418, 4774451407313060418), c: __m128i(4846791580151137091, 4846791580151137091) }"
+            "MMB16Tpl { a: __m128i(4702111234474983745, 4702111234474983745), b: __m128i(4774451407313060418, 4774451407313060418), c: __m128i(4846791580151137091, 4846791580151137091) }"
         );
     }
     #[test]
@@ -102,8 +102,8 @@ mod mini {
             return;
         }
         let a_c32 = MMC32Tpl::new(b'A', b'B', b'C');
-        let a_c16: MMC16Tpl = a_c32.into();
+        let a_c16: MMB16Tpl = a_c32.into();
         assert_eq!(a_c32, MMC32Tpl::new(b'A', b'B', b'C'));
-        assert_eq!(a_c16, MMC16Tpl::new(b'A', b'B', b'C'));
+        assert_eq!(a_c16, MMB16Tpl::new(b'A', b'B', b'C'));
     }
 }

@@ -1,4 +1,4 @@
-use super::{MMC16Dbl, MMC32Dbl};
+use super::{MMB16Dbl, MMC32Dbl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -83,7 +83,7 @@ fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc = MMC16Dbl::new(c1, c2);
+        let cc = MMB16Dbl::new(c1, c2);
         // to a aligned pointer
         {
             let loop_size = 16;
@@ -107,7 +107,7 @@ fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = C1Dbl::new(c1, c2);
+                    let c = B1Dbl::new(c1, c2);
                     let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -187,7 +187,7 @@ fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc = C8Dbl::new(c1, c2);
+    let cc = B8Dbl::new(c1, c2);
     basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
@@ -221,7 +221,7 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = C1Dbl::new(c1, c2);
+                    let c = B1Dbl::new(c1, c2);
                     let r = basic::_rchr_dbl_to_aligned_u256(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -300,7 +300,7 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
             }
         }
         {
-            let cc = MMC16Dbl::new(c1, c2);
+            let cc = MMB16Dbl::new(c1, c2);
             let unroll = 1;
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
@@ -318,7 +318,7 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc = MMC16Dbl::new(c1, c2);
+            let cc = MMB16Dbl::new(c1, c2);
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
             let min_ptr = unsafe { start_ptr.add(loop_size) };
@@ -346,7 +346,7 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
-                        let c = C1Dbl::new(c1, c2);
+                        let c = B1Dbl::new(c1, c2);
                         let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
@@ -368,14 +368,14 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc = C8Dbl::new(c1, c2);
+    let cc = B8Dbl::new(c1, c2);
     basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[inline(always)]
 unsafe fn _rchr_dbl_c16_uu_x1(
     buf_ptr: *const u8,
-    mm_c16: MMC16Dbl,
+    mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
@@ -404,7 +404,7 @@ unsafe fn _rchr_dbl_c16_uu_x1(
 #[inline(always)]
 unsafe fn _rchr_dbl_c16_aa_x1(
     buf_ptr: *const u8,
-    mm_c16: MMC16Dbl,
+    mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
@@ -433,7 +433,7 @@ unsafe fn _rchr_dbl_c16_aa_x1(
 #[inline(always)]
 unsafe fn _rchr_dbl_c16_aa_x2(
     buf_ptr: *const u8,
-    mm_c16: MMC16Dbl,
+    mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
@@ -480,7 +480,7 @@ unsafe fn _rchr_dbl_c16_aa_x2(
 #[inline(always)]
 unsafe fn _rchr_dbl_c16_aa_x4(
     buf_ptr: *const u8,
-    mm_c16: MMC16Dbl,
+    mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     let r = _rchr_dbl_c16_aa_x2(buf_ptr.add(16 * 2), mm_c16, st_ptr);
@@ -497,7 +497,7 @@ unsafe fn _rchr_dbl_c16_aa_x4(
 #[inline(always)]
 unsafe fn _rchr_dbl_c16_aa_x8(
     buf_ptr: *const u8,
-    mm_c16: MMC16Dbl,
+    mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     let r = _rchr_dbl_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
