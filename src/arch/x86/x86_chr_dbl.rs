@@ -363,15 +363,15 @@ unsafe fn _chr_dbl_c16_uu_x1(
     let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else {
         None
     }
@@ -391,15 +391,15 @@ unsafe fn _chr_dbl_c16_aa_x1(
     let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else {
         None
     }
@@ -427,18 +427,18 @@ unsafe fn _chr_dbl_c16_aa_x2(
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else if mask_1_a != 0 {
         if mask_1_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_1_a.trailing_zeros() as usize;
             let idx2 = mask_1_b.trailing_zeros() as usize;
             if idx1 < idx2 {
@@ -447,10 +447,10 @@ unsafe fn _chr_dbl_c16_aa_x2(
                 Some(base + idx2 + 16)
             }
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_1_a.trailing_zeros() as usize + 16)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_1_a.trailing_zeros() as usize + 16)
         }
     } else if mask_1_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_1_b.trailing_zeros() as usize + 16)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1_b.trailing_zeros() as usize + 16)
     } else {
         None
     }
@@ -504,15 +504,15 @@ unsafe fn _chr_dbl_c32_uu_x1(
     let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else {
         None
     }
@@ -532,15 +532,15 @@ unsafe fn _chr_dbl_c32_aa_x1(
     let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else {
         None
     }
@@ -568,26 +568,26 @@ unsafe fn _chr_dbl_c32_aa_x2(
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_0_a.trailing_zeros() as usize;
             let idx2 = mask_0_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2))
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_a.trailing_zeros() as usize)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_a.trailing_zeros() as usize)
         }
     } else if mask_0_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0_b.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0_b.trailing_zeros() as usize)
     } else if mask_1_a != 0 {
         if mask_1_b != 0 {
-            let base = plus_offset_from(buf_ptr, st_ptr);
+            let base = buf_ptr.usz_offset_from(st_ptr);
             let idx1 = mask_1_a.trailing_zeros() as usize;
             let idx2 = mask_1_b.trailing_zeros() as usize;
             Some(base + idx1.min(idx2) + 32)
         } else {
-            Some(plus_offset_from(buf_ptr, st_ptr) + mask_1_a.trailing_zeros() as usize + 32)
+            Some(buf_ptr.usz_offset_from(st_ptr) + mask_1_a.trailing_zeros() as usize + 32)
         }
     } else if mask_1_b != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_1_b.trailing_zeros() as usize + 32)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1_b.trailing_zeros() as usize + 32)
     } else {
         None
     }

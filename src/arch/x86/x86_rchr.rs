@@ -382,7 +382,7 @@ unsafe fn _rchr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
@@ -395,7 +395,7 @@ unsafe fn _rchr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
@@ -412,11 +412,11 @@ unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mask_1 = _mm_movemask_epi8(mm_1_eq);
     if mask_1 != 0 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
                 + 16,
         )
     } else if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
@@ -439,21 +439,21 @@ unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mask_3 = _mm_movemask_epi8(mm_3_eq);
     if mask_3 != 0 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_3 as u16).leading_zeros() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_3 as u16).leading_zeros() as usize
                 + 16 * 3,
         )
     } else if mask_2 != 0 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_2 as u16).leading_zeros() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_2 as u16).leading_zeros() as usize
                 + 16 * 2,
         )
     } else if mask_1 != 0 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
                 + 16,
         )
     } else if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
@@ -479,7 +479,7 @@ unsafe fn _rchr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }
@@ -492,7 +492,7 @@ unsafe fn _rchr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }
@@ -509,11 +509,11 @@ unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u
     let mask_1 = _mm256_movemask_epi8(mm_1_eq);
     if mask_1 != 0 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_1 as u32).leading_zeros() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_1 as u32).leading_zeros() as usize
                 + 32,
         )
     } else if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }

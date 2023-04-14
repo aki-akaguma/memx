@@ -448,7 +448,7 @@ fn _nechr_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Optio
     //
     if !bits_0.is_highs() {
         let bits_0 = bits_0.propagate_a_high_bit();
-        Some(plus_offset_from(buf_ptr, st_ptr) + (bits_0.trailing_ones() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_ones() / 8) as usize)
     } else {
         None
     }
@@ -500,7 +500,7 @@ fn _nechr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<u
     //
     if !bits_0.is_highs() {
         let bits_0 = bits_0.propagate_a_high_bit();
-        Some(plus_offset_from(buf_ptr, st_ptr) + (bits_0.trailing_ones() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_ones() / 8) as usize)
     } else {
         None
     }
@@ -552,7 +552,7 @@ fn _nechr_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<u
     //
     if !bits_0.is_highs() {
         let bits_0 = bits_0.propagate_a_high_bit();
-        Some(plus_offset_from(buf_ptr, st_ptr) + (bits_0.trailing_ones() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_ones() / 8) as usize)
     } else {
         None
     }
@@ -604,7 +604,7 @@ fn _nechr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<u
     //
     if !bits_0.is_highs() {
         let bits_0 = bits_0.propagate_a_high_bit();
-        Some(plus_offset_from(buf_ptr, st_ptr) + (bits_0.trailing_ones() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_ones() / 8) as usize)
     } else {
         None
     }
@@ -615,7 +615,7 @@ fn _nechr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<u
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac != c1.a {
-        Some(plus_offset_from(buf_ptr, st_ptr))
+        Some(buf_ptr.usz_offset_from(st_ptr))
     } else {
         None
     }

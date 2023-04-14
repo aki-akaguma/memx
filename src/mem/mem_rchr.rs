@@ -505,7 +505,7 @@ pub(crate) fn _rchr_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8
     let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (bits_0.trailing_zeros() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (bits_0.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -556,7 +556,7 @@ fn _rchr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<us
     let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 8 - 1 - (bits_0.trailing_zeros() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 8 - 1 - (bits_0.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -607,7 +607,7 @@ fn _rchr_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<us
     let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 4 - 1 - (bits_0.trailing_zeros() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 4 - 1 - (bits_0.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -658,7 +658,7 @@ fn _rchr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<us
     let bits_0 = PackedU16::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 2 - 1 - (bits_0.trailing_zeros() / 8) as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 2 - 1 - (bits_0.trailing_zeros() / 8) as usize)
     } else {
         None
     }
@@ -669,7 +669,7 @@ fn _rchr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<us
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac == c1.a {
-        Some(plus_offset_from(buf_ptr, st_ptr))
+        Some(buf_ptr.usz_offset_from(st_ptr))
     } else {
         None
     }

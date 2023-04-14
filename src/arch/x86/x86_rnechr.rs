@@ -403,7 +403,7 @@ unsafe fn _rnechr_c16_uu_x1(
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
     let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
     if mask != 0xFFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
     } else {
         None
     }
@@ -420,7 +420,7 @@ unsafe fn _rnechr_c16_aa_x1(
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
     let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
     if mask != 0xFFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
     } else {
         None
     }
@@ -441,11 +441,11 @@ unsafe fn _rnechr_c16_aa_x2(
     let mask_b = _mm_movemask_epi8(mm_b_eq) as u32 & 0xFFFF_u32;
     if mask_b != 0xFFFF_u32 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_b as u16).leading_ones() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_b as u16).leading_ones() as usize
                 + 16,
         )
     } else if mask_a != 0xFFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_a as u16).leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_a as u16).leading_ones() as usize)
     } else {
         None
     }
@@ -472,21 +472,21 @@ unsafe fn _rnechr_c16_aa_x4(
     let mask_d = _mm_movemask_epi8(mm_d_eq) as u32 & 0xFFFF_u32;
     if mask_d != 0xFFFF_u32 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_d as u16).leading_ones() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_d as u16).leading_ones() as usize
                 + 16 * 3,
         )
     } else if mask_c != 0xFFFF_u32 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_c as u16).leading_ones() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_c as u16).leading_ones() as usize
                 + 16 * 2,
         )
     } else if mask_b != 0xFFFF_u32 {
         Some(
-            plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_b as u16).leading_ones() as usize
+            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_b as u16).leading_ones() as usize
                 + 16,
         )
     } else if mask_a != 0xFFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_a as u16).leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_a as u16).leading_ones() as usize)
     } else {
         None
     }
@@ -520,7 +520,7 @@ unsafe fn _rnechr_c32_uu_x1(
     let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32.a);
     let mask = _mm256_movemask_epi8(mm_eq) as u32;
     if mask != 0xFFFF_FFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask.leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - mask.leading_ones() as usize)
     } else {
         None
     }
@@ -537,7 +537,7 @@ unsafe fn _rnechr_c32_aa_x1(
     let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32.a);
     let mask = _mm256_movemask_epi8(mm_eq) as u32;
     if mask != 0xFFFF_FFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask.leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - mask.leading_ones() as usize)
     } else {
         None
     }
@@ -557,9 +557,9 @@ unsafe fn _rnechr_c32_aa_x2(
     let mask_a = _mm256_movemask_epi8(mm_a_eq) as u32;
     let mask_b = _mm256_movemask_epi8(mm_b_eq) as u32;
     if mask_b != 0xFFFF_FFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask_b.leading_ones() as usize + 32)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - mask_b.leading_ones() as usize + 32)
     } else if mask_a != 0xFFFF_FFFF_u32 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask_a.leading_ones() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - mask_a.leading_ones() as usize)
     } else {
         None
     }
