@@ -447,7 +447,7 @@ fn _chr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Opt
     let v_0_b = v_0 ^ c16.b;
     let bits_0_a = PackedU128::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU128::new(v_0_b).may_have_zero_quick();
-    let base = plus_offset_from(buf_ptr, st_ptr);
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
     if !bits_0_a.is_zeros() {
         if !bits_0_b.is_zeros() {
@@ -510,7 +510,7 @@ fn _chr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option
     let v_0_b = v_0 ^ c8.b;
     let bits_0_a = PackedU64::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU64::new(v_0_b).may_have_zero_quick();
-    let base = plus_offset_from(buf_ptr, st_ptr);
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
     if !bits_0_a.is_zeros() {
         if !bits_0_b.is_zeros() {
@@ -573,7 +573,7 @@ fn _chr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option
     let v_0_b = v_0 ^ c4.b;
     let bits_0_a = PackedU32::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU32::new(v_0_b).may_have_zero_quick();
-    let base = plus_offset_from(buf_ptr, st_ptr);
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
     if !bits_0_a.is_zeros() {
         if !bits_0_b.is_zeros() {
@@ -636,7 +636,7 @@ fn _chr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: B2Dbl, st_ptr: *const u8) -> Option
     let v_0_b = v_0 ^ c2.b;
     let bits_0_a = PackedU16::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU16::new(v_0_b).may_have_zero_quick();
-    let base = plus_offset_from(buf_ptr, st_ptr);
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
     if !bits_0_a.is_zeros() {
         if !bits_0_b.is_zeros() {
@@ -658,7 +658,7 @@ fn _chr_dbl_c1_aa_x1(buf_ptr: *const u8, c1: B1Dbl, st_ptr: *const u8) -> Option
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac == c1.a || aac == c1.b {
-        Some(plus_offset_from(buf_ptr, st_ptr))
+        Some(buf_ptr.usz_offset_from(st_ptr))
     } else {
         None
     }

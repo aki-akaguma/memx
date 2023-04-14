@@ -384,7 +384,7 @@ unsafe fn _rchr_dbl_c16_uu_x1(
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.b);
     let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
     let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
-    let base = plus_offset_from(buf_ptr, st_ptr) + 16 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
@@ -413,7 +413,7 @@ unsafe fn _rchr_dbl_c16_aa_x1(
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.b);
     let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
     let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
-    let base = plus_offset_from(buf_ptr, st_ptr) + 16 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
@@ -450,7 +450,7 @@ unsafe fn _rchr_dbl_c16_aa_x2(
     let mask_1_a = _mm_movemask_epi8(mm_1_eq_a);
     let mask_1_b = _mm_movemask_epi8(mm_1_eq_b);
     //
-    let base = plus_offset_from(buf_ptr, st_ptr) + 16 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
     if mask_1_a != 0 {
         if mask_1_b != 0 {
@@ -523,7 +523,7 @@ unsafe fn _rchr_dbl_c32_uu_x1(
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.b);
     let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
     let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
-    let base = plus_offset_from(buf_ptr, st_ptr) + 32 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
@@ -552,7 +552,7 @@ unsafe fn _rchr_dbl_c32_aa_x1(
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.b);
     let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
     let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
-    let base = plus_offset_from(buf_ptr, st_ptr) + 32 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
     //
     if mask_0_a != 0 {
         if mask_0_b != 0 {
@@ -589,7 +589,7 @@ unsafe fn _rchr_dbl_c32_aa_x2(
     let mask_1_a = _mm256_movemask_epi8(mm_1_eq_a);
     let mask_1_b = _mm256_movemask_epi8(mm_1_eq_b);
     //
-    let base = plus_offset_from(buf_ptr, st_ptr) + 32 - 1;
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
     //
     if mask_1_a != 0 {
         if mask_1_b != 0 {

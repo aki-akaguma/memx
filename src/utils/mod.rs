@@ -29,6 +29,7 @@ pub trait PtrOps {
     fn is_aligned_u64(&self) -> bool;
     fn is_aligned_u32(&self) -> bool;
     fn is_aligned_u16(&self) -> bool;
+    fn usz_offset_from(&self, origin: *const u8) -> usize;
 }
 impl PtrOps for *const u8 {
     #[inline(always)]
@@ -50,6 +51,11 @@ impl PtrOps for *const u8 {
     #[inline(always)]
     fn is_aligned_u16(&self) -> bool {
         ((*self as usize) & 0x01_usize) == 0
+    }
+    #[inline(always)]
+    fn usz_offset_from(&self, origin: *const u8) -> usize {
+        assert!((*self as usize) >= (origin as usize));
+        (*self as usize) - (origin as usize)
     }
 }
 
@@ -73,6 +79,11 @@ impl PtrOps for *mut u8 {
     #[inline(always)]
     fn is_aligned_u16(&self) -> bool {
         ((*self as usize) & 0x01_usize) == 0
+    }
+    #[inline(always)]
+    fn usz_offset_from(&self, origin: *const u8) -> usize {
+        assert!((*self as usize) >= (origin as usize));
+        (*self as usize) - (origin as usize)
     }
 }
 
@@ -143,11 +154,6 @@ read_big_integer_impl! {
     _read_a_big_endian_from_ptr_u32: u32,
     _read_a_big_endian_from_ptr_u64: u64,
     _read_a_big_endian_from_ptr_u128: u128,
-}
-
-#[inline(always)]
-pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
-    (ptr as usize) - (origin as usize)
 }
 
 #[inline(always)]

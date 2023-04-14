@@ -357,7 +357,7 @@ unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
     let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
     let mask = _mm_movemask_epi8(mm_eq);
     if mask != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask.trailing_zeros() as usize)
     } else {
         None
     }
@@ -370,7 +370,7 @@ unsafe fn _chr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
     } else {
         None
     }
@@ -386,9 +386,9 @@ unsafe fn _chr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
     let mask_1 = _mm_movemask_epi8(mm_1_eq) as u64;
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
     } else if mask_1 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_1.trailing_zeros() as usize + 16)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1.trailing_zeros() as usize + 16)
     } else {
         None
     }
@@ -427,7 +427,7 @@ unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
     } else {
         None
     }
@@ -440,7 +440,7 @@ unsafe fn _chr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
     } else {
         None
     }
@@ -456,9 +456,9 @@ unsafe fn _chr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8
     let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u64;
     let mask_1 = _mm256_movemask_epi8(mm_1_eq) as u64;
     if mask_0 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_0.trailing_zeros() as usize)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
     } else if mask_1 != 0 {
-        Some(plus_offset_from(buf_ptr, st_ptr) + mask_1.trailing_zeros() as usize + 32)
+        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1.trailing_zeros() as usize + 32)
     } else {
         None
     }
