@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memset_impl(buf: &mut [u8], c: u8) {
+pub fn _memset_impl(buf: &mut [u8], c1: u8) {
     if buf.is_empty() {
         return;
     }
@@ -19,11 +19,11 @@ pub fn _memset_impl(buf: &mut [u8], c: u8) {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        _start_set_128(buf, c);
+        _start_set_128(buf, c1);
         #[cfg(feature = "test_pointer_width_64")]
-        _start_set_64(buf, c);
+        _start_set_64(buf, c1);
         #[cfg(feature = "test_pointer_width_32")]
-        _start_set_32(buf, c);
+        _start_set_32(buf, c1);
     }
     #[cfg(not(all(
         any(feature = "test", tarpaulin),
@@ -35,11 +35,11 @@ pub fn _memset_impl(buf: &mut [u8], c: u8) {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        _start_set_128(buf, c);
+        _start_set_128(buf, c1);
         #[cfg(target_pointer_width = "64")]
-        _start_set_64(buf, c);
+        _start_set_64(buf, c1);
         #[cfg(target_pointer_width = "32")]
-        _start_set_32(buf, c);
+        _start_set_32(buf, c1);
     }
 }
 
@@ -74,7 +74,7 @@ macro_rules! _unroll_one_set_to_align_x4 {
     }};
 }
 
-pub(crate) fn _set_to_aligned_u256(buf_ptr: *mut u8, c: u8) -> *mut u8 {
+pub(crate) fn _set_to_aligned_u256(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
     let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
@@ -92,7 +92,7 @@ pub(crate) fn _set_to_aligned_u256(buf_ptr: *mut u8, c: u8) -> *mut u8 {
     buf_ptr_end
 }
 
-pub(crate) fn _set_to_aligned_u128(buf_ptr: *mut u8, c: u8) -> *mut u8 {
+pub(crate) fn _set_to_aligned_u128(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
     let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
@@ -105,7 +105,7 @@ pub(crate) fn _set_to_aligned_u128(buf_ptr: *mut u8, c: u8) -> *mut u8 {
     buf_ptr_end
 }
 
-fn _set_to_aligned_u64(buf_ptr: *mut u8, c: u8) -> *mut u8 {
+fn _set_to_aligned_u64(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
     let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
@@ -116,7 +116,7 @@ fn _set_to_aligned_u64(buf_ptr: *mut u8, c: u8) -> *mut u8 {
     buf_ptr_end
 }
 
-fn _set_to_aligned_u32(buf_ptr: *mut u8, c: u8) -> *mut u8 {
+fn _set_to_aligned_u32(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
     let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
@@ -163,12 +163,13 @@ macro_rules! _unroll_one_set_1 {
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_set_128(buf: &mut [u8], c: u8) {
+fn _start_set_128(buf: &mut [u8], c_1: u8) {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc: u128 = _c16_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B16Sgl::new(c_1);
     //
     if buf_len >= 16 {
         {
@@ -233,17 +234,18 @@ fn _start_set_128(buf: &mut [u8], c: u8) {
         }
     }
     // the remaining data is the max: 15 bytes.
-    _memset_remaining_15_bytes_impl(buf_ptr, cc as u64, end_ptr)
+    _memset_remaining_15_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_set_64(buf: &mut [u8], c: u8) {
+fn _start_set_64(buf: &mut [u8], c_1: u8) {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc: u64 = _c8_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B8Sgl::new(c_1);
     //
     if buf_len >= 8 {
         {
@@ -308,17 +310,18 @@ fn _start_set_64(buf: &mut [u8], c: u8) {
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memset_remaining_7_bytes_impl(buf_ptr, cc as u32, end_ptr)
+    _memset_remaining_7_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_set_32(buf: &mut [u8], c: u8) {
+fn _start_set_32(buf: &mut [u8], c_1: u8) {
     //
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc: u32 = _c4_value(c);
+    let c = B1Sgl::new(c_1);
+    let cc = B4Sgl::new(c_1);
     //
     if buf_len >= 4 {
         {
@@ -383,11 +386,11 @@ fn _start_set_32(buf: &mut [u8], c: u8) {
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memset_remaining_3_bytes_impl(buf_ptr, cc as u16, end_ptr)
+    _memset_remaining_3_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *mut u8, cc: u64, end_ptr: *const u8) {
+pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *mut u8, cc: B8Sgl, end_ptr: *const u8) {
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u64() {
         let loop_size = 8;
@@ -398,11 +401,11 @@ pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *mut u8, cc: u64, end_ptr
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memset_remaining_7_bytes_impl(buf_ptr, cc as u32, end_ptr)
+    _memset_remaining_7_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *mut u8, cc: u32, end_ptr: *const u8) {
+pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *mut u8, cc: B4Sgl, end_ptr: *const u8) {
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u32() {
         let loop_size = 4;
@@ -413,11 +416,11 @@ pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *mut u8, cc: u32, end_ptr:
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memset_remaining_3_bytes_impl(buf_ptr, cc as u16, end_ptr)
+    _memset_remaining_3_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: u16, end_ptr: *const u8) {
+pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: B2Sgl, end_ptr: *const u8) {
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u16() {
         let loop_size = 2;
@@ -431,7 +434,7 @@ pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: u16, end_ptr:
         let loop_size = 1;
         if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
             while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-                _unroll_one_set_1!(buf_ptr, cc as u8, loop_size, 0);
+                _unroll_one_set_1!(buf_ptr, cc.into(), loop_size, 0);
                 buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
@@ -439,33 +442,33 @@ pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: u16, end_ptr:
 }
 
 #[inline(always)]
-fn _set_c16(buf_ptr: *mut u8, c16: u128) {
+fn _set_c16(buf_ptr: *mut u8, c16: B16Sgl) {
     let aa_ptr = buf_ptr as *mut u128;
-    unsafe { aa_ptr.write(c16) };
+    unsafe { aa_ptr.write(c16.a) };
 }
 
 #[inline(always)]
-fn _set_c8(buf_ptr: *mut u8, c8: u64) {
+fn _set_c8(buf_ptr: *mut u8, c8: B8Sgl) {
     let aa_ptr = buf_ptr as *mut u64;
-    unsafe { aa_ptr.write(c8) };
+    unsafe { aa_ptr.write(c8.a) };
 }
 
 #[inline(always)]
-fn _set_c4(buf_ptr: *mut u8, c4: u32) {
+fn _set_c4(buf_ptr: *mut u8, c4: B4Sgl) {
     let aa_ptr = buf_ptr as *mut u32;
-    unsafe { aa_ptr.write(c4) };
+    unsafe { aa_ptr.write(c4.a) };
 }
 
 #[inline(always)]
-fn _set_c2(buf_ptr: *mut u8, c2: u16) {
+fn _set_c2(buf_ptr: *mut u8, c2: B2Sgl) {
     let aa_ptr = buf_ptr as *mut u16;
-    unsafe { aa_ptr.write(c2) };
+    unsafe { aa_ptr.write(c2.a) };
 }
 
 #[inline(always)]
-fn _set_c1(buf_ptr: *mut u8, c1: u8) {
+fn _set_c1(buf_ptr: *mut u8, c1: B1Sgl) {
     let aa_ptr = buf_ptr as *mut u8;
-    unsafe { aa_ptr.write(c1) };
+    unsafe { aa_ptr.write(c1.a) };
 }
 
 /*

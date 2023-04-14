@@ -1,3 +1,4 @@
+use super::{MMB16Sgl, MMB32Sgl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -11,14 +12,12 @@ use mmx::_mm_cmpeq_epi8;
 use mmx::_mm_load_si128;
 use mmx::_mm_loadu_si128;
 use mmx::_mm_movemask_epi8;
-use mmx::_mm_set1_epi8;
 
 use mmx::__m256i;
 use mmx::_mm256_cmpeq_epi8;
 use mmx::_mm256_load_si256;
 use mmx::_mm256_loadu_si256;
 use mmx::_mm256_movemask_epi8;
-use mmx::_mm256_set1_epi8;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
@@ -78,13 +77,13 @@ pub unsafe fn _memrnechr_avx2(buf: &[u8], c: u8) -> Option<usize> {
 }
 
 #[inline(always)]
-fn _memrnechr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memrnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc: __m128i = unsafe { _c16_value(c) };
+        let cc = MMB16Sgl::new(c1);
         // to a aligned pointer
         {
             let loop_size = 16;
@@ -108,6 +107,7 @@ fn _memrnechr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
+                    let c = B1Sgl::new(c1);
                     let r = basic::_rnechr_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -195,18 +195,18 @@ fn _memrnechr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc: u64 = _c8_value(c);
+    let cc = B8Sgl::new(c1);
     basic::_memrnechr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[inline(always)]
-fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memrnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let cc: __m256i = unsafe { _c32_value(c) };
+        let cc = MMB32Sgl::new(c1);
         // to a aligned pointer
         {
             let loop_size = 32;
@@ -230,6 +230,7 @@ fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
+                    let c = B1Sgl::new(c1);
                     let r = basic::_rnechr_to_aligned_u256(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -316,7 +317,7 @@ fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             }
         }
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
@@ -337,7 +338,7 @@ fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     } else if buf_len >= 16 {
         start_ptr.prefetch_read_data();
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
             let min_ptr = unsafe { start_ptr.add(loop_size) };
@@ -365,6 +366,7 @@ fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
+                        let c = B1Sgl::new(c1);
                         let r = basic::_rnechr_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
@@ -386,24 +388,19 @@ fn _memrnechr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc: u64 = _c8_value(c);
+    let cc = B8Sgl::new(c1);
     basic::_memrnechr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
-}
-
-#[inline(always)]
-unsafe fn _c16_value(c: u8) -> __m128i {
-    _mm_set1_epi8(c as i8)
 }
 
 #[inline(always)]
 unsafe fn _rnechr_c16_uu_x1(
     buf_ptr: *const u8,
-    mm_c16: __m128i,
+    mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
+    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
     let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
     if mask != 0xFFFF_u32 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
@@ -415,12 +412,12 @@ unsafe fn _rnechr_c16_uu_x1(
 #[inline(always)]
 unsafe fn _rnechr_c16_aa_x1(
     buf_ptr: *const u8,
-    mm_c16: __m128i,
+    mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
+    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
     let mask = _mm_movemask_epi8(mm_eq) as u32 & 0xFFFF_u32;
     if mask != 0xFFFF_u32 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask as u16).leading_ones() as usize)
@@ -432,14 +429,14 @@ unsafe fn _rnechr_c16_aa_x1(
 #[inline(always)]
 unsafe fn _rnechr_c16_aa_x2(
     buf_ptr: *const u8,
-    mm_c16: __m128i,
+    mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
-    let mm_a_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mm_b_eq = _mm_cmpeq_epi8(mm_b, mm_c16);
+    let mm_a_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
+    let mm_b_eq = _mm_cmpeq_epi8(mm_b, mm_c16.a);
     let mask_a = _mm_movemask_epi8(mm_a_eq) as u32 & 0xFFFF_u32;
     let mask_b = _mm_movemask_epi8(mm_b_eq) as u32 & 0xFFFF_u32;
     if mask_b != 0xFFFF_u32 {
@@ -457,7 +454,7 @@ unsafe fn _rnechr_c16_aa_x2(
 #[inline(always)]
 unsafe fn _rnechr_c16_aa_x4(
     buf_ptr: *const u8,
-    mm_c16: __m128i,
+    mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
@@ -465,10 +462,10 @@ unsafe fn _rnechr_c16_aa_x4(
     let mm_b = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
     let mm_c = _mm_load_si128(buf_ptr.add(16 * 2) as *const __m128i);
     let mm_d = _mm_load_si128(buf_ptr.add(16 * 3) as *const __m128i);
-    let mm_a_eq = _mm_cmpeq_epi8(mm_a, mm_c16);
-    let mm_b_eq = _mm_cmpeq_epi8(mm_b, mm_c16);
-    let mm_c_eq = _mm_cmpeq_epi8(mm_c, mm_c16);
-    let mm_d_eq = _mm_cmpeq_epi8(mm_d, mm_c16);
+    let mm_a_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
+    let mm_b_eq = _mm_cmpeq_epi8(mm_b, mm_c16.a);
+    let mm_c_eq = _mm_cmpeq_epi8(mm_c, mm_c16.a);
+    let mm_d_eq = _mm_cmpeq_epi8(mm_d, mm_c16.a);
     let mask_a = _mm_movemask_epi8(mm_a_eq) as u32 & 0xFFFF_u32;
     let mask_b = _mm_movemask_epi8(mm_b_eq) as u32 & 0xFFFF_u32;
     let mask_c = _mm_movemask_epi8(mm_c_eq) as u32 & 0xFFFF_u32;
@@ -498,7 +495,7 @@ unsafe fn _rnechr_c16_aa_x4(
 #[inline(always)]
 unsafe fn _rnechr_c16_aa_x8(
     buf_ptr: *const u8,
-    mm_c16: __m128i,
+    mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     let r = _rnechr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
@@ -513,19 +510,14 @@ unsafe fn _rnechr_c16_aa_x8(
 }
 
 #[inline(always)]
-unsafe fn _c32_value(c: u8) -> __m256i {
-    _mm256_set1_epi8(c as i8)
-}
-
-#[inline(always)]
 unsafe fn _rnechr_c32_uu_x1(
     buf_ptr: *const u8,
-    mm_c32: __m256i,
+    mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
+    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32.a);
     let mask = _mm256_movemask_epi8(mm_eq) as u32;
     if mask != 0xFFFF_FFFF_u32 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask.leading_ones() as usize)
@@ -537,12 +529,12 @@ unsafe fn _rnechr_c32_uu_x1(
 #[inline(always)]
 unsafe fn _rnechr_c32_aa_x1(
     buf_ptr: *const u8,
-    mm_c32: __m256i,
+    mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
+    let mm_eq = _mm256_cmpeq_epi8(mm_a, mm_c32.a);
     let mask = _mm256_movemask_epi8(mm_eq) as u32;
     if mask != 0xFFFF_FFFF_u32 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - mask.leading_ones() as usize)
@@ -554,14 +546,14 @@ unsafe fn _rnechr_c32_aa_x1(
 #[inline(always)]
 unsafe fn _rnechr_c32_aa_x2(
     buf_ptr: *const u8,
-    mm_c32: __m256i,
+    mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     //
     let mm_a = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_b = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
-    let mm_a_eq = _mm256_cmpeq_epi8(mm_a, mm_c32);
-    let mm_b_eq = _mm256_cmpeq_epi8(mm_b, mm_c32);
+    let mm_a_eq = _mm256_cmpeq_epi8(mm_a, mm_c32.a);
+    let mm_b_eq = _mm256_cmpeq_epi8(mm_b, mm_c32.a);
     let mask_a = _mm256_movemask_epi8(mm_a_eq) as u32;
     let mask_b = _mm256_movemask_epi8(mm_b_eq) as u32;
     if mask_b != 0xFFFF_FFFF_u32 {
@@ -576,7 +568,7 @@ unsafe fn _rnechr_c32_aa_x2(
 #[inline(always)]
 unsafe fn _rnechr_c32_aa_x4(
     buf_ptr: *const u8,
-    mm_c32: __m256i,
+    mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     let r = _rnechr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr);
@@ -593,7 +585,7 @@ unsafe fn _rnechr_c32_aa_x4(
 #[inline(always)]
 unsafe fn _rnechr_c32_aa_x8(
     buf_ptr: *const u8,
-    mm_c32: __m256i,
+    mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
     let r = _rnechr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);

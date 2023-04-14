@@ -20,10 +20,10 @@ impl PartialEq for MMB16Sgl {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct MMC32Sgl {
+pub(crate) struct MMB32Sgl {
     pub a: __m256i,
 }
-impl MMC32Sgl {
+impl MMB32Sgl {
     #[inline(always)]
     pub fn new(c1: u8) -> Self {
         Self {
@@ -31,14 +31,14 @@ impl MMC32Sgl {
         }
     }
 }
-impl PartialEq for MMC32Sgl {
+impl PartialEq for MMB32Sgl {
     fn eq(&self, other: &Self) -> bool {
         unsafe { _c32_eq(self.a, other.a) }
     }
 }
 
-impl From<MMC32Sgl> for MMB16Sgl {
-    fn from(cc: MMC32Sgl) -> Self {
+impl From<MMB32Sgl> for MMB16Sgl {
+    fn from(cc: MMB32Sgl) -> Self {
         Self {
             a: unsafe { _c16_from_c32(cc.a) },
         }
@@ -56,14 +56,14 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a = MMC32Sgl::new(b'A');
+        let a = MMB32Sgl::new(b'A');
         let b = a.clone();
         let c = a;
         assert_eq!(a, b);
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMC32Sgl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745) }"
+            "MMB32Sgl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745) }"
         );
     }
     #[test]
@@ -83,9 +83,9 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a_c32 = MMC32Sgl::new(b'A');
+        let a_c32 = MMB32Sgl::new(b'A');
         let a_c16: MMB16Sgl = a_c32.into();
-        assert_eq!(a_c32, MMC32Sgl::new(b'A'));
+        assert_eq!(a_c32, MMB32Sgl::new(b'A'));
         assert_eq!(a_c16, MMB16Sgl::new(b'A'));
     }
 }

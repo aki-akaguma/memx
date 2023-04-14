@@ -151,7 +151,7 @@ pub(crate) fn plus_offset_from(ptr: *const u8, origin: *const u8) -> usize {
 }
 
 #[inline(always)]
-pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
+fn propagate_a_high_bit<T>(bits: T) -> T
 where
     T: core::ops::Div<Output = T> + core::ops::Mul<Output = T> + From<u8>,
 {
@@ -240,22 +240,22 @@ packed_integers! {
 */
 
 #[inline(always)]
-pub(crate) fn _c16_value(c: u8) -> u128 {
+fn _c16_value(c: u8) -> u128 {
     (c as u128) * PackedU128::ONES
 }
 
 #[inline(always)]
-pub(crate) fn _c8_value(c: u8) -> u64 {
+fn _c8_value(c: u8) -> u64 {
     (c as u64) * PackedU64::ONES
 }
 
 #[inline(always)]
-pub(crate) fn _c4_value(c: u8) -> u32 {
+fn _c4_value(c: u8) -> u32 {
     (c as u32) * PackedU32::ONES
 }
 
 #[inline(always)]
-pub(crate) fn _c2_value(c: u8) -> u16 {
+fn _c2_value(c: u8) -> u16 {
     (c as u16) * PackedU16::ONES
 }
 

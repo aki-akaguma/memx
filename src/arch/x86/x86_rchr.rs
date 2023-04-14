@@ -1,4 +1,4 @@
-use super::{_c16_value, _c32_value};
+use super::{MMB16Sgl, MMB32Sgl};
 use crate::mem as basic;
 use crate::utils::*;
 
@@ -77,13 +77,13 @@ pub unsafe fn _memrchr_avx2(buf: &[u8], c: u8) -> Option<usize> {
 }
 
 #[inline(always)]
-fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memrchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc: __m128i = unsafe { _c16_value(c) };
+        let cc = MMB16Sgl::new(c1);
         // to a aligned pointer
         {
             let loop_size = 16;
@@ -107,6 +107,7 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
+                    let c = B1Sgl::new(c1);
                     let r = basic::_rchr_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -186,19 +187,19 @@ fn _memrchr_sse2_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc: u64 = _c8_value(c);
+    let cc = B8Sgl::new(c1);
     basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[allow(clippy::missing_safety_doc)]
 #[inline(always)]
-fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
+fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let cc: __m256i = unsafe { _c32_value(c) };
+        let cc = MMB32Sgl::new(c1);
         // to a aligned pointer
         {
             let loop_size = 32;
@@ -222,6 +223,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
+                    let c = B1Sgl::new(c1);
                     let r = basic::_rchr_to_aligned_u256(buf_ptr_cur, c, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr_cur = p;
@@ -300,7 +302,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
             }
         }
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
@@ -319,7 +321,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     } else if buf_len >= 16 {
         start_ptr.prefetch_read_data();
         {
-            let cc: __m128i = unsafe { _c16_value(c) };
+            let cc = MMB16Sgl::new(c1);
             let loop_size = 16;
             let mut buf_ptr = buf_ptr_cur;
             let min_ptr = unsafe { start_ptr.add(loop_size) };
@@ -347,6 +349,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
+                        let c = B1Sgl::new(c1);
                         let r = basic::_rchr_to_aligned_u128(buf_ptr_cur, c, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
@@ -368,15 +371,15 @@ fn _memrchr_avx2_impl(buf: &[u8], c: u8) -> Option<usize> {
     }
     start_ptr.prefetch_read_data();
     //
-    let cc: u64 = _c8_value(c);
+    let cc = B8Sgl::new(c1);
     basic::_memrchr_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_uu_x1(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
@@ -386,10 +389,10 @@ unsafe fn _rchr_c16_uu_x1(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x1(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
@@ -399,12 +402,12 @@ unsafe fn _rchr_c16_aa_x1(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16);
-    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
+    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     let mask_1 = _mm_movemask_epi8(mm_1_eq);
     if mask_1 != 0 {
@@ -420,16 +423,16 @@ unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
     let mm_2 = _mm_load_si128(buf_ptr.add(16 * 2) as *const __m128i);
     let mm_3 = _mm_load_si128(buf_ptr.add(16 * 3) as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16);
-    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16);
-    let mm_2_eq = _mm_cmpeq_epi8(mm_2, mm_c16);
-    let mm_3_eq = _mm_cmpeq_epi8(mm_3, mm_c16);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
+    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.a);
+    let mm_2_eq = _mm_cmpeq_epi8(mm_2, mm_c16.a);
+    let mm_3_eq = _mm_cmpeq_epi8(mm_3, mm_c16.a);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     let mask_1 = _mm_movemask_epi8(mm_1_eq);
     let mask_2 = _mm_movemask_epi8(mm_2_eq);
@@ -457,7 +460,7 @@ unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
     if r.is_some() {
         return r;
@@ -470,10 +473,10 @@ unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: __m128i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_uu_x1(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
@@ -483,10 +486,10 @@ unsafe fn _rchr_c32_uu_x1(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x1(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(plus_offset_from(buf_ptr, st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
@@ -496,12 +499,12 @@ unsafe fn _rchr_c32_aa_x1(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32);
-    let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
+    let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.a);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     let mask_1 = _mm256_movemask_epi8(mm_1_eq);
     if mask_1 != 0 {
@@ -517,7 +520,7 @@ unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr);
     if r.is_some() {
         return r;
@@ -530,7 +533,7 @@ unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x8(buf_ptr: *const u8, mm_c32: __m256i, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x8(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     let r = _rchr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);
     if r.is_some() {
         return r;
