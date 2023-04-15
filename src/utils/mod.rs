@@ -245,26 +245,6 @@ packed_integers! {
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */
 
-#[inline(always)]
-fn _c16_value(c: u8) -> u128 {
-    (c as u128) * PackedU128::ONES
-}
-
-#[inline(always)]
-fn _c8_value(c: u8) -> u64 {
-    (c as u64) * PackedU64::ONES
-}
-
-#[inline(always)]
-fn _c4_value(c: u8) -> u32 {
-    (c as u32) * PackedU32::ONES
-}
-
-#[inline(always)]
-fn _c2_value(c: u8) -> u16 {
-    (c as u16) * PackedU16::ONES
-}
-
 mod multi;
 pub(crate) use multi::dbl::{B16Dbl, B1Dbl, B2Dbl, B4Dbl, B8Dbl};
 //pub(crate) use multi::qpl::{B16Qpl, B1Qpl, B2Qpl, B4Qpl, B8Qpl};

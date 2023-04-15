@@ -1,46 +1,46 @@
-use super::super::{__m128i, __m256i};
-use super::super::{_c16_eq, _c16_from_c32, _c16_value, _c32_eq, _c32_value};
+use super::{__m128i, __m256i};
+use super::{_b16_eq, _b16_from_b32, _b16_value, _b32_eq, _b32_value};
 
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB16Dbl {
-    pub a: __m128i,
-    pub b: __m128i,
+    pub v1: __m128i,
+    pub v2: __m128i,
 }
 impl MMB16Dbl {
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
+    pub fn new(b1: u8, b2: u8) -> Self {
         Self {
-            a: unsafe { _c16_value(c1) },
-            b: unsafe { _c16_value(c2) },
+            v1: unsafe { _b16_value(b1) },
+            v2: unsafe { _b16_value(b2) },
         }
     }
 }
 impl PartialEq for MMB16Dbl {
     fn eq(&self, other: &Self) -> bool {
-        let a = unsafe { _c16_eq(self.a, other.a) };
-        let b = unsafe { _c16_eq(self.b, other.b) };
+        let a = unsafe { _b16_eq(self.v1, other.v1) };
+        let b = unsafe { _b16_eq(self.v2, other.v2) };
         a && b
     }
 }
 
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB32Dbl {
-    pub a: __m256i,
-    pub b: __m256i,
+    pub v1: __m256i,
+    pub v2: __m256i,
 }
 impl MMB32Dbl {
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8) -> Self {
+    pub fn new(b1: u8, b2: u8) -> Self {
         Self {
-            a: unsafe { _c32_value(c1) },
-            b: unsafe { _c32_value(c2) },
+            v1: unsafe { _b32_value(b1) },
+            v2: unsafe { _b32_value(b2) },
         }
     }
 }
 impl PartialEq for MMB32Dbl {
     fn eq(&self, other: &Self) -> bool {
-        let a = unsafe { _c32_eq(self.a, other.a) };
-        let b = unsafe { _c32_eq(self.b, other.b) };
+        let a = unsafe { _b32_eq(self.v1, other.v1) };
+        let b = unsafe { _b32_eq(self.v2, other.v2) };
         a && b
     }
 }
@@ -48,8 +48,8 @@ impl PartialEq for MMB32Dbl {
 impl From<MMB32Dbl> for MMB16Dbl {
     fn from(cc: MMB32Dbl) -> Self {
         Self {
-            a: unsafe { _c16_from_c32(cc.a) },
-            b: unsafe { _c16_from_c32(cc.b) },
+            v1: unsafe { _b16_from_b32(cc.v1) },
+            v2: unsafe { _b16_from_b32(cc.v2) },
         }
     }
 }
@@ -61,7 +61,7 @@ mod mini {
     use super::*;
     //
     #[test]
-    fn t_c32() {
+    fn t_b32() {
         if !cpuid::has_avx2() {
             return;
         }
@@ -72,11 +72,11 @@ mod mini {
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMB32Dbl { a: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), b: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418) }"
+            "MMB32Dbl { v1: __m256i(4702111234474983745, 4702111234474983745, 4702111234474983745, 4702111234474983745), v2: __m256i(4774451407313060418, 4774451407313060418, 4774451407313060418, 4774451407313060418) }"
         );
     }
     #[test]
-    fn t_c16() {
+    fn t_b16() {
         let a = MMB16Dbl::new(b'A', b'B');
         let b = a.clone();
         let c = a;
@@ -84,7 +84,7 @@ mod mini {
         assert_eq!(a, c);
         assert_eq!(
             format!("{a:?}"),
-            "MMB16Dbl { a: __m128i(4702111234474983745, 4702111234474983745), b: __m128i(4774451407313060418, 4774451407313060418) }"
+            "MMB16Dbl { v1: __m128i(4702111234474983745, 4702111234474983745), v2: __m128i(4774451407313060418, 4774451407313060418) }"
         );
     }
     #[test]
@@ -92,9 +92,9 @@ mod mini {
         if !cpuid::has_avx2() {
             return;
         }
-        let a_c32 = MMB32Dbl::new(b'A', b'B');
-        let a_c16: MMB16Dbl = a_c32.into();
-        assert_eq!(a_c32, MMB32Dbl::new(b'A', b'B'));
-        assert_eq!(a_c16, MMB16Dbl::new(b'A', b'B'));
+        let a_b32 = MMB32Dbl::new(b'A', b'B');
+        let a_b16: MMB16Dbl = a_b32.into();
+        assert_eq!(a_b32, MMB32Dbl::new(b'A', b'B'));
+        assert_eq!(a_b16, MMB16Dbl::new(b'A', b'B'));
     }
 }

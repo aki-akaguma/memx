@@ -354,7 +354,7 @@ pub fn _memchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
 unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_a = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.a);
+    let mm_eq = _mm_cmpeq_epi8(mm_a, mm_c16.v1);
     let mask = _mm_movemask_epi8(mm_eq);
     if mask != 0 {
         Some(buf_ptr.usz_offset_from(st_ptr) + mask.trailing_zeros() as usize)
@@ -367,7 +367,7 @@ unsafe fn _chr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
 unsafe fn _chr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
     if mask_0 != 0 {
         Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
@@ -381,8 +381,8 @@ unsafe fn _chr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.a);
-    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.a);
+    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
+    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
     let mask_1 = _mm_movemask_epi8(mm_1_eq) as u64;
     if mask_0 != 0 {
@@ -424,7 +424,7 @@ unsafe fn _chr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8
 unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
@@ -437,7 +437,7 @@ unsafe fn _chr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8
 unsafe fn _chr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     if mask_0 != 0 {
         Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_zeros() as usize)
@@ -451,8 +451,8 @@ unsafe fn _chr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.a);
-    let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.a);
+    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
+    let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u64;
     let mask_1 = _mm256_movemask_epi8(mm_1_eq) as u64;
     if mask_0 != 0 {

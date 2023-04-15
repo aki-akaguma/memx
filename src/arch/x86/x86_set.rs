@@ -299,42 +299,42 @@ fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
 
 #[inline(always)]
 unsafe fn _set_c16_uu(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
-    _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16.a);
+    _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c16_aa(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c16_aa_x2(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
-    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.v1);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c16_aa_x4(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
-    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.a);
-    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.a);
-    _mm_store_si128(buf_ptr.add(16 * 2) as *mut __m128i, mm_c16.a);
-    _mm_store_si128(buf_ptr.add(16 * 3) as *mut __m128i, mm_c16.a);
+    _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.v1);
+    _mm_store_si128(buf_ptr.add(16) as *mut __m128i, mm_c16.v1);
+    _mm_store_si128(buf_ptr.add(16 * 2) as *mut __m128i, mm_c16.v1);
+    _mm_store_si128(buf_ptr.add(16 * 3) as *mut __m128i, mm_c16.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c32_uu(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
-    _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32.a);
+    _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
-    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.a);
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.v1);
 }
 
 #[inline(always)]
 unsafe fn _set_c32_aa_x2(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
-    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.a);
-    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32.a);
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.v1);
+    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32.v1);
 }
 
 #[cfg(test)]
