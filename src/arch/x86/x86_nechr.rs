@@ -359,8 +359,10 @@ unsafe fn _nechr_c16_uu_x1(
     let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else {
         None
     }
@@ -376,8 +378,10 @@ unsafe fn _nechr_c16_aa_x1(
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else {
         None
     }
@@ -396,10 +400,12 @@ unsafe fn _nechr_c16_aa_x2(
     let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
     let mask_1 = _mm_movemask_epi8(mm_1_eq) as u32 & 0xFFFF_u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else if mask_1 != 0xFFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1.trailing_ones() as usize + 16)
+        Some(base + mask_1.trailing_ones() as usize + 16)
     } else {
         None
     }
@@ -449,8 +455,10 @@ unsafe fn _nechr_c32_uu_x1(
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else {
         None
     }
@@ -466,8 +474,10 @@ unsafe fn _nechr_c32_aa_x1(
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else {
         None
     }
@@ -486,10 +496,12 @@ unsafe fn _nechr_c32_aa_x2(
     let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
     let mask_1 = _mm256_movemask_epi8(mm_1_eq) as u32;
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
     if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_0.trailing_ones() as usize)
+        Some(base + mask_0.trailing_ones() as usize)
     } else if mask_1 != 0xFFFF_FFFF_u32 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + mask_1.trailing_ones() as usize + 32)
+        Some(base + mask_1.trailing_ones() as usize + 32)
     } else {
         None
     }

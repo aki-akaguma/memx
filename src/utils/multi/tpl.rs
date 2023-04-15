@@ -179,7 +179,10 @@ mod mini {
         assert_eq!(a.v1, b.v1);
         assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
-        assert_eq!(format!("{a:?}"), "B2Tpl { v1: 16705, v2: 16962, v3: 17219 }");
+        assert_eq!(
+            format!("{a:?}"),
+            "B2Tpl { v1: 16705, v2: 16962, v3: 17219 }"
+        );
     }
     #[test]
     fn t_b1() {

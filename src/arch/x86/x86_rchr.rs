@@ -376,33 +376,49 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_uu_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_uu_x1(
+    buf_ptr: *const u8,
+    mm_c16: MMB16Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
+    //
     if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(base - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x1(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x1(
+    buf_ptr: *const u8,
+    mm_c16: MMB16Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
+    //
     if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(base - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x2(
+    buf_ptr: *const u8,
+    mm_c16: MMB16Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
@@ -410,20 +426,23 @@ unsafe fn _rchr_c16_aa_x2(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.v1);
     let mask_0 = _mm_movemask_epi8(mm_0_eq);
     let mask_1 = _mm_movemask_epi8(mm_1_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
+    //
     if mask_1 != 0 {
-        Some(
-            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
-                + 16,
-        )
+        Some(base - (mask_1 as u16).leading_zeros() as usize + 16)
     } else if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(base - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x4(
+    buf_ptr: *const u8,
+    mm_c16: MMB16Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
@@ -437,30 +456,27 @@ unsafe fn _rchr_c16_aa_x4(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
     let mask_1 = _mm_movemask_epi8(mm_1_eq);
     let mask_2 = _mm_movemask_epi8(mm_2_eq);
     let mask_3 = _mm_movemask_epi8(mm_3_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
+    //
     if mask_3 != 0 {
-        Some(
-            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_3 as u16).leading_zeros() as usize
-                + 16 * 3,
-        )
+        Some(base - (mask_3 as u16).leading_zeros() as usize + 16 * 3)
     } else if mask_2 != 0 {
-        Some(
-            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_2 as u16).leading_zeros() as usize
-                + 16 * 2,
-        )
+        Some(base - (mask_2 as u16).leading_zeros() as usize + 16 * 2)
     } else if mask_1 != 0 {
-        Some(
-            buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_1 as u16).leading_zeros() as usize
-                + 16,
-        )
+        Some(base - (mask_1 as u16).leading_zeros() as usize + 16)
     } else if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 16 - 1 - (mask_0 as u16).leading_zeros() as usize)
+        Some(base - (mask_0 as u16).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c16_aa_x8(
+    buf_ptr: *const u8,
+    mm_c16: MMB16Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     let r = _rchr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
     if r.is_some() {
         return r;
@@ -473,33 +489,49 @@ unsafe fn _rchr_c16_aa_x8(buf_ptr: *const u8, mm_c16: MMB16Sgl, st_ptr: *const u
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_uu_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_uu_x1(
+    buf_ptr: *const u8,
+    mm_c32: MMB32Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
+    //
     if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(base - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x1(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x1(
+    buf_ptr: *const u8,
+    mm_c32: MMB32Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
+    //
     if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(base - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x2(
+    buf_ptr: *const u8,
+    mm_c32: MMB32Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
@@ -507,20 +539,23 @@ unsafe fn _rchr_c32_aa_x2(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u
     let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.v1);
     let mask_0 = _mm256_movemask_epi8(mm_0_eq);
     let mask_1 = _mm256_movemask_epi8(mm_1_eq);
+    let base = buf_ptr.usz_offset_from(st_ptr) + 32 - 1;
+    //
     if mask_1 != 0 {
-        Some(
-            buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_1 as u32).leading_zeros() as usize
-                + 32,
-        )
+        Some(base - (mask_1 as u32).leading_zeros() as usize + 32)
     } else if mask_0 != 0 {
-        Some(buf_ptr.usz_offset_from(st_ptr) + 32 - 1 - (mask_0 as u32).leading_zeros() as usize)
+        Some(base - (mask_0 as u32).leading_zeros() as usize)
     } else {
         None
     }
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x4(
+    buf_ptr: *const u8,
+    mm_c32: MMB32Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     let r = _rchr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr);
     if r.is_some() {
         return r;
@@ -533,7 +568,11 @@ unsafe fn _rchr_c32_aa_x4(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u
 }
 
 #[inline(always)]
-unsafe fn _rchr_c32_aa_x8(buf_ptr: *const u8, mm_c32: MMB32Sgl, st_ptr: *const u8) -> Option<usize> {
+unsafe fn _rchr_c32_aa_x8(
+    buf_ptr: *const u8,
+    mm_c32: MMB32Sgl,
+    st_ptr: *const u8,
+) -> Option<usize> {
     let r = _rchr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);
     if r.is_some() {
         return r;
