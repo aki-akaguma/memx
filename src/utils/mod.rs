@@ -22,6 +22,24 @@ impl PtrOpsPrefetch for *const u8 {
         }
     }
 }
+impl PtrOpsPrefetch for *mut u8 {
+    #[inline(always)]
+    fn prefetch_read_data(&self) {
+        // TODO: Replace with core::intrinsics::prefetch_read_data
+        // after stabilization
+        // The cache line size of x86_64 is 64 bytes.
+        #[cfg(not(miri))]
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        {
+            #[cfg(target_arch = "x86")]
+            use core::arch::x86 as mmx;
+            #[cfg(target_arch = "x86_64")]
+            use core::arch::x86_64 as mmx;
+            //
+            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
+        }
+    }
+}
 
 pub trait PtrOps {
     fn is_aligned_u256(&self) -> bool;

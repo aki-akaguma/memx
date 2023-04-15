@@ -67,7 +67,7 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
-GRCOV_TEST=--test memrchr_dbl
+GRCOV_TEST=--test memset
 GRCOV_TEST=
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
@@ -87,7 +87,7 @@ BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
 BG_PROF=
 BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
 BENCH_GRCOV=
-BENCH_GRCOV=--bench bench-memrchr_dbl
+BENCH_GRCOV=--bench bench-memset
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
@@ -110,7 +110,7 @@ endef
 #bench_nms = bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memchr_dbl
+bench_nms = bench-memset
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
