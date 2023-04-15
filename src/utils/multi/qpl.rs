@@ -1,101 +1,101 @@
-use super::super::{_c16_value, _c2_value, _c4_value, _c8_value};
+use super::{_b16_value, _b2_value, _b4_value, _b8_value};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct B16Qpl {
-    pub a: u128,
-    pub b: u128,
-    pub c: u128,
-    pub d: u128,
+    pub v1: u128,
+    pub v2: u128,
+    pub v3: u128,
+    pub v4: u128,
 }
 impl B16Qpl {
     #[allow(dead_code)]
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
+    pub fn new(b1: u8, b2: u8, b3: u8, b4: u8) -> Self {
         Self {
-            a: _c16_value(c1),
-            b: _c16_value(c2),
-            c: _c16_value(c3),
-            d: _c16_value(c4),
+            v1: _b16_value(b1),
+            v2: _b16_value(b2),
+            v3: _b16_value(b3),
+            v4: _b16_value(b4),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct B8Qpl {
-    pub a: u64,
-    pub b: u64,
-    pub c: u64,
-    pub d: u64,
+    pub v1: u64,
+    pub v2: u64,
+    pub v3: u64,
+    pub v4: u64,
 }
 impl B8Qpl {
     #[allow(dead_code)]
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
+    pub fn new(b1: u8, b2: u8, b3: u8, b4: u8) -> Self {
         Self {
-            a: _c8_value(c1),
-            b: _c8_value(c2),
-            c: _c8_value(c3),
-            d: _c8_value(c4),
+            v1: _b8_value(b1),
+            v2: _b8_value(b2),
+            v3: _b8_value(b3),
+            v4: _b8_value(b4),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct B4Qpl {
-    pub a: u32,
-    pub b: u32,
-    pub c: u32,
-    pub d: u32,
+    pub v1: u32,
+    pub v2: u32,
+    pub v3: u32,
+    pub v4: u32,
 }
 impl B4Qpl {
     #[allow(dead_code)]
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
+    pub fn new(b1: u8, b2: u8, b3: u8, b4: u8) -> Self {
         Self {
-            a: _c4_value(c1),
-            b: _c4_value(c2),
-            c: _c4_value(c3),
-            d: _c4_value(c4),
+            v1: _b4_value(b1),
+            v2: _b4_value(b2),
+            v3: _b4_value(b3),
+            v4: _b4_value(b4),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct B2Qpl {
-    pub a: u16,
-    pub b: u16,
-    pub c: u16,
-    pub d: u16,
+    pub v1: u16,
+    pub v2: u16,
+    pub v3: u16,
+    pub v4: u16,
 }
 impl B2Qpl {
     #[allow(dead_code)]
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
+    pub fn new(b1: u8, b2: u8, b3: u8, b4: u8) -> Self {
         Self {
-            a: _c2_value(c1),
-            b: _c2_value(c2),
-            c: _c2_value(c3),
-            d: _c2_value(c4),
+            v1: _b2_value(b1),
+            v2: _b2_value(b2),
+            v3: _b2_value(b3),
+            v4: _b2_value(b4),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct B1Qpl {
-    pub a: u8,
-    pub b: u8,
-    pub c: u8,
-    pub d: u8,
+    pub v1: u8,
+    pub v2: u8,
+    pub v3: u8,
+    pub v4: u8,
 }
 impl B1Qpl {
     #[allow(dead_code)]
     #[inline(always)]
-    pub fn new(c1: u8, c2: u8, c3: u8, c4: u8) -> Self {
+    pub fn new(b1: u8, b2: u8, b3: u8, b4: u8) -> Self {
         Self {
-            a: c1,
-            b: c2,
-            c: c3,
-            d: c4,
+            v1: b1,
+            v2: b2,
+            v3: b3,
+            v4: b4,
         }
     }
 }
@@ -103,10 +103,10 @@ impl B1Qpl {
 impl From<B16Qpl> for B8Qpl {
     fn from(cc: B16Qpl) -> Self {
         Self {
-            a: cc.a as u64,
-            b: cc.b as u64,
-            c: cc.c as u64,
-            d: cc.d as u64,
+            v1: cc.v1 as u64,
+            v2: cc.v2 as u64,
+            v3: cc.v3 as u64,
+            v4: cc.v4 as u64,
         }
     }
 }
@@ -114,10 +114,10 @@ impl From<B16Qpl> for B8Qpl {
 impl From<B8Qpl> for B4Qpl {
     fn from(cc: B8Qpl) -> Self {
         Self {
-            a: cc.a as u32,
-            b: cc.b as u32,
-            c: cc.c as u32,
-            d: cc.d as u32,
+            v1: cc.v1 as u32,
+            v2: cc.v2 as u32,
+            v3: cc.v3 as u32,
+            v4: cc.v4 as u32,
         }
     }
 }
@@ -125,10 +125,10 @@ impl From<B8Qpl> for B4Qpl {
 impl From<B4Qpl> for B2Qpl {
     fn from(cc: B4Qpl) -> Self {
         Self {
-            a: cc.a as u16,
-            b: cc.b as u16,
-            c: cc.c as u16,
-            d: cc.d as u16,
+            v1: cc.v1 as u16,
+            v2: cc.v2 as u16,
+            v3: cc.v3 as u16,
+            v4: cc.v4 as u16,
         }
     }
 }
@@ -136,10 +136,10 @@ impl From<B4Qpl> for B2Qpl {
 impl From<B2Qpl> for B1Qpl {
     fn from(cc: B2Qpl) -> Self {
         Self {
-            a: cc.a as u8,
-            b: cc.b as u8,
-            c: cc.c as u8,
-            d: cc.d as u8,
+            v1: cc.v1 as u8,
+            v2: cc.v2 as u8,
+            v3: cc.v3 as u8,
+            v4: cc.v4 as u8,
         }
     }
 }
@@ -150,74 +150,74 @@ mod mini {
     use super::*;
     //
     #[test]
-    fn t_c16() {
+    fn t_b16() {
         let a = B16Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
-        assert_eq!(a.a, b.a);
-        assert_eq!(a.a, c.a);
+        assert_eq!(a.v1, b.v1);
+        assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
-        assert_eq!(format!("{a:?}"), "B16Qpl { a: 86738642548474510294585684247313465665, b: 88073083203066425837579310158810595906, c: 89407523857658341380572936070307726147, d: 90741964512250256923566561981804856388 }");
+        assert_eq!(format!("{a:?}"), "B16Qpl { v1: 86738642548474510294585684247313465665, v2: 88073083203066425837579310158810595906, v3: 89407523857658341380572936070307726147, v4: 90741964512250256923566561981804856388 }");
     }
     #[test]
-    fn t_c8() {
+    fn t_b8() {
         let a = B8Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
-        assert_eq!(a.a, b.a);
-        assert_eq!(a.a, c.a);
+        assert_eq!(a.v1, b.v1);
+        assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
         assert_eq!(
             format!("{a:?}"),
-            "B8Qpl { a: 4702111234474983745, b: 4774451407313060418, c: 4846791580151137091, d: 4919131752989213764 }"
+            "B8Qpl { v1: 4702111234474983745, v2: 4774451407313060418, v3: 4846791580151137091, v4: 4919131752989213764 }"
         );
     }
     #[test]
-    fn t_c4() {
+    fn t_b4() {
         let a = B4Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
-        assert_eq!(a.a, b.a);
-        assert_eq!(a.a, c.a);
+        assert_eq!(a.v1, b.v1);
+        assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
         assert_eq!(
             format!("{a:?}"),
-            "B4Qpl { a: 1094795585, b: 1111638594, c: 1128481603, d: 1145324612 }"
+            "B4Qpl { v1: 1094795585, v2: 1111638594, v3: 1128481603, v4: 1145324612 }"
         );
     }
     #[test]
-    fn t_c2() {
+    fn t_b2() {
         let a = B2Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
-        assert_eq!(a.a, b.a);
-        assert_eq!(a.a, c.a);
+        assert_eq!(a.v1, b.v1);
+        assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
         assert_eq!(
             format!("{a:?}"),
-            "B2Qpl { a: 16705, b: 16962, c: 17219, d: 17476 }"
+            "B2Qpl { v1: 16705, v2: 16962, v3: 17219, v4: 17476 }"
         );
     }
     #[test]
-    fn t_c1() {
+    fn t_b1() {
         let a = B1Qpl::new(b'A', b'B', b'C', b'D');
         let b = a.clone();
         let c = a;
-        assert_eq!(a.a, b.a);
-        assert_eq!(a.a, c.a);
+        assert_eq!(a.v1, b.v1);
+        assert_eq!(a.v1, c.v1);
         assert_eq!(a, b);
-        assert_eq!(format!("{a:?}"), "B1Qpl { a: 65, b: 66, c: 67, d: 68 }");
+        assert_eq!(format!("{a:?}"), "B1Qpl { v1: 65, v2: 66, v3: 67, v4: 68 }");
     }
     #[test]
     fn t_into() {
-        let a_c16 = B16Qpl::new(b'A', b'B', b'C', b'D');
-        let a_c8: B8Qpl = a_c16.into();
-        let a_c4: B4Qpl = a_c8.into();
-        let a_c2: B2Qpl = a_c4.into();
-        let a_c1: B1Qpl = a_c2.into();
-        assert_eq!(a_c8, B8Qpl::new(b'A', b'B', b'C', b'D'));
-        assert_eq!(a_c4, B4Qpl::new(b'A', b'B', b'C', b'D'));
-        assert_eq!(a_c2, B2Qpl::new(b'A', b'B', b'C', b'D'));
-        assert_eq!(a_c1, B1Qpl::new(b'A', b'B', b'C', b'D'));
+        let a_b16 = B16Qpl::new(b'A', b'B', b'C', b'D');
+        let a_b8: B8Qpl = a_b16.into();
+        let a_b4: B4Qpl = a_b8.into();
+        let a_b2: B2Qpl = a_b4.into();
+        let a_b1: B1Qpl = a_b2.into();
+        assert_eq!(a_b8, B8Qpl::new(b'A', b'B', b'C', b'D'));
+        assert_eq!(a_b4, B4Qpl::new(b'A', b'B', b'C', b'D'));
+        assert_eq!(a_b2, B2Qpl::new(b'A', b'B', b'C', b'D'));
+        assert_eq!(a_b1, B1Qpl::new(b'A', b'B', b'C', b'D'));
     }
 }

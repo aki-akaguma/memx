@@ -444,31 +444,31 @@ pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: B2Sgl, end_pt
 #[inline(always)]
 fn _set_c16(buf_ptr: *mut u8, c16: B16Sgl) {
     let aa_ptr = buf_ptr as *mut u128;
-    unsafe { aa_ptr.write(c16.a) };
+    unsafe { aa_ptr.write(c16.v1) };
 }
 
 #[inline(always)]
 fn _set_c8(buf_ptr: *mut u8, c8: B8Sgl) {
     let aa_ptr = buf_ptr as *mut u64;
-    unsafe { aa_ptr.write(c8.a) };
+    unsafe { aa_ptr.write(c8.v1) };
 }
 
 #[inline(always)]
 fn _set_c4(buf_ptr: *mut u8, c4: B4Sgl) {
     let aa_ptr = buf_ptr as *mut u32;
-    unsafe { aa_ptr.write(c4.a) };
+    unsafe { aa_ptr.write(c4.v1) };
 }
 
 #[inline(always)]
 fn _set_c2(buf_ptr: *mut u8, c2: B2Sgl) {
     let aa_ptr = buf_ptr as *mut u16;
-    unsafe { aa_ptr.write(c2.a) };
+    unsafe { aa_ptr.write(c2.v1) };
 }
 
 #[inline(always)]
 fn _set_c1(buf_ptr: *mut u8, c1: B1Sgl) {
     let aa_ptr = buf_ptr as *mut u8;
-    unsafe { aa_ptr.write(c1.a) };
+    unsafe { aa_ptr.write(c1.v1) };
 }
 
 /*

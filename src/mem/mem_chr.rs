@@ -442,7 +442,7 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
 
 #[inline(always)]
 fn _chr_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) } ^ c16.a;
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) } ^ c16.v1;
     let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -493,7 +493,7 @@ fn _chr_c16_aa_x8(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<
 
 #[inline(always)]
 fn _chr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.a;
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.v1;
     let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -544,7 +544,7 @@ fn _chr_c8_aa_x8(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usi
 
 #[inline(always)]
 fn _chr_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) } ^ c4.a;
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) } ^ c4.v1;
     let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -595,7 +595,7 @@ fn _chr_c4_aa_x8(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usi
 
 #[inline(always)]
 fn _chr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) } ^ c2.a;
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) } ^ c2.v1;
     let bits_0 = PackedU16::new(v_0).may_have_zero_quick();
     //
     if !bits_0.is_zeros() {
@@ -609,7 +609,7 @@ fn _chr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<usi
 fn _chr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
-    if aac == c1.a {
+    if aac == c1.v1 {
         Some(buf_ptr.usz_offset_from(st_ptr))
     } else {
         None
