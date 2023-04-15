@@ -72,99 +72,52 @@ pub unsafe fn _memset_avx2(buf: &mut [u8], c: u8) {
     _memset_avx2_impl(buf, c)
 }
 
-macro_rules! _unroll_one_set_16_uu {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c16_uu(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_16_aa {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c16_aa(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_16_aa_x2 {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c16_aa_x2(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_16_aa_x4 {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c16_aa_x4(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_32_uu {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c32_uu(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_32_aa {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c32_aa(aa_ptr, $cc) };
-    }};
-}
-
-macro_rules! _unroll_one_set_32_aa_x2 {
-    ($a_ptr:expr, $cc:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        unsafe { _set_c32_aa_x2(aa_ptr, $cc) };
-    }};
-}
-
 #[inline(always)]
 fn _memset_sse2_impl(buf: &mut [u8], c1: u8) {
-    let buf_len = buf.len();
-    if buf_len == 0 {
-        return;
-    }
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
         let cc = MMB16Sgl::new(c1);
+        // to a aligned pointer
         {
-            let loop_size = 16;
-            //
-            #[cfg(not(feature = "test_alignment_check"))]
-            {
-                if buf_ptr.is_aligned_u128() {
-                    _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                } else {
-                    _unroll_one_set_16_uu!(buf_ptr, cc, loop_size, 0);
-                }
-                let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+            let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+            if buf_ptr.is_aligned_u128() {
+                unsafe { _set_c16_aa_x1(buf_ptr, cc) };
                 buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-            }
-            #[cfg(feature = "test_alignment_check")]
-            {
-                if buf_ptr.is_aligned_u128() {
-                    _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+            } else {
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    unsafe { _set_c16_uu_x1(buf_ptr, cc) };
                     buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-                } else {
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Sgl::new(c1);
                     buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
                 }
             }
         }
-        //
+        // the loop
+        {
+            let unroll = 8;
+            let loop_size = 16;
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_x8 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16_x8 {
+                    unsafe { _set_c16_aa_x8(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
+            }
+        }
         {
             let unroll = 4;
             let loop_size = 16;
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_16_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_16_x4 {
-                    _unroll_one_set_16_aa_x4!(buf_ptr, cc, loop_size, 0);
+                    unsafe { _set_c16_aa_x4(buf_ptr, cc) };
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
             }
@@ -175,59 +128,75 @@ fn _memset_sse2_impl(buf: &mut [u8], c1: u8) {
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_16_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_16_x2 {
-                    _unroll_one_set_16_aa_x2!(buf_ptr, cc, loop_size, 0);
+                    unsafe { _set_c16_aa_x2(buf_ptr, cc) };
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
             }
         }
         {
+            let unroll = 1;
             let loop_size = 16;
-            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-            while buf_ptr <= end_ptr_16 {
-                _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16 {
+                    unsafe { _set_c16_aa_x1(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
             }
         }
     }
     //
     let cc = B8Sgl::new(c1);
-    // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
 }
 
 #[inline(always)]
 fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
     let buf_len = buf.len();
-    if buf_len == 0 {
-        return;
-    }
-    let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
         let cc = MMB32Sgl::new(c1);
+        // to a aligned pointer
         {
-            let loop_size = 32;
-            //
-            #[cfg(not(feature = "test_alignment_check"))]
-            {
-                if buf_ptr.is_aligned_u256() {
-                    _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
-                } else {
-                    _unroll_one_set_32_uu!(buf_ptr, cc, loop_size, 0);
-                }
-                let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+            let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+            if buf_ptr.is_aligned_u256() {
+                unsafe { _set_c32_aa_x1(buf_ptr, cc) };
                 buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-            }
-            #[cfg(feature = "test_alignment_check")]
-            {
-                if buf_ptr.is_aligned_u256() {
-                    _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
-                    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+            } else {
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    unsafe { _set_c32_uu_x1(buf_ptr, cc) };
                     buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-                } else {
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Sgl::new(c1);
                     buf_ptr = basic::_set_to_aligned_u256(buf_ptr, c);
+                }
+            }
+        }
+        // the loop
+        {
+            let unroll = 8;
+            let loop_size = 32;
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_32_x8 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_32_x8 {
+                    unsafe { _set_c32_aa_x8(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
+            }
+        }
+        {
+            let unroll = 4;
+            let loop_size = 32;
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_32_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_32_x4 {
+                    unsafe { _set_c32_aa_x4(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
             }
         }
@@ -237,73 +206,80 @@ fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
             if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
                 let end_ptr_32_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
                 while buf_ptr <= end_ptr_32_x2 {
-                    _unroll_one_set_32_aa_x2!(buf_ptr, cc, loop_size, 0);
+                    unsafe { _set_c32_aa_x2(buf_ptr, cc) };
                     buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
                 }
             }
         }
         {
+            let unroll = 1;
             let loop_size = 32;
-            let end_ptr_32 = unsafe { end_ptr.sub(loop_size) };
-            while buf_ptr <= end_ptr_32 {
-                _unroll_one_set_32_aa!(buf_ptr, cc, loop_size, 0);
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_32_x1 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_32_x1 {
+                    unsafe { _set_c32_aa_x1(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
             }
         }
         {
             let cc = MMB16Sgl::new(c1);
+            let unroll = 1;
             let loop_size = 16;
-            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-            while buf_ptr <= end_ptr_16 {
-                _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_x1 = unsafe { end_ptr.sub(loop_size * unroll) };
+                while buf_ptr <= end_ptr_16_x1 {
+                    unsafe { _set_c16_aa_x1(buf_ptr, cc) };
+                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                }
             }
         }
     } else if buf_len >= 16 {
         {
             let cc = MMB16Sgl::new(c1);
+            let unroll = 1;
             let loop_size = 16;
-            let end_ptr_16 = unsafe { end_ptr.sub(loop_size) };
-            if buf_ptr <= end_ptr_16 {
+            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+                let end_ptr_16_x1 = unsafe { end_ptr.sub(loop_size * unroll) };
                 //
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    if buf_ptr.is_aligned_u128() {
-                        while buf_ptr <= end_ptr_16 {
-                            _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                            buf_ptr = unsafe { buf_ptr.add(loop_size) };
-                        }
-                    } else {
-                        while buf_ptr <= end_ptr_16 {
-                            _unroll_one_set_16_uu!(buf_ptr, cc, loop_size, 0);
+                if buf_ptr.is_aligned_u128() {
+                    while buf_ptr <= end_ptr_16_x1 {
+                        unsafe { _set_c16_aa_x1(buf_ptr, cc) };
+                        buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                    }
+                } else {
+                    #[cfg(not(feature = "test_alignment_check"))]
+                    {
+                        while buf_ptr <= end_ptr_16_x1 {
+                            unsafe { _set_c16_uu_x1(buf_ptr, cc) };
                             buf_ptr = unsafe { buf_ptr.add(loop_size) };
                         }
                     }
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let c = B1Sgl::new(c1);
-                    buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
-                    while buf_ptr <= end_ptr_16 {
-                        _unroll_one_set_16_aa!(buf_ptr, cc, loop_size, 0);
-                        buf_ptr = unsafe { buf_ptr.add(loop_size) };
+                    #[cfg(feature = "test_alignment_check")]
+                    {
+                        let c = B1Sgl::new(c1);
+                        buf_ptr = basic::_set_to_aligned_u128(buf_ptr, c);
+                        while buf_ptr <= end_ptr_16_x1 {
+                            unsafe { _set_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                            buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+                        }
                     }
                 }
             }
         }
     }
+    //
     let cc = B8Sgl::new(c1);
-    // the remaining data is the max: 15 bytes.
     basic::_memset_remaining_15_bytes_impl(buf_ptr, cc, end_ptr)
 }
 
 #[inline(always)]
-unsafe fn _set_c16_uu(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+unsafe fn _set_c16_uu_x1(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
     _mm_storeu_si128(buf_ptr as *mut __m128i, mm_c16.v1);
 }
 
 #[inline(always)]
-unsafe fn _set_c16_aa(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+unsafe fn _set_c16_aa_x1(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
     _mm_store_si128(buf_ptr as *mut __m128i, mm_c16.v1);
 }
 
@@ -322,12 +298,18 @@ unsafe fn _set_c16_aa_x4(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
 }
 
 #[inline(always)]
-unsafe fn _set_c32_uu(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+unsafe fn _set_c16_aa_x8(buf_ptr: *mut u8, mm_c16: MMB16Sgl) {
+    _set_c16_aa_x4(buf_ptr, mm_c16);
+    _set_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16);
+}
+
+#[inline(always)]
+unsafe fn _set_c32_uu_x1(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
     _mm256_storeu_si256(buf_ptr as *mut __m256i, mm_c32.v1);
 }
 
 #[inline(always)]
-unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+unsafe fn _set_c32_aa_x1(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
     _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.v1);
 }
 
@@ -335,6 +317,20 @@ unsafe fn _set_c32_aa(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
 unsafe fn _set_c32_aa_x2(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
     _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.v1);
     _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32.v1);
+}
+
+#[inline(always)]
+unsafe fn _set_c32_aa_x4(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+    _mm256_store_si256(buf_ptr as *mut __m256i, mm_c32.v1);
+    _mm256_store_si256(buf_ptr.add(32) as *mut __m256i, mm_c32.v1);
+    _mm256_store_si256(buf_ptr.add(32 * 2) as *mut __m256i, mm_c32.v1);
+    _mm256_store_si256(buf_ptr.add(32 * 3) as *mut __m256i, mm_c32.v1);
+}
+
+#[inline(always)]
+unsafe fn _set_c32_aa_x8(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
+    _set_c32_aa_x4(buf_ptr, mm_c32);
+    _set_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32);
 }
 
 #[cfg(test)]
