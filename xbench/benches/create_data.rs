@@ -48,7 +48,7 @@ pub fn create_data_cpy() -> (Vec<Vec<u8>>, Vec<u8>) {
     }
 }
 
-pub fn create_data_set() -> Vec<Vec<u8>> {
+pub fn create_data_set() -> (Vec<Vec<u8>>, usize) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
         "ja.1" => create_data_set_ja_1(),
@@ -375,15 +375,14 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, Vec<u8>) {
     (v, src_s.to_vec())
 }
 
-pub fn create_data_set_en_1() -> Vec<Vec<u8>> {
-    // S1: 1233 byte, S2: 367 byte
-    let s1 = EN_DAT_S1.to_string() + EN_DAT_S1 + EN_DAT_S2; // 2833 byte = 1233 + 1233 + 367
+pub fn create_data_set_en_1() -> (Vec<Vec<u8>>, usize) {
+    let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 91 {
+        if i > 11 {
             break;
         }
         if i % 2 == 0 {
@@ -392,18 +391,17 @@ pub fn create_data_set_en_1() -> Vec<Vec<u8>> {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    v
+    (v, 15)
 }
 
-pub fn create_data_set_ja_1() -> Vec<Vec<u8>> {
-    // S1: 1346 byte, S2: 884 byte
-    let s1 = JA_DAT_S1.to_string() + JA_DAT_S1 + JA_DAT_S1; // 4038 byte = 1346 * 3
+pub fn create_data_set_ja_1() -> (Vec<Vec<u8>>, usize) {
+    let s1 = JA_DAT_S1.to_string() + JA_DAT_S2;
     let s2 = JA_DAT_S2.to_string();
     let mut v: Vec<Vec<u8>> = Vec::new();
     let mut i = 0;
     loop {
         i += 1;
-        if i > 91 {
+        if i > 41 {
             break;
         }
         if i % 2 == 0 {
@@ -412,7 +410,7 @@ pub fn create_data_set_ja_1() -> Vec<Vec<u8>> {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    v
+    (v, 144)
 }
 
 // data for test

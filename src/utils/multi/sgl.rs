@@ -78,6 +78,18 @@ impl From<B4Sgl> for B2Sgl {
     }
 }
 
+impl From<B8Sgl> for B1Sgl {
+    fn from(cc: B8Sgl) -> Self {
+        Self { v1: cc.v1 as u8 }
+    }
+}
+
+impl From<B4Sgl> for B1Sgl {
+    fn from(cc: B4Sgl) -> Self {
+        Self { v1: cc.v1 as u8 }
+    }
+}
+
 impl From<B2Sgl> for B1Sgl {
     fn from(cc: B2Sgl) -> Self {
         Self { v1: cc.v1 as u8 }

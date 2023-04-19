@@ -48,6 +48,7 @@ pub trait PtrOps {
     fn is_aligned_u32(&self) -> bool;
     fn is_aligned_u16(&self) -> bool;
     fn usz_offset_from(&self, origin: *const u8) -> usize;
+    fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool;
 }
 impl PtrOps for *const u8 {
     #[inline(always)]
@@ -75,6 +76,11 @@ impl PtrOps for *const u8 {
         assert!((*self as usize) >= (origin as usize));
         (*self as usize) - (origin as usize)
     }
+    #[inline(always)]
+    fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool {
+        let (end_val, overflowing) = (end_ptr as usize).overflowing_sub(loop_unroll);
+        !overflowing && (*self as usize) <= end_val
+    }
 }
 
 impl PtrOps for *mut u8 {
@@ -84,24 +90,27 @@ impl PtrOps for *mut u8 {
     }
     #[inline(always)]
     fn is_aligned_u128(&self) -> bool {
-        ((*self as usize) & 0x0F_usize) == 0
+        (*self as *const u8).is_aligned_u128()
     }
     #[inline(always)]
     fn is_aligned_u64(&self) -> bool {
-        ((*self as usize) & 0x07_usize) == 0
+        (*self as *const u8).is_aligned_u64()
     }
     #[inline(always)]
     fn is_aligned_u32(&self) -> bool {
-        ((*self as usize) & 0x03_usize) == 0
+        (*self as *const u8).is_aligned_u32()
     }
     #[inline(always)]
     fn is_aligned_u16(&self) -> bool {
-        ((*self as usize) & 0x01_usize) == 0
+        (*self as *const u8).is_aligned_u16()
     }
     #[inline(always)]
     fn usz_offset_from(&self, origin: *const u8) -> usize {
-        assert!((*self as usize) >= (origin as usize));
-        (*self as usize) - (origin as usize)
+        (*self as *const u8).usz_offset_from(origin)
+    }
+    #[inline(always)]
+    fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool {
+        (*self as *const u8).is_not_over(end_ptr, loop_unroll)
     }
 }
 
