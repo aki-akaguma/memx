@@ -306,10 +306,8 @@ pub(crate) fn _memset_remaining_15_bytes_impl(buf_ptr: *mut u8, cc: B8Sgl, end_p
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 8;
-        if !buf_ptr.is_aligned_u64() {
-            if buf_ptr.is_not_over(end_ptr, loop_size) {
-                buf_ptr = _set_to_aligned_u64(buf_ptr, cc.into());
-            }
+        if !buf_ptr.is_aligned_u64() && buf_ptr.is_not_over(end_ptr, loop_size) {
+            buf_ptr = _set_to_aligned_u64(buf_ptr, cc.into());
         }
     }
     _memset_remaining_15_bytes_impl_aligned(buf_ptr, cc, end_ptr);
@@ -320,10 +318,8 @@ pub(crate) fn _memset_remaining_7_bytes_impl(buf_ptr: *mut u8, cc: B4Sgl, end_pt
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 4;
-        if !buf_ptr.is_aligned_u32() {
-            if buf_ptr.is_not_over(end_ptr, loop_size) {
-                buf_ptr = _set_to_aligned_u32(buf_ptr, cc.into());
-            }
+        if !buf_ptr.is_aligned_u32() && buf_ptr.is_not_over(end_ptr, loop_size) {
+            buf_ptr = _set_to_aligned_u32(buf_ptr, cc.into());
         }
     }
     _memset_remaining_7_bytes_impl_aligned(buf_ptr, cc, end_ptr);
@@ -334,10 +330,8 @@ pub(crate) fn _memset_remaining_3_bytes_impl(buf_ptr: *mut u8, cc: B2Sgl, end_pt
     let mut buf_ptr = buf_ptr;
     {
         let loop_size = 2;
-        if !buf_ptr.is_aligned_u16() {
-            if buf_ptr.is_not_over(end_ptr, loop_size) {
-                buf_ptr = _set_to_aligned_u16(buf_ptr, cc.into());
-            }
+        if !buf_ptr.is_aligned_u16() && buf_ptr.is_not_over(end_ptr, loop_size) {
+            buf_ptr = _set_to_aligned_u16(buf_ptr, cc.into());
         }
     }
     _memset_remaining_3_bytes_impl_aligned(buf_ptr, cc, end_ptr);
@@ -534,13 +528,13 @@ fn _set_c1_aa_x2(buf_ptr: *mut u8, c1: B1Sgl) {
 #[inline(always)]
 fn _set_c1_aa_x4(buf_ptr: *mut u8, c1: B1Sgl) {
     _set_c1_aa_x2(buf_ptr, c1);
-    _set_c1_aa_x2(unsafe { buf_ptr.add(1 * 2) }, c1);
+    _set_c1_aa_x2(unsafe { buf_ptr.add(2) }, c1);
 }
 
 #[inline(always)]
 fn _set_c1_aa_x8(buf_ptr: *mut u8, c1: B1Sgl) {
     _set_c1_aa_x4(buf_ptr, c1);
-    _set_c1_aa_x4(unsafe { buf_ptr.add(1 * 4) }, c1);
+    _set_c1_aa_x4(unsafe { buf_ptr.add(4) }, c1);
 }
 /*
  * The simple implement:
