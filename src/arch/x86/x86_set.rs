@@ -178,7 +178,6 @@ fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
         {
             let unroll = 4;
             let loop_size = 32;
@@ -187,6 +186,7 @@ fn _memset_avx2_impl(buf: &mut [u8], c1: u8) {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 32;
