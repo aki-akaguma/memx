@@ -11,6 +11,7 @@ test:
 	cargo test --offline --features test_pointer_width_128
 	cargo test --offline --features test_pointer_width_64
 	cargo test --offline --features test_pointer_width_32
+	cargo test --offline --features test_alignment_check
 
 AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl -- test memrchr_dbl
 test-alignment-check:
