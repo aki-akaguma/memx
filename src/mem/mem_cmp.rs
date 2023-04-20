@@ -477,7 +477,7 @@ pub(crate) fn _memcmp_remaining_15_bytes_impl(
                     if aa_ptr >= eend_ptr {
                         break 'near;
                     }
-                    let r = _cmp_b8_aa_x1(a_ptr, b_ptr);
+                    let r = _cmp_b8_aa_x1(aa_ptr, bb_ptr);
                     if !r.is_eq() {
                         return r;
                     }
@@ -514,7 +514,7 @@ fn _memcmp_remaining_7_bytes_impl(
                     if aa_ptr >= eend_ptr {
                         break 'near;
                     }
-                    let r = _cmp_b4_aa_x1(a_ptr, b_ptr);
+                    let r = _cmp_b4_aa_x1(aa_ptr, bb_ptr);
                     if !r.is_eq() {
                         return r;
                     }
@@ -551,7 +551,7 @@ fn _memcmp_remaining_3_bytes_impl(
                     if aa_ptr >= eend_ptr {
                         break 'near2;
                     }
-                    let r = _cmp_b2_aa_x1(a_ptr, b_ptr);
+                    let r = _cmp_b2_aa_x1(aa_ptr, bb_ptr);
                     if !r.is_eq() {
                         return r;
                     }
