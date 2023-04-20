@@ -13,12 +13,6 @@ pub fn std_memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     a.cmp(&b)
 }
 
-macro_rules! j_bool {
-    ($j: expr) => {
-        $j < 16 || $j % 8 == 0 || $j % 10 == 0
-    };
-}
-
 #[inline(never)]
 fn statistics_std_memcmp(
     texts: &[&str],
@@ -36,15 +30,17 @@ fn statistics_std_memcmp(
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                if let Some(x) = founded.get_mut(&r) {
-                    *x += 1;
-                } else {
-                    founded.insert(r, 1);
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            //
+            if let Some(x) = founded.get_mut(&r) {
+                *x += 1;
+            } else {
+                founded.insert(r, 1);
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     founded
@@ -78,15 +74,16 @@ fn process_std_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)
@@ -125,15 +122,16 @@ fn process_libc_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)
@@ -154,15 +152,16 @@ fn process_memx_memcmp(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)
@@ -183,15 +182,16 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)
@@ -216,15 +216,16 @@ fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usi
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)
@@ -249,15 +250,16 @@ fn process_memx_memcmp_avx2(texts: &[&str], pattern: &str) -> (usize, usize, usi
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                match r {
-                    Ordering::Equal => found_eq += 1,
-                    Ordering::Less => found_le += 1,
-                    Ordering::Greater => found_gr += 1,
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            match r {
+                Ordering::Equal => found_eq += 1,
+                Ordering::Less => found_le += 1,
+                Ordering::Greater => found_gr += 1,
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     (found_eq, found_le, found_gr)

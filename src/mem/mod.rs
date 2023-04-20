@@ -64,6 +64,12 @@ mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
 
 #[allow(unused_imports)]
+pub(crate) use mem_cmp::_cmp_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_cmp::_cmp_to_aligned_u256;
+#[allow(unused_imports)]
+pub(crate) use mem_cmp::_memcmp_remaining_15_bytes_impl;
+#[allow(unused_imports)]
 pub(crate) use mem_cmp::_start_cmp_128;
 
 mod mem_eq;

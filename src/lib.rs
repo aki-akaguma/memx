@@ -142,9 +142,10 @@ pub fn memrchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 /// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
-    mem::_memcmp_impl(a, b)
     /*
+    mem::_memcmp_impl(a, b)
     sse2 or avx2 are slower, but I don't know why.
+    */
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -157,7 +158,6 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     let r = mem::_memcmp_impl(a, b);
     //
     r
-    */
 }
 
 /// This mimics `libc::bcmp()`, same as `a == b`.

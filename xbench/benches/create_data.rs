@@ -273,7 +273,7 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
     let mut i = 0;
     loop {
         i += 1;
-        if i > 3 {
+        if i > 7 {
             break;
         }
         if i % 2 == 0 {
@@ -282,9 +282,9 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 166;
-    let less_cnt = 135;
-    let greater_cnt = 124;
+    let match_cnt = 144;
+    let less_cnt = 138;
+    let greater_cnt = 60;
     let match_s = "rrrrrrrrrrrrrrr"; // 15 bytes
     (v, match_s, match_cnt, less_cnt, greater_cnt)
 }
@@ -312,7 +312,7 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
     let mut i = 0;
     loop {
         i += 1;
-        if i > 3 {
+        if i > 41 {
             break;
         }
         if i % 2 == 0 {
@@ -321,9 +321,9 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
             v.push(s2.clone());
         }
     }
-    let match_cnt = 8;
-    let less_cnt = 246;
-    let greater_cnt = 324;
+    let match_cnt = 20;
+    let less_cnt = 160;
+    let greater_cnt = 126;
     #[rustfmt::skip]
     let match_s = concat!(
         "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrrrr",

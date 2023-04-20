@@ -12,12 +12,6 @@ pub fn std_memeq_impl(a: &[u8], b: &[u8]) -> bool {
     a == b
 }
 
-macro_rules! j_bool {
-    ($j: expr) => {
-        $j < 16 || $j % 8 == 0 || $j % 10 == 0
-    };
-}
-
 #[inline(never)]
 fn statistics_std_memeq(texts: &[&str], pattern: &str) -> std::collections::HashMap<bool, usize> {
     #[inline(never)]
@@ -32,15 +26,17 @@ fn statistics_std_memeq(texts: &[&str], pattern: &str) -> std::collections::Hash
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                let r = _t_(&line_bytes[i..(i + pat_len)], pat_bytes);
-                if let Some(x) = founded.get_mut(&r) {
-                    *x += 1;
-                } else {
-                    founded.insert(r, 1);
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            //
+            if let Some(x) = founded.get_mut(&r) {
+                *x += 1;
+            } else {
+                founded.insert(r, 1);
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     founded
@@ -72,12 +68,14 @@ fn process_std_memeq(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
@@ -117,12 +115,14 @@ fn process_libc_memeq(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
@@ -141,12 +141,14 @@ fn process_memx_memeq(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
@@ -165,12 +167,14 @@ fn process_memx_memeq_basic(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
@@ -193,12 +197,14 @@ fn process_memx_memeq_sse2(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
@@ -221,12 +227,14 @@ fn process_memx_memeq_avx2(texts: &[&str], pattern: &str) -> usize {
     for line in texts {
         let line_bytes = line.as_bytes();
         let line_len = line_bytes.len();
-        for i in 0..(line_len - pat_len) {
-            if j_bool!(i) {
-                if _t_(&line_bytes[i..(i + pat_len)], pat_bytes) {
-                    found += 1;
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            let r = _t_(tt, pat_bytes);
+            if r {
+                found += 1;
             }
+            curr_idx = curr_idx + pat_len;
         }
     }
     found
