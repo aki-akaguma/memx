@@ -1,6 +1,6 @@
 use crate::utils::*;
 
-#[inline(always)]
+#[inline(never)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     if a.is_empty() && b.is_empty() {
         return true;
