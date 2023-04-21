@@ -2,12 +2,6 @@ use crate::utils::*;
 
 #[inline(never)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    if a.is_empty() && b.is_empty() {
-        return true;
-    }
-    if a.is_empty() || b.is_empty() {
-        return false;
-    }
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -35,45 +29,56 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
         )
     )))]
     {
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64"))]
-        {
-            _start_eq_64(a, b)
-        }
-        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86", target_arch = "aarch64")))]
-        {
-            #[cfg(target_pointer_width = "128")]
-            let r = _start_eq_128(a, b);
-            #[cfg(target_pointer_width = "64")]
-            let r = _start_eq_64(a, b);
-            #[cfg(target_pointer_width = "32")]
-            let r = _start_eq_32(a, b);
-            //
-            r
-        }
+        #[cfg(target_pointer_width = "128")]
+        let r = _start_eq_128(a, b);
+        #[cfg(target_pointer_width = "64")]
+        let r = _start_eq_64(a, b);
+        #[cfg(target_pointer_width = "32")]
+        let r = _start_eq_32(a, b);
+        //
+        r
     }
 }
 
-macro_rules! _unroll_one_eq_to_align {
+macro_rules! _unroll_one_eq_to_aligned_x1 {
     ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
         if $a_ptr_2 >= $a_ptr_end {
             break $label;
         }
-        let aac = unsafe { *$a_ptr_2 };
-        let bbc = unsafe { *$b_ptr_2 };
-        if aac != bbc {
-            return (None, Some(false));
+        let r = _eq_b1_aa_x1($a_ptr_2, $b_ptr_2);
+        if !r {
+            return (None, Some(r));
         }
         $a_ptr_2 = unsafe { $a_ptr_2.add(1) };
         $b_ptr_2 = unsafe { $b_ptr_2.add(1) };
     }};
 }
 
-macro_rules! _unroll_one_eq_to_align_x4 {
+macro_rules! _unroll_one_eq_to_aligned_x2 {
     ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_eq_to_align!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_align!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_align!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_align!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+        _unroll_one_eq_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+        _unroll_one_eq_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+    }};
+}
+
+macro_rules! _unroll_one_eq_to_aligned_x4 {
+    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
+        _unroll_one_eq_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+        _unroll_one_eq_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+    }};
+}
+
+macro_rules! _unroll_one_eq_to_aligned_x8 {
+    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
+        _unroll_one_eq_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+        _unroll_one_eq_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+    }};
+}
+
+macro_rules! _unroll_one_eq_to_aligned_x16 {
+    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
+        _unroll_one_eq_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
+        _unroll_one_eq_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
     }};
 }
 
@@ -88,15 +93,8 @@ pub(crate) fn _eq_to_aligned_u256(
     let mut a_ptr_2 = a_ptr;
     let mut b_ptr_2 = b_ptr;
     'near: loop {
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        //
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
+        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
+        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
     }
     (Some((a_ptr_end, b_ptr_end)), None)
 }
@@ -112,10 +110,7 @@ pub(crate) fn _eq_to_aligned_u128(
     let mut a_ptr_2 = a_ptr;
     let mut b_ptr_2 = b_ptr;
     'near: loop {
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
+        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
     }
     (Some((a_ptr_end, b_ptr_end)), None)
 }
@@ -131,8 +126,7 @@ fn _eq_to_aligned_u64(
     let mut a_ptr_2 = a_ptr;
     let mut b_ptr_2 = b_ptr;
     'near: loop {
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
+        _unroll_one_eq_to_aligned_x8!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
     }
     (Some((a_ptr_end, b_ptr_end)), None)
 }
@@ -148,85 +142,12 @@ fn _eq_to_aligned_u32(
     let mut a_ptr_2 = a_ptr;
     let mut b_ptr_2 = b_ptr;
     'near: loop {
-        _unroll_one_eq_to_align_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
+        _unroll_one_eq_to_aligned_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
     }
     (Some((a_ptr_end, b_ptr_end)), None)
 }
 
-macro_rules! _unroll_one_eq_16 {
-    ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
-        //
-        let aac = unsafe { _read_a_native_endian_from_ptr_u128(aa_ptr) };
-        let bbc = unsafe { _read_a_native_endian_from_ptr_u128(bb_ptr) };
-        if aac != bbc {
-            return false;
-        }
-    }};
-}
-
-macro_rules! _unroll_one_eq_8 {
-    ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
-        //
-        let aac = unsafe { _read_a_native_endian_from_ptr_u64(aa_ptr) };
-        let bbc = unsafe { _read_a_native_endian_from_ptr_u64(bb_ptr) };
-        if aac != bbc {
-            return false;
-        }
-    }};
-}
-
-macro_rules! _unroll_one_eq_4 {
-    ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
-        //
-        let aac = unsafe { _read_a_native_endian_from_ptr_u32(aa_ptr) };
-        let bbc = unsafe { _read_a_native_endian_from_ptr_u32(bb_ptr) };
-        if aac != bbc {
-            return false;
-        }
-    }};
-}
-
-macro_rules! _unroll_one_eq_2 {
-    ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
-        //
-        let aac = unsafe { _read_a_native_endian_from_ptr_u16(aa_ptr) };
-        let bbc = unsafe { _read_a_native_endian_from_ptr_u16(bb_ptr) };
-        if aac != bbc {
-            return false;
-        }
-    }};
-}
-
-macro_rules! _unroll_one_eq_1 {
-    ($a_ptr:expr, $b_ptr:expr, $loop_size:expr, $idx:expr) => {{
-        let aa_ptr = unsafe { $a_ptr.add($loop_size * $idx) };
-        let bb_ptr = unsafe { $b_ptr.add($loop_size * $idx) };
-        //
-        let aac = unsafe { *(aa_ptr as *const u8) };
-        let bbc = unsafe { *(bb_ptr as *const u8) };
-        if aac != bbc {
-            return false;
-        }
-    }};
-}
-
-#[cfg(any(
-    any(
-        target_pointer_width = "128",
-        target_arch = "x86_64",
-        target_arch = "x86",
-        target_arch = "aarch64"
-    ),
-    feature = "test_pointer_width_128"
-))]
+//#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
 pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     //
@@ -242,6 +163,7 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     b_ptr.prefetch_read_data();
     //
     if a_len >= 16 {
+        // to a aligned pointer
         {
             if !a_ptr.is_aligned_u128() {
                 let r = _eq_to_aligned_u128(a_ptr, b_ptr);
@@ -253,46 +175,68 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
                 }
             }
         }
+        // the loop
         if b_ptr.is_aligned_u128() {
+            {
+                let unroll = 16;
+                let loop_size = 16;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_aa_x16(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            {
+                let unroll = 8;
+                let loop_size = 16;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_aa_x8(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            /*
             {
                 let unroll = 4;
                 let loop_size = 16;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        a_ptr.prefetch_read_data();
-                        b_ptr.prefetch_read_data();
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 1);
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 2);
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 3);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_aa_x4(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
             {
                 let unroll = 2;
                 let loop_size = 16;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 1);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_aa_x2(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
+            */
             {
+                let unroll = 1;
                 let loop_size = 16;
-                let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-                while a_ptr <= eend_ptr {
-                    _unroll_one_eq_16!(a_ptr, b_ptr, loop_size, 0);
-                    a_ptr = unsafe { a_ptr.add(loop_size) };
-                    b_ptr = unsafe { b_ptr.add(loop_size) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
         }
@@ -301,15 +245,7 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
     _memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[cfg(any(
-    any(
-        target_pointer_width = "64",
-        target_arch = "x86_64",
-        target_arch = "x86",
-        target_arch = "aarch64"
-    ),
-    feature = "test_pointer_width_64"
-))]
+//#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
 fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     //
@@ -325,6 +261,7 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     b_ptr.prefetch_read_data();
     //
     if a_len >= 8 {
+        // to a aligned pointer
         {
             if !a_ptr.is_aligned_u64() {
                 let r = _eq_to_aligned_u64(a_ptr, b_ptr);
@@ -336,49 +273,68 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
                 }
             }
         }
+        // the loop
         if b_ptr.is_aligned_u64() {
+            {
+                let unroll = 16;
+                let loop_size = 8;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_aa_x16(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            {
+                let unroll = 8;
+                let loop_size = 8;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_aa_x8(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            /*
             {
                 let unroll = 4;
                 let loop_size = 8;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        a_ptr.prefetch_read_data();
-                        b_ptr.prefetch_read_data();
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 1);
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 2);
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 3);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_aa_x4(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
             {
                 let unroll = 2;
                 let loop_size = 8;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 1);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_aa_x2(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
+            */
             {
                 let unroll = 1;
                 let loop_size = 8;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_8!(a_ptr, b_ptr, loop_size, 0);
-                        a_ptr = unsafe { a_ptr.add(loop_size) };
-                        b_ptr = unsafe { b_ptr.add(loop_size) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
         }
@@ -387,15 +343,7 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     _memeq_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-#[cfg(any(
-    any(
-        target_pointer_width = "32",
-        target_arch = "x86_64",
-        target_arch = "x86",
-        target_arch = "aarch64"
-    ),
-    feature = "test_pointer_width_32"
-))]
+//#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
 fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
     //
@@ -411,6 +359,7 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
     b_ptr.prefetch_read_data();
     //
     if a_len >= 4 {
+        // to a aligned pointer
         {
             if !a_ptr.is_aligned_u32() {
                 let r = _eq_to_aligned_u32(a_ptr, b_ptr);
@@ -422,48 +371,68 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
                 }
             }
         }
+        // the loop
         if b_ptr.is_aligned_u32() {
+            {
+                let unroll = 16;
+                let loop_size = 4;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_aa_x16(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            {
+                let unroll = 8;
+                let loop_size = 4;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_aa_x8(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+            /*
             {
                 let unroll = 4;
                 let loop_size = 4;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 1);
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 2);
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 3);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_aa_x4(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
             {
                 let unroll = 2;
                 let loop_size = 4;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 1);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                        b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_aa_x2(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
+            */
             {
                 let unroll = 1;
                 let loop_size = 4;
-                if unsafe { end_ptr.offset_from(a_ptr) } >= (loop_size * unroll) as isize {
-                    let eend_ptr = unsafe { end_ptr.sub(loop_size * unroll) };
-                    while a_ptr <= eend_ptr {
-                        _unroll_one_eq_4!(a_ptr, b_ptr, loop_size, 0);
-                        //
-                        a_ptr = unsafe { a_ptr.add(loop_size) };
-                        b_ptr = unsafe { b_ptr.add(loop_size) };
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
                     }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
         }
@@ -482,7 +451,7 @@ pub(crate) fn _memeq_remaining_15_bytes_impl(
     let mut b_ptr = b_ptr;
     if a_ptr.is_aligned_u64() && b_ptr.is_aligned_u64() {
         let loop_size = 8;
-        if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
+        if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             let mut aa_ptr = a_ptr;
             let mut bb_ptr = b_ptr;
@@ -491,7 +460,10 @@ pub(crate) fn _memeq_remaining_15_bytes_impl(
                     if aa_ptr > eend_ptr {
                         break 'near;
                     }
-                    _unroll_one_eq_8!(aa_ptr, bb_ptr, loop_size, 0);
+                    let r = _eq_b8_aa_x1(aa_ptr, bb_ptr);
+                    if !r {
+                        return r;
+                    }
                     aa_ptr = unsafe { aa_ptr.add(loop_size) };
                     bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
@@ -510,7 +482,7 @@ fn _memeq_remaining_7_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
     let mut b_ptr = b_ptr;
     if a_ptr.is_aligned_u32() && b_ptr.is_aligned_u32() {
         let loop_size = 4;
-        if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
+        if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             let mut aa_ptr = a_ptr;
             let mut bb_ptr = b_ptr;
@@ -519,7 +491,10 @@ fn _memeq_remaining_7_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
                     if aa_ptr > eend_ptr {
                         break 'near;
                     }
-                    _unroll_one_eq_4!(aa_ptr, bb_ptr, loop_size, 0);
+                    let r = _eq_b4_aa_x1(aa_ptr, bb_ptr);
+                    if !r {
+                        return r;
+                    }
                     aa_ptr = unsafe { aa_ptr.add(loop_size) };
                     bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
@@ -538,7 +513,7 @@ fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
     let mut b_ptr = b_ptr;
     if a_ptr.is_aligned_u16() && b_ptr.is_aligned_u16() {
         let loop_size = 2;
-        if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
+        if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             let mut aa_ptr = a_ptr;
             let mut bb_ptr = b_ptr;
@@ -547,7 +522,10 @@ fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
                     if aa_ptr > eend_ptr {
                         break 'near2;
                     }
-                    _unroll_one_eq_2!(aa_ptr, bb_ptr, loop_size, 0);
+                    let r = _eq_b2_aa_x1(aa_ptr, bb_ptr);
+                    if !r {
+                        return r;
+                    }
                     aa_ptr = unsafe { aa_ptr.add(loop_size) };
                     bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
@@ -558,13 +536,16 @@ fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
     }
     {
         let loop_size = 1;
-        if unsafe { end_ptr.offset_from(a_ptr) } >= loop_size as isize {
+        if a_ptr.is_not_over(end_ptr, loop_size) {
             'near1: loop {
                 for _ in 0..32 {
                     if a_ptr >= end_ptr {
                         break 'near1;
                     }
-                    _unroll_one_eq_1!(a_ptr, b_ptr, loop_size, 0);
+                    let r = _eq_b1_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
                     a_ptr = unsafe { a_ptr.add(loop_size) };
                     b_ptr = unsafe { b_ptr.add(loop_size) };
                 }
@@ -573,6 +554,212 @@ fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
     }
     //
     true
+}
+
+#[inline(always)]
+fn _eq_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { _read_a_native_endian_from_ptr_u128(a_ptr) };
+    let bc = unsafe { _read_a_native_endian_from_ptr_u128(b_ptr) };
+    ac == bc
+}
+
+#[inline(always)]
+fn _eq_b16_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b16_aa_x1(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b16_aa_x1(unsafe { a_ptr.add(16) }, unsafe { b_ptr.add(16) })
+}
+
+#[inline(always)]
+fn _eq_b16_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b16_aa_x2(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b16_aa_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
+}
+
+#[inline(always)]
+fn _eq_b16_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b16_aa_x4(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b16_aa_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) })
+}
+
+#[inline(always)]
+fn _eq_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b16_aa_x8(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b16_aa_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) })
+}
+
+#[inline(always)]
+fn _eq_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { _read_a_native_endian_from_ptr_u64(a_ptr) };
+    let bc = unsafe { _read_a_native_endian_from_ptr_u64(b_ptr) };
+    ac == bc
+}
+
+#[inline(always)]
+fn _eq_b8_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b8_aa_x1(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b8_aa_x1(unsafe { a_ptr.add(8) }, unsafe { b_ptr.add(8) })
+}
+
+#[inline(always)]
+fn _eq_b8_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b8_aa_x2(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b8_aa_x2(unsafe { a_ptr.add(8 * 2) }, unsafe { b_ptr.add(8 * 2) })
+}
+
+#[inline(always)]
+fn _eq_b8_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b8_aa_x4(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b8_aa_x4(unsafe { a_ptr.add(8 * 4) }, unsafe { b_ptr.add(8 * 4) })
+}
+
+#[inline(always)]
+fn _eq_b8_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b8_aa_x8(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b8_aa_x8(unsafe { a_ptr.add(8 * 8) }, unsafe { b_ptr.add(8 * 8) })
+}
+
+#[inline(always)]
+fn _eq_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { _read_a_native_endian_from_ptr_u32(a_ptr) };
+    let bc = unsafe { _read_a_native_endian_from_ptr_u32(b_ptr) };
+    ac == bc
+}
+
+#[inline(always)]
+fn _eq_b4_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b4_aa_x1(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b4_aa_x1(unsafe { a_ptr.add(4) }, unsafe { b_ptr.add(4) })
+}
+
+#[inline(always)]
+fn _eq_b4_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b4_aa_x2(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b4_aa_x2(unsafe { a_ptr.add(4 * 2) }, unsafe { b_ptr.add(4 * 2) })
+}
+
+#[inline(always)]
+fn _eq_b4_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b4_aa_x4(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b4_aa_x4(unsafe { a_ptr.add(4 * 4) }, unsafe { b_ptr.add(4 * 4) })
+}
+
+#[inline(always)]
+fn _eq_b4_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b4_aa_x8(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b4_aa_x8(unsafe { a_ptr.add(4 * 8) }, unsafe { b_ptr.add(4 * 8) })
+}
+
+#[inline(always)]
+fn _eq_b2_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { _read_a_native_endian_from_ptr_u16(a_ptr) };
+    let bc = unsafe { _read_a_native_endian_from_ptr_u16(b_ptr) };
+    ac == bc
+}
+
+#[inline(always)]
+fn _eq_b2_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b2_aa_x1(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b2_aa_x1(unsafe { a_ptr.add(2) }, unsafe { b_ptr.add(2) })
+}
+
+#[inline(always)]
+fn _eq_b2_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b2_aa_x2(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b2_aa_x2(unsafe { a_ptr.add(2 * 2) }, unsafe { b_ptr.add(2 * 2) })
+}
+
+#[inline(always)]
+fn _eq_b2_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b2_aa_x4(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b2_aa_x4(unsafe { a_ptr.add(2 * 4) }, unsafe { b_ptr.add(2 * 4) })
+}
+
+#[inline(always)]
+fn _eq_b2_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b2_aa_x8(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b2_aa_x8(unsafe { a_ptr.add(2 * 8) }, unsafe { b_ptr.add(2 * 8) })
+}
+
+#[inline(always)]
+fn _eq_b1_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { *a_ptr };
+    let bc = unsafe { *b_ptr };
+    ac == bc
+}
+
+#[inline(always)]
+fn _eq_b1_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b1_aa_x1(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b1_aa_x1(unsafe { a_ptr.add(1) }, unsafe { b_ptr.add(1) })
+}
+
+#[inline(always)]
+fn _eq_b1_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b1_aa_x2(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b1_aa_x2(unsafe { a_ptr.add(2) }, unsafe { b_ptr.add(2) })
+}
+
+#[inline(always)]
+fn _eq_b1_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let r = _eq_b1_aa_x4(a_ptr, b_ptr);
+    if !r {
+        return r;
+    }
+    _eq_b1_aa_x4(unsafe { a_ptr.add(4) }, unsafe { b_ptr.add(4) })
 }
 
 /*
@@ -589,29 +776,6 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
         if a[i] != b[i] {
             return false;
         }
-    }
-    true
-}
-
-#[inline(always)]
-pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
-    let a_len = a.len();
-    let b_len = b.len();
-    if a_len != b_len {
-        return false;
-    }
-    let min_len = a_len;
-    let mut a_ptr = a.as_ptr();
-    let mut b_ptr = b.as_ptr();
-    let end_ptr = unsafe { a_ptr.add(min_len) };
-    while a_ptr < end_ptr {
-        let aa = unsafe { *a_ptr };
-        let bb = unsafe { *b_ptr };
-        if aa != bb {
-            return false;
-        }
-        a_ptr = unsafe { a_ptr.add(1) };
-        b_ptr = unsafe { b_ptr.add(1) };
     }
     true
 }

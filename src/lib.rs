@@ -162,9 +162,10 @@ pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
 
 /// This mimics `libc::bcmp()`, same as `a == b`.
 pub fn memeq(a: &[u8], b: &[u8]) -> bool {
-    mem::_memeq_impl(a, b)
     /*
+    mem::_memeq_impl(a, b)
     sse2 or avx2 are slower, but I don't know why.
+    */
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -177,7 +178,6 @@ pub fn memeq(a: &[u8], b: &[u8]) -> bool {
     let r = mem::_memeq_impl(a, b);
     //
     r
-    */
 }
 
 /// This mimics `libc::memmem()`, same as `(haystack as &str).find(needle as &str)` or `haystack.windows(needle.len()).position(|window| window == needle)`.
