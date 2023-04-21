@@ -148,22 +148,6 @@ fn _cmp_to_aligned_u32(
     (Some((a_ptr_end, b_ptr_end)), None)
 }
 
-#[inline(always)]
-fn _cmp_to_aligned_u16(
-    a_ptr: *const u8,
-    b_ptr: *const u8,
-) -> (Option<(*const u8, *const u8)>, Option<Ordering>) {
-    let remaining_align = 0x04_usize - ((a_ptr as usize) & 0x03_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_cmp_to_aligned_x2!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (Some((a_ptr_end, b_ptr_end)), None)
-}
-
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
 pub(crate) fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
