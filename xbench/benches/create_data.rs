@@ -339,7 +339,7 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, Vec<u8>) {
     let mut i = 0;
     loop {
         i += 1;
-        if i > 4 {
+        if i > 21 {
             break;
         }
         if i % 2 == 0 {
@@ -348,7 +348,7 @@ pub fn create_data_cpy_en_1() -> (Vec<Vec<u8>>, Vec<u8>) {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    let src_s = "E1234567890123456789012345E".as_bytes(); // 27 bytes
+    let src_s = "E1234567890123E".as_bytes(); // 15 bytes
     (v, src_s.to_vec())
 }
 
@@ -359,7 +359,7 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, Vec<u8>) {
     let mut i = 0;
     loop {
         i += 1;
-        if i > 3 {
+        if i > 41 {
             break;
         }
         if i % 2 == 0 {
@@ -368,11 +368,10 @@ pub fn create_data_cpy_ja_1() -> (Vec<Vec<u8>>, Vec<u8>) {
             v.push(s2.as_bytes().to_vec());
         }
     }
-    //let src_s = "いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい".as_bytes(); // 99 bytes
-    let b1 = "いいいいいいいいいいいいいいいいいいいい"; // 60 bytes
-    let m1 = b1.repeat(14);
-    let src_s = m1.as_bytes();
-    (v, src_s.to_vec())
+    let b1 = "いいいいいいいいいいいいいいいい"; // 48 bytes
+    let m1 = b1.repeat(3);
+    let _src_s = m1.as_bytes(); // 144 bytes
+    (v, _src_s.to_vec())
 }
 
 pub fn create_data_set_en_1() -> (Vec<Vec<u8>>, usize) {

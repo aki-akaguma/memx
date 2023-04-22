@@ -93,6 +93,13 @@ pub(crate) use mem_rmem::_memrmem_impl;
 mod mem_cpy;
 pub(crate) use mem_cpy::_memcpy_impl;
 
+#[allow(unused_imports)]
+pub(crate) use mem_cpy::_cpy_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_cpy::_cpy_to_aligned_u256;
+#[allow(unused_imports)]
+pub(crate) use mem_cpy::_memcpy_remaining_15_bytes_impl;
+
 mod mem_set;
 pub(crate) use mem_set::_memset_impl;
 

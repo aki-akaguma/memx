@@ -6,12 +6,14 @@ readme: README.md
 README.md: README.tpl src/lib.rs
 	cargo readme > $@
 
+TEST_THR=-- --test-threads=1
+TEST_THR=
 test:
-	cargo test --offline --features test
-	cargo test --offline --features test_pointer_width_128
-	cargo test --offline --features test_pointer_width_64
-	cargo test --offline --features test_pointer_width_32
-	cargo test --offline --features test_alignment_check
+	cargo test --offline --features test $(TEST_THR)
+	cargo test --offline --features test_pointer_width_128 $(TEST_THR)
+	cargo test --offline --features test_pointer_width_64 $(TEST_THR)
+	cargo test --offline --features test_pointer_width_32 $(TEST_THR)
+	cargo test --offline --features test_alignment_check $(TEST_THR)
 
 AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl -- test memrchr_dbl
 test-alignment-check:
@@ -68,7 +70,7 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
-GRCOV_TEST=--test memeq
+GRCOV_TEST=--test memcpy
 GRCOV_TEST=
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
@@ -88,7 +90,7 @@ BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
 BG_PROF=
 BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
 BENCH_GRCOV=
-BENCH_GRCOV=--bench bench-memeq
+BENCH_GRCOV=--bench bench-memcpy
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
@@ -111,7 +113,7 @@ endef
 #bench_nms = bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memeq
+bench_nms = bench-memcpy
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux

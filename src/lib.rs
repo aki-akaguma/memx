@@ -226,17 +226,22 @@ pub fn memrmem(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 /// The `src` and the `dst` must not overlape.
 /// This function return `Err(RangeError)` if `dst.len() < src.len()`, otherwise return `Ok(())`
 pub fn memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    mem::_memcpy_impl(dst, src)
     /*
+    mem::_memcpy_impl(dst, src)
     sse2 or avx2 are slower, but I don't know why.
-    #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-    let r = arch::x86::_memcpy_impl(dst, src);
-    //
-    #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+    */
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memcpy_impl(dst, src) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memcpy_impl(dst, src) }
+    };
+    #[cfg(feature = "test_pointer_width")]
     let r = mem::_memcpy_impl(dst, src);
     //
     r
-    */
 }
 
 /// This mimics `libc::memset()`, same as `buf.fill(c)`.
