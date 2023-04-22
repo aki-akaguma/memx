@@ -14,12 +14,6 @@ pub fn std_memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), memx::RangeErro
     Ok(())
 }
 
-macro_rules! j_bool {
-    ($j: expr) => {
-        $j < 16 || $j % 4 == 0
-    };
-}
-
 #[inline(never)]
 fn statistics_std_memcpy(
     texts: &mut [Vec<u8>],
@@ -33,28 +27,20 @@ fn statistics_std_memcpy(
     let pat_len = pat_bytes.len();
     use std::collections::HashMap;
     let mut founded: HashMap<u32, usize> = HashMap::new();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _r = _t_(&mut line_bytes[j..], pat_bytes);
-                //
-                let addr = ((&line_bytes[j..]).as_ptr() as usize % 64) as u32;
-                if let Some(x) = founded.get_mut(&addr) {
-                    *x += 1;
-                } else {
-                    founded.insert(addr, 0);
-                }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            //
+            let addr = (tt.as_ptr() as usize % 64) as u32;
+            if let Some(x) = founded.get_mut(&addr) {
+                *x += 1;
+            } else {
+                founded.insert(addr, 0);
             }
-        }
-        let _r = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
-        //
-        let addr = ((&line_bytes[(line_len - pat_bytes.len())..]).as_ptr() as usize % 64) as u32;
-        if let Some(x) = founded.get_mut(&addr) {
-            *x += 1;
-        } else {
-            founded.insert(addr, 0);
+            curr_idx = curr_idx + pat_len.max(1);
         }
     }
     founded
@@ -81,15 +67,14 @@ fn process_std_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _r = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _r = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -118,15 +103,14 @@ fn process_libc_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _r = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _r = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -138,15 +122,14 @@ fn process_memx_memcpy(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _ = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _ = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -158,15 +141,14 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _ = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _ = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -182,15 +164,14 @@ fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _ = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _ = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
@@ -206,30 +187,28 @@ fn process_memx_memcpy_avx2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     }
     //
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &mut texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                let _ = _t_(&mut line_bytes[j..], pat_bytes);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &mut line_bytes[curr_idx..(curr_idx + pat_len)];
+            let _r = _t_(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        let _ = _t_(&mut line_bytes[(line_len - pat_bytes.len())..], pat_bytes);
     }
 }
 
 #[inline(never)]
 fn assert_result(texts: &[Vec<u8>], pat_bytes: &[u8]) {
     let pat_len = pat_bytes.len();
-    for i in 0..texts.len() {
-        let line_bytes = &texts[i];
+    for line_bytes in texts {
         let line_len = line_bytes.len();
-        for j in 0..=(line_len - pat_len) {
-            if j_bool!(j) {
-                assert_eq!(line_bytes[j], pat_bytes[0]);
-            }
+        let mut curr_idx = 0;
+        while curr_idx < line_len - pat_len {
+            let tt = &line_bytes[curr_idx..(curr_idx + pat_len)];
+            assert_eq!(tt, pat_bytes);
+            curr_idx = curr_idx + pat_len.max(1);
         }
-        assert_eq!(&line_bytes[(line_len - pat_len)..], pat_bytes);
     }
 }
 

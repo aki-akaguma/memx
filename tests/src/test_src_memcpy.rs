@@ -52,11 +52,11 @@ fn test02() {
         });
         assert_eq!(r, Ok(()));
         assert_eq!(&dst[x..(x + src_sl.len())], src_sl);
-        assert_eq!(dst[x + src_sl.len()], 0);
-        assert_eq!(dst[x + src_sl.len() + 1], 0);
-        assert_eq!(dst[x + src_sl.len() + 2], 0);
-        assert_eq!(dst[x + src_sl.len() + 3], 0);
         assert_eq!(dst[x + src_sl.len() + 4], 0);
+        assert_eq!(dst[x + src_sl.len() + 3], 0);
+        assert_eq!(dst[x + src_sl.len() + 2], 0);
+        assert_eq!(dst[x + src_sl.len() + 1], 0);
+        assert_eq!(dst[x + src_sl.len()], 0);
     };
     #[cfg(not(miri))]
     {
