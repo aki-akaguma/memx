@@ -144,7 +144,6 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Sgl::new(c_1);
     let cc = B16Sgl::new(c_1);
     buf_ptr.prefetch_read_data();
     //
@@ -152,11 +151,24 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
-                let r = _chr_to_aligned_u128(buf_ptr, c, start_ptr);
-                if let Some(p) = r.0 {
-                    buf_ptr = p;
-                } else if let Some(v) = r.1 {
-                    return Some(v);
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_c16_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Sgl::new(c_1);
+                    let r = _chr_to_aligned_u128(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
                 }
             }
         }
@@ -164,7 +176,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c16_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -173,10 +185,11 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c16_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -188,7 +201,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c16_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -197,10 +210,11 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c16_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -221,7 +235,6 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Sgl::new(c_1);
     let cc = B8Sgl::new(c_1);
     buf_ptr.prefetch_read_data();
     //
@@ -229,11 +242,24 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u64() {
-                let r = _chr_to_aligned_u64(buf_ptr, c, start_ptr);
-                if let Some(p) = r.0 {
-                    buf_ptr = p;
-                } else if let Some(v) = r.1 {
-                    return Some(v);
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_c8_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Sgl::new(c_1);
+                    let r = _chr_to_aligned_u64(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
                 }
             }
         }
@@ -241,7 +267,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c8_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -250,10 +276,11 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -265,7 +292,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_c8_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -273,10 +300,11 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_c8_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -296,7 +324,6 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Sgl::new(c_1);
     let cc = B4Sgl::new(c_1);
     buf_ptr.prefetch_read_data();
     //
@@ -304,11 +331,24 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u32() {
-                let r = _chr_to_aligned_u32(buf_ptr, c, start_ptr);
-                if let Some(p) = r.0 {
-                    buf_ptr = p;
-                } else if let Some(v) = r.1 {
-                    return Some(v);
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_c4_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Sgl::new(c_1);
+                    let r = _chr_to_aligned_u32(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
                 }
             }
         }
@@ -316,7 +356,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_c4_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -325,10 +365,11 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_c4_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -339,7 +380,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_c4_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -347,10 +388,11 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_c4_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -373,7 +415,7 @@ pub(crate) fn _memchr_remaining_15_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u64() {
         let loop_size = 8;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_c8_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -395,7 +437,7 @@ pub(crate) fn _memchr_remaining_7_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u32() {
         let loop_size = 4;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_c4_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -417,7 +459,7 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u16() {
         let loop_size = 2;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_c2_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -427,17 +469,27 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     }
     {
         let loop_size = 1;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-                let r = _chr_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+        while buf_ptr.is_not_over(end_ptr, loop_size) {
+            let r = _chr_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
+            if r.is_some() {
+                return r;
             }
+            buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
     None
+}
+
+#[inline(always)]
+fn _chr_c16_uu_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) } ^ c16.v1;
+    let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
+    //
+    if !bits_0.is_zeros() {
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -492,6 +544,18 @@ fn _chr_c16_aa_x8(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<
 }
 
 #[inline(always)]
+fn _chr_c8_uu_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.v1;
+    let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
+    //
+    if !bits_0.is_zeros() {
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
 fn _chr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.v1;
     let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
@@ -540,6 +604,18 @@ fn _chr_c8_aa_x8(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usi
         return r;
     }
     None
+}
+
+#[inline(always)]
+fn _chr_c4_uu_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) } ^ c4.v1;
+    let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
+    //
+    if !bits_0.is_zeros() {
+        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
