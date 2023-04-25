@@ -144,7 +144,6 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Dbl::new(c_1, c_2);
     let cc = B16Dbl::new(c_1, c_2);
     buf_ptr.prefetch_read_data();
     //
@@ -152,6 +151,28 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
+                /*
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_dbl_c16_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Dbl::new(c_1, c_2);
+                    let r = _chr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                }
+                */
+                let c = B1Dbl::new(c_1, c_2);
                 let r = _chr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
@@ -164,7 +185,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c16_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -173,10 +194,11 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c16_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -188,7 +210,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c16_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -197,10 +219,11 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 16;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -221,7 +244,6 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Dbl::new(c_1, c_2);
     let cc = B8Dbl::new(c_1, c_2);
     buf_ptr.prefetch_read_data();
     //
@@ -229,6 +251,28 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u64() {
+                /*
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_dbl_c8_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Dbl::new(c_1, c_2);
+                    let r = _chr_dbl_to_aligned_u64(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                }
+                */
+                let c = B1Dbl::new(c_1, c_2);
                 let r = _chr_dbl_to_aligned_u64(buf_ptr, c, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
@@ -241,7 +285,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c8_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -250,10 +294,11 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -265,7 +310,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_dbl_c8_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -273,10 +318,11 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 8;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_dbl_c8_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -296,7 +342,6 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let c = B1Dbl::new(c_1, c_2);
     let cc = B4Dbl::new(c_1, c_2);
     buf_ptr.prefetch_read_data();
     //
@@ -304,6 +349,28 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u32() {
+                /*
+                #[cfg(not(feature = "test_alignment_check"))]
+                {
+                    let r = _chr_dbl_c4_uu_x1(buf_ptr, cc, start_ptr);
+                    if r.is_some() {
+                        return r;
+                    }
+                    let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
+                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
+                }
+                #[cfg(feature = "test_alignment_check")]
+                {
+                    let c = B1Dbl::new(c_1, c_2);
+                    let r = _chr_dbl_to_aligned_u32(buf_ptr, c, start_ptr);
+                    if let Some(p) = r.0 {
+                        buf_ptr = p;
+                    } else if let Some(v) = r.1 {
+                        return Some(v);
+                    }
+                }
+                */
+                let c = B1Dbl::new(c_1, c_2);
                 let r = _chr_dbl_to_aligned_u32(buf_ptr, c, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
@@ -316,7 +383,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c4_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
@@ -325,10 +392,11 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_dbl_c4_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -339,7 +407,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
         {
             let unroll = 2;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_dbl_c4_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -347,10 +415,11 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 4;
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let r = _chr_dbl_c4_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -373,7 +442,7 @@ pub(crate) fn _memchr_dbl_remaining_15_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u64() {
         let loop_size = 8;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_dbl_c8_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -395,7 +464,7 @@ pub(crate) fn _memchr_dbl_remaining_7_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u32() {
         let loop_size = 4;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_dbl_c4_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -417,7 +486,7 @@ pub(crate) fn _memchr_dbl_remaining_3_bytes_impl(
     let mut buf_ptr = buf_ptr;
     if buf_ptr.is_aligned_u16() {
         let loop_size = 2;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             let r = _chr_dbl_c2_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
@@ -427,17 +496,20 @@ pub(crate) fn _memchr_dbl_remaining_3_bytes_impl(
     }
     {
         let loop_size = 1;
-        if unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-            while unsafe { end_ptr.offset_from(buf_ptr) } >= loop_size as isize {
-                let r = _chr_dbl_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
+        while buf_ptr.is_not_over(end_ptr, loop_size) {
+            let r = _chr_dbl_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
+            if r.is_some() {
+                return r;
             }
+            buf_ptr = unsafe { buf_ptr.add(loop_size) };
         }
     }
     None
+}
+
+#[inline(always)]
+fn _chr_dbl_c16_uu_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
+    _chr_dbl_c16_aa_x1(buf_ptr, c16, st_ptr)
 }
 
 #[inline(always)]
@@ -504,6 +576,11 @@ fn _chr_dbl_c16_aa_x8(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Opt
 }
 
 #[inline(always)]
+fn _chr_dbl_c8_uu_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
+    _chr_dbl_c8_aa_x1(buf_ptr, c8, st_ptr)
+}
+
+#[inline(always)]
 fn _chr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option<usize> {
     let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
     let v_0_a = v_0 ^ c8.v1;
@@ -564,6 +641,11 @@ fn _chr_dbl_c8_aa_x8(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option
         return r;
     }
     None
+}
+
+#[inline(always)]
+fn _chr_dbl_c4_uu_x1(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option<usize> {
+    _chr_dbl_c4_aa_x1(buf_ptr, c4, st_ptr)
 }
 
 #[inline(always)]
