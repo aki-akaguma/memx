@@ -49,6 +49,7 @@ pub trait PtrOps {
     fn is_aligned_u16(&self) -> bool;
     fn usz_offset_from(&self, origin: *const u8) -> usize;
     fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool;
+    fn is_not_under(&self, start_ptr: *const u8, loop_unroll: usize) -> bool;
 }
 impl PtrOps for *const u8 {
     #[inline(always)]
@@ -81,6 +82,11 @@ impl PtrOps for *const u8 {
         let (end_val, overflowing) = (end_ptr as usize).overflowing_sub(loop_unroll);
         !overflowing && (*self as usize) <= end_val
     }
+    #[inline(always)]
+    fn is_not_under(&self, start_ptr: *const u8, loop_unroll: usize) -> bool {
+        let (start_val, overflowing) = loop_unroll.overflowing_add(start_ptr as usize);
+        !overflowing && (*self as usize) >= start_val
+    }
 }
 
 impl PtrOps for *mut u8 {
@@ -111,6 +117,10 @@ impl PtrOps for *mut u8 {
     #[inline(always)]
     fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool {
         (*self as *const u8).is_not_over(end_ptr, loop_unroll)
+    }
+    #[inline(always)]
+    fn is_not_under(&self, start_ptr: *const u8, loop_unroll: usize) -> bool {
+        (*self as *const u8).is_not_under(start_ptr, loop_unroll)
     }
 }
 
