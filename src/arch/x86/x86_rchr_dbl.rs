@@ -80,37 +80,30 @@ pub unsafe fn _memrchr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
-    let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
+    let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
         let cc = MMB16Dbl::new(c1, c2);
         // to a aligned pointer
         {
-            let loop_size = 16;
-            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
-            buf_ptr.prefetch_read_data();
-            let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
-            if buf_ptr.is_aligned_u128() {
-                let r = unsafe { _rchr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
-            } else {
+            if !buf_ptr.is_aligned_u128() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let r = unsafe { _rchr_dbl_c16_uu_x1(buf_ptr, cc, start_ptr) };
+                    let loop_size = 16;
+                    let buf_ptr_pre = unsafe { buf_ptr.sub(loop_size) };
+                    let r = unsafe { _rchr_dbl_c16_uu_x1(buf_ptr_pre, cc, start_ptr) };
                     if r.is_some() {
                         return r;
                     }
-                    buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
+                    buf_ptr = unsafe { buf_ptr_pre.add(remaining_align) };
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
                     let c = B1Dbl::new(c1, c2);
-                    let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr_cur, c, start_ptr);
+                    let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
                     if let Some(p) = r.0 {
-                        buf_ptr_cur = p;
+                        buf_ptr = p;
                     } else if let Some(v) = r.1 {
                         return Some(v);
                     }
@@ -119,112 +112,61 @@ fn _memrchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
         // the loop
         {
-            let unroll = 8;
-            let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _rchr_dbl_c16_aa_x8(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                }
-                buf_ptr_cur = buf_ptr;
-            }
-        }
-        {
             let unroll = 4;
             let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _rchr_dbl_c16_aa_x4(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
+            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _rchr_dbl_c16_aa_x4(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
-                buf_ptr_cur = buf_ptr;
-            }
-        }
-        {
-            let unroll = 2;
-            let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    let r = unsafe { _rchr_dbl_c16_aa_x2(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                }
-                buf_ptr_cur = buf_ptr;
             }
         }
         {
             let unroll = 1;
             let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    let r = unsafe { _rchr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
+            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                let r = unsafe { _rchr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
-                buf_ptr_cur = buf_ptr;
             }
         }
     }
-    start_ptr.prefetch_read_data();
     //
     let cc = B8Dbl::new(c1, c2);
-    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
+    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 
 #[inline(always)]
 fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
-    let mut buf_ptr_cur = unsafe { start_ptr.add(buf_len) };
+    let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
         let cc = MMB32Dbl::new(c1, c2);
         {
-            let loop_size = 32;
-            let buf_ptr = unsafe { buf_ptr_cur.sub(loop_size) };
-            buf_ptr.prefetch_read_data();
-            let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
-            if buf_ptr.is_aligned_u256() {
-                let r = unsafe { _rchr_dbl_c32_aa_x1(buf_ptr, cc, start_ptr) };
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
-            } else {
+            if !buf_ptr.is_aligned_u256() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let r = unsafe { _rchr_dbl_c32_uu_x1(buf_ptr, cc, start_ptr) };
+                    let loop_size = 32;
+                    let buf_ptr_pre = unsafe { buf_ptr.sub(loop_size) };
+                    let r = unsafe { _rchr_dbl_c32_uu_x1(buf_ptr_pre, cc, start_ptr) };
                     if r.is_some() {
                         return r;
                     }
-                    buf_ptr_cur = unsafe { buf_ptr.add(remaining_align) };
+                    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
+                    buf_ptr = unsafe { buf_ptr_pre.add(remaining_align) };
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
                     let c = B1Dbl::new(c1, c2);
-                    let r = basic::_rchr_dbl_to_aligned_u256(buf_ptr_cur, c, start_ptr);
+                    let r = basic::_rchr_dbl_to_aligned_u256(buf_ptr, c, start_ptr);
                     if let Some(p) = r.0 {
-                        buf_ptr_cur = p;
+                        buf_ptr = p;
                     } else if let Some(v) = r.1 {
                         return Some(v);
                     }
@@ -233,96 +175,47 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
         // the loop
         {
-            let unroll = 8;
-            let loop_size = 32;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _rchr_dbl_c32_aa_x8(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                }
-                buf_ptr_cur = buf_ptr;
-            }
-        }
-        {
-            let unroll = 4;
-            let loop_size = 32;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _rchr_dbl_c32_aa_x4(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                }
-                buf_ptr_cur = buf_ptr;
-            }
-        }
-        {
             let unroll = 2;
             let loop_size = 32;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _rchr_dbl_c32_aa_x2(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
+            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                let r = unsafe { _rchr_dbl_c32_aa_x2(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
-                buf_ptr_cur = buf_ptr;
             }
         }
         {
             let unroll = 1;
             let loop_size = 32;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size * unroll) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                    let r = unsafe { _rchr_dbl_c32_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
+            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                let r = unsafe { _rchr_dbl_c32_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
-                buf_ptr_cur = buf_ptr;
             }
         }
         {
             let cc = MMB16Dbl::new(c1, c2);
             let unroll = 1;
             let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            if unsafe { buf_ptr.offset_from(start_ptr) } >= (loop_size * unroll) as isize {
-                let min_ptr = unsafe { start_ptr.add(loop_size) };
-                while buf_ptr >= min_ptr {
-                    buf_ptr = unsafe { buf_ptr.sub(loop_size) };
-                    let r = unsafe { _rchr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
+            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                buf_ptr = unsafe { buf_ptr.sub(loop_size) };
+                let r = unsafe { _rchr_dbl_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
-                buf_ptr_cur = buf_ptr;
             }
         }
     } else if buf_len >= 16 {
         {
             let cc = MMB16Dbl::new(c1, c2);
+            let unroll = 1;
             let loop_size = 16;
-            let mut buf_ptr = buf_ptr_cur;
-            let min_ptr = unsafe { start_ptr.add(loop_size) };
-            if buf_ptr >= min_ptr {
+            if buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
+                let min_ptr = unsafe { start_ptr.add(loop_size) };
+                //
                 if buf_ptr.is_aligned_u128() {
                     while buf_ptr >= min_ptr {
                         buf_ptr = unsafe { buf_ptr.sub(loop_size) };
@@ -331,7 +224,6 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                             return r;
                         }
                     }
-                    buf_ptr_cur = buf_ptr;
                 } else {
                     #[cfg(not(feature = "test_alignment_check"))]
                     {
@@ -342,12 +234,11 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                                 return r;
                             }
                         }
-                        buf_ptr_cur = buf_ptr;
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
                         let c = B1Dbl::new(c1, c2);
-                        let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr_cur, c, start_ptr);
+                        let r = basic::_rchr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
                         } else if let Some(v) = r.1 {
@@ -360,16 +251,14 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                                 return r;
                             }
                         }
-                        buf_ptr_cur = buf_ptr;
                     }
                 }
             }
         }
     }
-    start_ptr.prefetch_read_data();
     //
     let cc = B8Dbl::new(c1, c2);
-    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr_cur, cc, start_ptr)
+    basic::_memrchr_dbl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 
 #[inline(always)]
