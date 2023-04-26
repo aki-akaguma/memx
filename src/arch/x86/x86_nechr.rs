@@ -88,20 +88,14 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         let cc = MMB16Sgl::new(c1);
         // to a aligned pointer
         {
-            let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
-            if buf_ptr.is_aligned_u128() {
-                let r = unsafe { _nechr_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-            } else {
+            if !buf_ptr.is_aligned_u128() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
                     let r = unsafe { _nechr_c16_uu_x1(buf_ptr, cc, start_ptr) };
                     if r.is_some() {
                         return r;
                     }
+                    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
                     buf_ptr = unsafe { buf_ptr.add(remaining_align) };
                 }
                 #[cfg(feature = "test_alignment_check")]
@@ -120,59 +114,49 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_16_x8 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_16_x8 {
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _nechr_c16_aa_x8(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _nechr_c16_aa_x8(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_16_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_16_x4 {
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _nechr_c16_aa_x4(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _nechr_c16_aa_x4(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
         {
             let unroll = 2;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_16_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_16_x2 {
-                    let r = unsafe { _nechr_c16_aa_x2(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                let r = unsafe { _nechr_c16_aa_x2(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_16_x1 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_16_x1 {
-                    let r = unsafe { _nechr_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                let r = unsafe { _nechr_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
     }
@@ -193,20 +177,14 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         let cc = MMB32Sgl::new(c1);
         // to a aligned pointer
         {
-            let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
-            if buf_ptr.is_aligned_u256() {
-                let r = unsafe { _nechr_c32_aa_x1(buf_ptr, cc, start_ptr) };
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-            } else {
+            if !buf_ptr.is_aligned_u256() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
                     let r = unsafe { _nechr_c32_uu_x1(buf_ptr, cc, start_ptr) };
                     if r.is_some() {
                         return r;
                     }
+                    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
                     buf_ptr = unsafe { buf_ptr.add(remaining_align) };
                 }
                 #[cfg(feature = "test_alignment_check")]
@@ -225,75 +203,62 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         {
             let unroll = 8;
             let loop_size = 32;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_32_x8 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_32_x8 {
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _nechr_c32_aa_x8(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _nechr_c32_aa_x8(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 4;
             let loop_size = 32;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_32_x4 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_32_x4 {
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _nechr_c32_aa_x4(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _nechr_c32_aa_x4(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
         {
             let unroll = 2;
             let loop_size = 32;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_32_x2 = unsafe { end_ptr.sub(loop_size * unroll) };
-                while buf_ptr <= end_ptr_32_x2 {
-                    buf_ptr.prefetch_read_data();
-                    let r = unsafe { _nechr_c32_aa_x2(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                buf_ptr.prefetch_read_data();
+                let r = unsafe { _nechr_c32_aa_x2(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 32;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_32_x1 = unsafe { end_ptr.sub(loop_size) };
-                while buf_ptr <= end_ptr_32_x1 {
-                    let r = unsafe { _nechr_c32_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                let r = unsafe { _nechr_c32_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
         {
             let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
-                let end_ptr_16_x1 = unsafe { end_ptr.sub(loop_size) };
-                while buf_ptr <= end_ptr_16_x1 {
-                    let r = unsafe { _nechr_c16_aa_x1(buf_ptr, cc, start_ptr) };
-                    if r.is_some() {
-                        return r;
-                    }
-                    buf_ptr = unsafe { buf_ptr.add(loop_size) };
+            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                let r = unsafe { _nechr_c16_aa_x1(buf_ptr, cc, start_ptr) };
+                if r.is_some() {
+                    return r;
                 }
+                buf_ptr = unsafe { buf_ptr.add(loop_size) };
             }
         }
     } else if buf_len >= 16 {
@@ -301,7 +266,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             let cc = MMB16Sgl::new(c1);
             let unroll = 1;
             let loop_size = 16;
-            if unsafe { end_ptr.offset_from(buf_ptr) } >= (loop_size * unroll) as isize {
+            if buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 let end_ptr_16_x1 = unsafe { end_ptr.sub(loop_size * unroll) };
                 //
                 if buf_ptr.is_aligned_u128() {
