@@ -1,6 +1,6 @@
 use crate::utils::_ascii_stochas;
 
-#[inline(always)]
+#[inline(never)]
 pub fn _memrmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let hay_len = haystack.len();
     let nee_len = needle.len();

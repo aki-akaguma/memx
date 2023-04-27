@@ -96,7 +96,7 @@ fn _memrmem_sse2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         let r = unsafe { super::_memrchr_sse2(&haystack[..curr_idx], nee_1st_byte) };
         if let Some(pos) = r {
             let r_idx = pos;
-            if crate::mem::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+            if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
                 return Some(r_idx);
             }
             curr_idx = pos;
@@ -119,7 +119,7 @@ fn _memrmem_sse2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         if let Some(pos) = r {
             if pos >= nee_last_idx {
                 let r_idx = pos - nee_last_idx;
-                if crate::mem::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+                if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
                     return Some(r_idx);
                 }
                 curr_idx = pos;
@@ -171,7 +171,7 @@ fn _memrmem_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         let r = unsafe { super::_memrchr_avx2(&haystack[..curr_idx], nee_1st_byte) };
         if let Some(pos) = r {
             let r_idx = pos;
-            if crate::mem::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+            if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
                 return Some(r_idx);
             }
             curr_idx = pos;
@@ -194,7 +194,7 @@ fn _memrmem_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
         if let Some(pos) = r {
             if pos >= nee_last_idx {
                 let r_idx = pos - nee_last_idx;
-                if crate::mem::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+                if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
                     return Some(r_idx);
                 }
                 curr_idx = pos;
