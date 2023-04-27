@@ -192,7 +192,7 @@ fn process_memx_memrmem(texts: &[&str], pattern: &str) -> usize {
 fn process_memx_memrmem_basic(texts: &[&str], pattern: &str) -> usize {
     #[inline(never)]
     fn _t_(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-        memx::mem::memmem_basic(haystack, needle)
+        memx::mem::memrmem_basic(haystack, needle)
     }
     //
     let pat_bytes = pattern.as_bytes();
