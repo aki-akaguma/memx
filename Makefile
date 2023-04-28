@@ -15,8 +15,8 @@ test:
 	cargo test --offline --features test_pointer_width_32 $(TEST_THR)
 	cargo test --offline --features test_alignment_check $(TEST_THR)
 
-AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl -- test memrchr_dbl
 AC_TESTS=--test memeq
+AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl -- test memrchr_dbl
 
 test-alignment-check:
 	cargo test --offline --features test_alignment_check $(AC_TESTS)
