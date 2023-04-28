@@ -303,7 +303,7 @@ fn _eq_b16_au_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
     if !r {
         return r;
     }
-    _eq_b16_au_x4(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
+    _eq_b16_au_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
 }
 
 #[inline(always)]

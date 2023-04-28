@@ -81,6 +81,7 @@ impl PtrOps for *const u8 {
     fn is_not_over(&self, end_ptr: *const u8, loop_unroll: usize) -> bool {
         let (end_val, overflowing) = (end_ptr as usize).overflowing_sub(loop_unroll);
         !overflowing && (*self as usize) <= end_val
+        // (unsafe { end_ptr.offset_from(*self) }) >= loop_unroll as isize
     }
     #[inline(always)]
     fn is_not_under(&self, start_ptr: *const u8, loop_unroll: usize) -> bool {

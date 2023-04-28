@@ -578,21 +578,18 @@ pub(crate) fn _memcpy_remaining_3_bytes_impl(
 
 #[inline(always)]
 fn _cpy_b16_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u128(b_ptr) };
     let bc = unsafe { (b_ptr as *const u128).read_unaligned() };
     unsafe { (a_ptr as *mut u128).write_unaligned(bc) };
 }
 
 #[inline(always)]
 fn _cpy_b16_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u128(b_ptr) };
-    let bc = unsafe { (b_ptr as *const u128).read() };
-    unsafe { (a_ptr as *mut u128).write_unaligned(bc) };
+    let bc = unsafe { (b_ptr as *const u128).read_unaligned() };
+    unsafe { (a_ptr as *mut u128).write(bc) };
 }
 
 #[inline(always)]
 fn _cpy_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u128(b_ptr) };
     let bc = unsafe { (b_ptr as *const u128).read() };
     unsafe { (a_ptr as *mut u128).write(bc) };
 }
@@ -623,14 +620,12 @@ fn _cpy_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
 
 #[inline(always)]
 fn _cpy_b8_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u64(b_ptr) };
     let bc = unsafe { (b_ptr as *const u64).read_unaligned() };
     unsafe { (a_ptr as *mut u64).write_unaligned(bc) };
 }
 
 #[inline(always)]
 fn _cpy_b8_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u64(b_ptr) };
     let bc = unsafe { (b_ptr as *const u64).read_unaligned() };
     unsafe { (a_ptr as *mut u64).write(bc) };
 }
@@ -661,7 +656,6 @@ fn _cpy_b8_au_x16(a_ptr: *const u8, b_ptr: *const u8) {
 
 #[inline(always)]
 fn _cpy_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u64(b_ptr) };
     let bc = unsafe { (b_ptr as *const u64).read() };
     unsafe { (a_ptr as *mut u64).write(bc) };
 }
@@ -698,13 +692,12 @@ fn _cpy_b4_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
 
 #[inline(always)]
 fn _cpy_b4_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    let bc = unsafe { (b_ptr as *const u32).read() };
-    unsafe { (a_ptr as *mut u32).write_unaligned(bc) };
+    let bc = unsafe { (b_ptr as *const u32).read_unaligned() };
+    unsafe { (a_ptr as *mut u32).write(bc) };
 }
 
 #[inline(always)]
 fn _cpy_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
-    //let bc = unsafe { _read_a_native_endian_from_ptr_u32(b_ptr) };
     let bc = unsafe { (b_ptr as *const u32).read() };
     unsafe { (a_ptr as *mut u32).write(bc) };
 }
