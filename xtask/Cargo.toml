@@ -5,5 +5,5 @@ authors = ["aki <aki.akaguma@hotmail.com>"]
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
-regex = "1.8"
+anyhow = "=1.0"
+regex = "=1.7"

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] *
 ### Changed
-* update depends: `regex(1.8)`
+* update depends: `regex(=1.7)`
 * rename: `memchr_double()` to `memchr_dbl()`
 * refactoring source code: remove unroll loop macro
 

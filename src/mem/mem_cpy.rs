@@ -492,10 +492,10 @@ pub(crate) fn _memcpy_remaining_7_bytes_impl(
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             let mut aa_ptr = a_ptr;
             let mut bb_ptr = b_ptr;
-            'near: loop {
+            'near_aa: loop {
                 for _ in 0..8 {
                     if aa_ptr >= eend_ptr {
-                        break 'near;
+                        break 'near_aa;
                     }
                     _cpy_b4_aa_x1(aa_ptr, bb_ptr);
                     aa_ptr = unsafe { aa_ptr.add(loop_size) };
@@ -511,10 +511,10 @@ pub(crate) fn _memcpy_remaining_7_bytes_impl(
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             let mut aa_ptr = a_ptr;
             let mut bb_ptr = b_ptr;
-            'near: loop {
+            'near_uu: loop {
                 for _ in 0..8 {
                     if aa_ptr >= eend_ptr {
-                        break 'near;
+                        break 'near_uu;
                     }
                     _cpy_b4_uu_x1(aa_ptr, bb_ptr);
                     aa_ptr = unsafe { aa_ptr.add(loop_size) };
@@ -562,10 +562,10 @@ pub(crate) fn _memcpy_remaining_3_bytes_impl(
     {
         let loop_size = 1;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            'near1: loop {
+            'near_1: loop {
                 for _ in 0..8 {
                     if a_ptr >= end_ptr {
-                        break 'near1;
+                        break 'near_1;
                     }
                     _cpy_b1_aa_x1(a_ptr, b_ptr);
                     a_ptr = unsafe { a_ptr.add(loop_size) };
