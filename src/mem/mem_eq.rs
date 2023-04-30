@@ -116,7 +116,7 @@ pub(crate) fn _eq_to_aligned_u128(
 }
 
 #[inline(always)]
-fn _eq_to_aligned_u64(
+pub(crate) fn _eq_to_aligned_u64(
     a_ptr: *const u8,
     b_ptr: *const u8,
 ) -> (Option<(*const u8, *const u8)>, Option<bool>) {
@@ -178,18 +178,6 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
         // the loop
         if b_ptr.is_aligned_u128() {
             {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b16_aa_x16(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
                 let unroll = 8;
                 let loop_size = 16;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -201,37 +189,24 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
                     b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b16_aa_x4(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b16_aa_x2(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 1;
                 let loop_size = 16;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
                     let r = _eq_b16_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+        } else {
+            {
+                let unroll = 1;
+                let loop_size = 16;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b16_au_x1(a_ptr, b_ptr);
                     if !r {
                         return r;
                     }
@@ -247,7 +222,7 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
 
 //#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
+pub(crate) fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
     //
     let a_len = a.len();
     let b_len = b.len();
@@ -276,18 +251,6 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
         // the loop
         if b_ptr.is_aligned_u64() {
             {
-                let unroll = 16;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b8_aa_x16(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
                 let unroll = 8;
                 let loop_size = 8;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -299,37 +262,24 @@ fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
                     b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b8_aa_x4(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b8_aa_x2(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 1;
                 let loop_size = 8;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
                     let r = _eq_b8_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+        } else {
+            {
+                let unroll = 1;
+                let loop_size = 8;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b8_au_x1(a_ptr, b_ptr);
                     if !r {
                         return r;
                     }
@@ -386,48 +336,23 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
                 }
             }
             {
-                let unroll = 8;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b4_aa_x8(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b4_aa_x4(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b4_aa_x2(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            {
                 let unroll = 1;
                 let loop_size = 4;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
                     let r = _eq_b4_aa_x1(a_ptr, b_ptr);
+                    if !r {
+                        return r;
+                    }
+                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
+                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+                }
+            }
+        } else {
+            {
+                let unroll = 1;
+                let loop_size = 4;
+                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
+                    let r = _eq_b4_au_x1(a_ptr, b_ptr);
                     if !r {
                         return r;
                     }
@@ -449,27 +374,39 @@ pub(crate) fn _memeq_remaining_15_bytes_impl(
 ) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
-    if a_ptr.is_aligned_u64() && b_ptr.is_aligned_u64() {
+    if a_ptr.is_aligned_u64() {
         let loop_size = 8;
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near: loop {
-                for _ in 0..16 {
-                    if aa_ptr > eend_ptr {
-                        break 'near;
+            if b_ptr.is_aligned_u64() {
+                'near_aa: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_aa;
+                        }
+                        let r = _eq_b8_aa_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    let r = _eq_b8_aa_x1(aa_ptr, bb_ptr);
-                    if !r {
-                        return r;
+                }
+            } else {
+                'near_au: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_au;
+                        }
+                        let r = _eq_b8_au_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
         }
     }
     // the remaining data is the max: 7 bytes.
@@ -480,27 +417,39 @@ pub(crate) fn _memeq_remaining_15_bytes_impl(
 fn _memeq_remaining_7_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *const u8) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
-    if a_ptr.is_aligned_u32() && b_ptr.is_aligned_u32() {
+    if a_ptr.is_aligned_u32() {
         let loop_size = 4;
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near: loop {
-                for _ in 0..16 {
-                    if aa_ptr > eend_ptr {
-                        break 'near;
+            if b_ptr.is_aligned_u32() {
+                'near_aa: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_aa;
+                        }
+                        let r = _eq_b4_aa_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    let r = _eq_b4_aa_x1(aa_ptr, bb_ptr);
-                    if !r {
-                        return r;
+                }
+            } else {
+                'near_au: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_au;
+                        }
+                        let r = _eq_b4_au_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
         }
     }
     // the remaining data is the max: 3 bytes.
@@ -511,36 +460,48 @@ fn _memeq_remaining_7_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
 fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *const u8) -> bool {
     let mut a_ptr = a_ptr;
     let mut b_ptr = b_ptr;
-    if a_ptr.is_aligned_u16() && b_ptr.is_aligned_u16() {
+    if a_ptr.is_aligned_u16() {
         let loop_size = 2;
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near2: loop {
-                for _ in 0..16 {
-                    if aa_ptr > eend_ptr {
-                        break 'near2;
+            if b_ptr.is_aligned_u16() {
+                'near_aa_2: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_aa_2;
+                        }
+                        let r = _eq_b2_aa_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    let r = _eq_b2_aa_x1(aa_ptr, bb_ptr);
-                    if !r {
-                        return r;
+                }
+            } else {
+                'near_au_2: loop {
+                    for _ in 0..2 {
+                        if a_ptr > eend_ptr {
+                            break 'near_au_2;
+                        }
+                        let r = _eq_b2_au_x1(a_ptr, b_ptr);
+                        if !r {
+                            return r;
+                        }
+                        a_ptr = unsafe { a_ptr.add(loop_size) };
+                        b_ptr = unsafe { b_ptr.add(loop_size) };
                     }
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
                 }
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
         }
     }
     {
         let loop_size = 1;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            'near1: loop {
-                for _ in 0..32 {
+            'near_1: loop {
+                for _ in 0..8 {
                     if a_ptr >= end_ptr {
-                        break 'near1;
+                        break 'near_1;
                     }
                     let r = _eq_b1_aa_x1(a_ptr, b_ptr);
                     if !r {
@@ -557,9 +518,16 @@ fn _memeq_remaining_3_bytes_impl(a_ptr: *const u8, b_ptr: *const u8, end_ptr: *c
 }
 
 #[inline(always)]
+fn _eq_b16_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { (a_ptr as *const u128).read() };
+    let bc = unsafe { (b_ptr as *const u128).read_unaligned() };
+    ac == bc
+}
+
+#[inline(always)]
 fn _eq_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let ac = unsafe { _read_a_native_endian_from_ptr_u128(a_ptr) };
-    let bc = unsafe { _read_a_native_endian_from_ptr_u128(b_ptr) };
+    let ac = unsafe { (a_ptr as *const u128).read() };
+    let bc = unsafe { (b_ptr as *const u128).read() };
     ac == bc
 }
 
@@ -600,9 +568,16 @@ fn _eq_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 }
 
 #[inline(always)]
+fn _eq_b8_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { (a_ptr as *const u64).read() };
+    let bc = unsafe { (b_ptr as *const u64).read_unaligned() };
+    ac == bc
+}
+
+#[inline(always)]
 fn _eq_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let ac = unsafe { _read_a_native_endian_from_ptr_u64(a_ptr) };
-    let bc = unsafe { _read_a_native_endian_from_ptr_u64(b_ptr) };
+    let ac = unsafe { (a_ptr as *const u64).read() };
+    let bc = unsafe { (b_ptr as *const u64).read() };
     ac == bc
 }
 
@@ -643,9 +618,16 @@ fn _eq_b8_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 }
 
 #[inline(always)]
+fn _eq_b4_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { (a_ptr as *const u32).read() };
+    let bc = unsafe { (b_ptr as *const u32).read_unaligned() };
+    ac == bc
+}
+
+#[inline(always)]
 fn _eq_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let ac = unsafe { _read_a_native_endian_from_ptr_u32(a_ptr) };
-    let bc = unsafe { _read_a_native_endian_from_ptr_u32(b_ptr) };
+    let ac = unsafe { (a_ptr as *const u32).read() };
+    let bc = unsafe { (b_ptr as *const u32).read() };
     ac == bc
 }
 
@@ -686,9 +668,16 @@ fn _eq_b4_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 }
 
 #[inline(always)]
+fn _eq_b2_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
+    let ac = unsafe { (a_ptr as *const u16).read() };
+    let bc = unsafe { (b_ptr as *const u16).read_unaligned() };
+    ac == bc
+}
+
+#[inline(always)]
 fn _eq_b2_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let ac = unsafe { _read_a_native_endian_from_ptr_u16(a_ptr) };
-    let bc = unsafe { _read_a_native_endian_from_ptr_u16(b_ptr) };
+    let ac = unsafe { (a_ptr as *const u16).read() };
+    let bc = unsafe { (b_ptr as *const u16).read() };
     ac == bc
 }
 

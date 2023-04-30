@@ -84,9 +84,13 @@ pub(crate) use mem_eq::_eq_to_aligned_u128;
 #[allow(unused_imports)]
 pub(crate) use mem_eq::_eq_to_aligned_u256;
 #[allow(unused_imports)]
+pub(crate) use mem_eq::_eq_to_aligned_u64;
+#[allow(unused_imports)]
 pub(crate) use mem_eq::_memeq_remaining_15_bytes_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_eq::_start_eq_128;
+#[allow(unused_imports)]
+pub(crate) use mem_eq::_start_eq_64;
 
 mod mem_mem;
 pub(crate) use mem_mem::_memmem_impl;

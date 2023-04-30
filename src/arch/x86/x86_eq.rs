@@ -81,19 +81,19 @@ pub unsafe fn _memeq_avx2(a: &[u8], b: &[u8]) -> bool {
 
 #[inline(always)]
 fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
-    //
     let a_len = a.len();
     let b_len = b.len();
     if a_len != b_len {
         return false;
     }
-    let mut a_ptr = a.as_ptr();
-    let mut b_ptr = b.as_ptr();
-    let end_ptr = unsafe { a_ptr.add(a_len) };
-    a_ptr.prefetch_read_data();
-    b_ptr.prefetch_read_data();
-    //
-    if a_len >= 16 {
+    if a_len < 16 {
+        basic::_start_eq_64(a, b)
+    } else {
+        let mut a_ptr = a.as_ptr();
+        let mut b_ptr = b.as_ptr();
+        let end_ptr = unsafe { a_ptr.add(a_len) };
+        a_ptr.prefetch_read_data();
+        b_ptr.prefetch_read_data();
         // to a aligned pointer
         {
             if !a_ptr.is_aligned_u128() {
@@ -121,36 +121,6 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            /*
-            {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_aa_x16(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_aa_x8(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 4;
                 let loop_size = 16;
@@ -165,20 +135,6 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
                     b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
-            /*
-            {
-                let unroll = 2;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = _eq_b16_aa_x2(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 1;
                 let loop_size = 16;
@@ -192,36 +148,6 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
                 }
             }
         } else {
-            /*
-            {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_au_x16(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_au_x8(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 4;
                 let loop_size = 16;
@@ -236,22 +162,6 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
                     b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
                 }
             }
-            /*
-            {
-                let unroll = 2;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_au_x2(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
             {
                 let unroll = 1;
                 let loop_size = 16;
@@ -265,9 +175,9 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
                 }
             }
         }
+        // the remaining data is the max: 15 bytes.
+        basic::_memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
     }
-    // the remaining data is the max: 15 bytes.
-    basic::_memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
 #[inline(always)]
