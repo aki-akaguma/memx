@@ -99,13 +99,14 @@ grcov:
 BG_PROF=CARGO_PROFILE_BENCH_LTO=no CARGO_PROFILE_BENCH_OPT_LEVEL=0
 BG_PROF=
 BG_PROF=CARGO_PROFILE_RELEASE_LTO=no CARGO_PROFILE_RELEASE_OPT_LEVEL=0
-BENCH_GRCOV=--bench bench-memchr
 BENCH_GRCOV=
+BENCH_GRCOV=--bench bench-memcmp
 
 bench-grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
-	$(COV_ENV1) $(BG_PROF) cargo xbench $(BENCH_GRCOV)
+	AKI_TEST_DAT=en.1 $(COV_ENV1) $(BG_PROF) cargo xbench $(BENCH_GRCOV)
+	#AKI_TEST_DAT=ja.1 $(COV_ENV1) $(BG_PROF) cargo xbench $(BENCH_GRCOV)
 	@mkdir -p $(CURDIR)/target/coverage
 	grcov $(CURDIR)/target/profraw --binary-path $(CURDIR)/target/release/deps/ -s . -t html --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o $(CURDIR)/target/coverage/html
 
@@ -120,11 +121,11 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memrmem
+bench_nms = bench-memcmp
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux

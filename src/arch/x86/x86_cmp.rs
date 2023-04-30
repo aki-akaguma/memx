@@ -82,13 +82,14 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
     let a_len = a.len();
     let b_len = b.len();
     let min_len = a_len.min(b_len);
-    let mut a_ptr = a.as_ptr();
-    let mut b_ptr = b.as_ptr();
-    let end_ptr = unsafe { a_ptr.add(min_len) };
-    a_ptr.prefetch_read_data();
-    b_ptr.prefetch_read_data();
-    //
-    if min_len >= 16 {
+    if min_len < 16 {
+        basic::_start_cmp_64(a, b)
+    } else {
+        let mut a_ptr = a.as_ptr();
+        let mut b_ptr = b.as_ptr();
+        let end_ptr = unsafe { a_ptr.add(min_len) };
+        a_ptr.prefetch_read_data();
+        b_ptr.prefetch_read_data();
         // to a aligned pointer
         {
             if !a_ptr.is_aligned_u128() {
@@ -117,26 +118,12 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
         // the loop
         if b_ptr.is_aligned_u128() {
             {
-                let unroll = 16;
+                let unroll = 4;
                 let loop_size = 16;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
                     a_ptr.prefetch_read_data();
                     b_ptr.prefetch_read_data();
-                    let r = _cmp_b16_aa_x16(a_ptr, b_ptr);
-                    if !r.is_eq() {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _cmp_b16_aa_x8(a_ptr, b_ptr);
+                    let r = _cmp_b16_aa_x4(a_ptr, b_ptr);
                     if !r.is_eq() {
                         return r;
                     }
@@ -158,26 +145,12 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
             }
         } else {
             {
-                let unroll = 16;
+                let unroll = 4;
                 let loop_size = 16;
                 while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
                     a_ptr.prefetch_read_data();
                     b_ptr.prefetch_read_data();
-                    let r = _cmp_b16_au_x16(a_ptr, b_ptr);
-                    if !r.is_eq() {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _cmp_b16_au_x8(a_ptr, b_ptr);
+                    let r = _cmp_b16_au_x4(a_ptr, b_ptr);
                     if !r.is_eq() {
                         return r;
                     }
@@ -198,9 +171,9 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
                 }
             }
         }
+        // the remaining data is the max: 15 bytes.
+        basic::_memcmp_remaining_15_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
     }
-    // the remaining data is the max: 15 bytes.
-    basic::_memcmp_remaining_15_bytes_impl(a_ptr, b_ptr, a_len, b_len, end_ptr)
 }
 
 #[inline(always)]
