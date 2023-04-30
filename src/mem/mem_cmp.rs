@@ -376,10 +376,10 @@ pub(crate) fn _memcmp_remaining_15_bytes_impl(
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             if b_ptr.is_aligned_u64() {
-                'near: loop {
+                'near_aa: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near;
+                            break 'near_aa;
                         }
                         let r = _cmp_b8_aa_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -390,10 +390,10 @@ pub(crate) fn _memcmp_remaining_15_bytes_impl(
                     }
                 }
             } else {
-                'near: loop {
+                'near_au: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near;
+                            break 'near_au;
                         }
                         let r = _cmp_b8_au_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -425,10 +425,10 @@ fn _memcmp_remaining_7_bytes_impl(
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             if b_ptr.is_aligned_u32() {
-                'near: loop {
+                'near_aa: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near;
+                            break 'near_aa;
                         }
                         let r = _cmp_b4_aa_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -439,10 +439,10 @@ fn _memcmp_remaining_7_bytes_impl(
                     }
                 }
             } else {
-                'near: loop {
+                'near_au: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near;
+                            break 'near_au;
                         }
                         let r = _cmp_b4_au_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -474,10 +474,10 @@ fn _memcmp_remaining_3_bytes_impl(
         if a_ptr.is_not_over(end_ptr, loop_size) {
             let eend_ptr = unsafe { end_ptr.sub(loop_size) };
             if b_ptr.is_aligned_u16() {
-                'near2: loop {
+                'near_aa_2: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near2;
+                            break 'near_aa_2;
                         }
                         let r = _cmp_b2_aa_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -488,10 +488,10 @@ fn _memcmp_remaining_3_bytes_impl(
                     }
                 }
             } else {
-                'near2: loop {
+                'near_au_2: loop {
                     for _ in 0..2 {
                         if a_ptr >= eend_ptr {
-                            break 'near2;
+                            break 'near_au_2;
                         }
                         let r = _cmp_b2_au_x1(a_ptr, b_ptr);
                         if !r.is_eq() {
@@ -507,10 +507,10 @@ fn _memcmp_remaining_3_bytes_impl(
     {
         let loop_size = 1;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            'near1: loop {
+            'near_1: loop {
                 for _ in 0..8 {
                     if a_ptr >= end_ptr {
-                        break 'near1;
+                        break 'near_1;
                     }
                     let r = _cmp_b1_aa_x1(a_ptr, b_ptr);
                     if !r.is_eq() {
