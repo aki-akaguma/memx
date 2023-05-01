@@ -122,10 +122,10 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl
-#bench_nms = bench-memchr_dbl bench-memrchr_dbl
+bench_nms = bench-memchr_dbl bench-memrchr_dbl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memeq
+#bench_nms = bench-memeq
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -153,7 +153,7 @@ target/stamp.bench/stamp.bench.$(1).$(2):
 	@mkdir -p target/stamp.bench
 	@mkdir -p target/result
 	$(MAKE) -f makefile.build BENCH_NM=$(1) TARGET_GNU=$(2)-gnu TARGET_MUSL=$(2)-musl bench-all
-	$(MAKE) -f makefile.build report | tee target/result/result.$(1).$(2).txt
+	$(MAKE) -f makefile.build report --no-print-directory | tee target/result/result.$(1).$(2).txt
 	@touch target/stamp.bench/stamp.bench.$(1).$(2)
 
 endef

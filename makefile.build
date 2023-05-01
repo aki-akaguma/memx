@@ -82,28 +82,28 @@ clean:
 	@rm -f z.*
 
 report:
-	cargo xtask shape_benchmark_results
+	@cargo xtask shape_benchmark_results
 
 
 bench.en.1-gnu: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
 	@rm -fr target/criterion
-	@rm -f z.bench.en.1.log
-	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.en.1.log
+	@rm -f z.bench.gnu.en.1.log
+	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.gnu.en.1.log
 
 bench.ja.1-gnu: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_GNU)
 	@rm -fr target/criterion
-	@rm -f z.bench.ja.1.log
-	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.ja.1.log
+	@rm -f z.bench.gnu.ja.1.log
+	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_GNU) -- -n | tee -a z.bench.gnu.ja.1.log
 
 bench.en.1-musl: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
 	@rm -fr target/criterion
-	@rm -f z.musl.bench.en.1.log
-	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.en.1.log
+	@rm -f z.bench.musl.en.1.log
+	env AKI_TEST_DAT=en.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.bench.musl.en.1.log
 
 bench.ja.1-musl: target/stamp.build/stamp.build.$(BENCH_NM).$(TARGET_MUSL)
 	@rm -fr target/criterion
-	@rm -f z.musl.bench.ja.1.log
-	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.musl.bench.ja.1.log
+	@rm -f z.bench.musl.ja.1.log
+	env AKI_TEST_DAT=ja.1 $(TSK) cargo xbench $(BENCH_STR) --target=$(TARGET_MUSL) -- -n | tee -a z.bench.musl.ja.1.log
 
 
 bench-andr: bench.en.1-andr bench.ja.1-andr bench.en.1-musl-andr bench.ja.1-musl-andr
@@ -135,18 +135,18 @@ target/stamp.bench-build-musl-andr: target/$(BENCH_FNM)_musl
 	@touch target/stamp.bench-build-musl-andr
 
 bench.en.1-andr: target/stamp.bench-build-gnu-andr
-	@rm -f z.bench.en.1.log
-	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=en.1 /data/local/tmp/target/$(BENCH_FNM)_andr -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.en.1.log
+	@rm -f z.bench.gnu.en.1.log
+	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=en.1 /data/local/tmp/target/$(BENCH_FNM)_andr -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.gnu.en.1.log
 
 bench.ja.1-andr: target/stamp.bench-build-gnu-andr
-	@rm -f z.bench.ja.1.log
-	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=ja.1 /data/local/tmp/target/$(BENCH_FNM)_andr -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.ja.1.log
+	@rm -f z.bench.gnu.ja.1.log
+	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=ja.1 /data/local/tmp/target/$(BENCH_FNM)_andr -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.gnu.ja.1.log
 
 bench.en.1-musl-andr: target/stamp.bench-build-musl-andr
-	@rm -f z.musl.bench.en.1.log
-	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=en.1 /data/local/tmp/target/$(BENCH_FNM)_musl -n --bench | $(ADB_BBOX)/cat" | tee -a z.musl.bench.en.1.log
+	@rm -f z.bench.musl.en.1.log
+	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=en.1 /data/local/tmp/target/$(BENCH_FNM)_musl -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.musl.en.1.log
 
 bench.ja.1-musl-andr: target/stamp.bench-build-musl-andr
-	@rm -f z.musl.bench.ja.1.log
-	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=ja.1 /data/local/tmp/target/$(BENCH_FNM)_musl -n --bench | $(ADB_BBOX)/cat" | tee -a z.musl.bench.ja.1.log
+	@rm -f z.bench.musl.ja.1.log
+	adb -s $(ADB_DEV) shell "$(ADB_BBOX)/env AKI_TEST_DAT=ja.1 /data/local/tmp/target/$(BENCH_FNM)_musl -n --bench | $(ADB_BBOX)/cat" | tee -a z.bench.musl.ja.1.log
 
