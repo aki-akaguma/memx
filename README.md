@@ -42,11 +42,12 @@ Failed lists:
 
 # Benchmark results
 
-| forward search | backward search |
-|:---------------|:----------------|
-| [`memchr()`]   | [`memrchr()`]   |
-| [`memnechr()`] | [`memrnechr()`] |
-| [`memmem()`]   | [`memrmem()`]   |
+| forward search   | backward search   |
+|:-----------------|:------------------|
+| [`memchr()`]     | [`memrchr()`]     |
+| [`memnechr()`]   | [`memrnechr()`]   |
+| [`memmem()`]     | [`memrmem()`]     |
+| [`memchr_dbl()`] | [`memrchr_dbl()`] |
 
 | memory op      |
 |:---------------|
@@ -65,6 +66,8 @@ Failed lists:
 [`memrmem()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrmem.md
 [`memrnechr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr.md
 [`memset()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md
+[`memchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_dbl.md
+[`memrchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_dbl.md
 
 # Changelogs
 
