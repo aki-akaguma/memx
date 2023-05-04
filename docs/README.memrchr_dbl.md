@@ -1,37 +1,37 @@
 ## Benchmark results
 
-- compile by rustc 1.68.1 (8460ca823 2023-03-20)
+- compile by rustc 1.69.0 (84c898d65 2023-04-16)
 
-  0. x86_64-unknown-linux- @Broadwell:
+  0. x86_64-unknown-linux- @i5-4570:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr_double      |   16.347 µs |   29.675 µs |   16.338 µs |   30.004 µs |
-| memchr_memrchr_double   |    9.646 µs |   11.211 µs |    9.807 µs |   11.142 µs |
-| memx_memrchr_double     |    7.820 µs |    8.997 µs |    7.799 µs |    9.174 µs |
-| memx_memrchr_w_basic    |   10.837 µs |   14.912 µs |   10.758 µs |   15.322 µs |
-| memx_memrchr_w_sse2     |    7.855 µs |    9.622 µs |    7.855 µs |    9.683 µs |
-| memx_memrchr_w_avx2     |    7.726 µs |    8.977 µs |    7.672 µs |    9.033 µs |
+| std_memrchr_dbl         |   12.235 µs |   21.802 µs |   11.121 µs |   20.681 µs |
+| memchr_memrchr_dbl      |    6.839 µs |    7.751 µs |    6.797 µs |    7.811 µs |
+| memx_memrchr_dbl        |    5.933 µs |    6.795 µs |    5.852 µs |    6.969 µs |
+| memx_memrchr_w_basic    |    8.761 µs |   12.011 µs |    8.342 µs |   11.628 µs |
+| memx_memrchr_w_sse2     |    5.835 µs |    6.849 µs |    5.852 µs |    6.838 µs |
+| memx_memrchr_w_avx2     |    5.977 µs |    6.814 µs |    5.870 µs |    6.973 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr_double      |   32.306 µs |   53.684 µs |   32.588 µs |   52.928 µs |
-| memchr_memrchr_double   |   21.110 µs |   25.723 µs |   21.468 µs |   26.379 µs |
-| memx_memrchr_double     |   19.338 µs |   22.600 µs |   19.299 µs |   21.975 µs |
-| memx_memrchr_w_basic    |   21.571 µs |   28.116 µs |   21.257 µs |   28.435 µs |
-| memx_memrchr_w_sse2     |   18.459 µs |   19.682 µs |   18.359 µs |   20.344 µs |
+| std_memrchr_dbl         |   33.601 µs |   53.750 µs |   33.067 µs |   53.803 µs |
+| memchr_memrchr_dbl      |   21.458 µs |   25.744 µs |   22.105 µs |   26.392 µs |
+| memx_memrchr_dbl        |   20.621 µs |   24.656 µs |   20.752 µs |   24.059 µs |
+| memx_memrchr_w_basic    |   21.814 µs |   30.338 µs |   21.158 µs |   30.836 µs |
+| memx_memrchr_w_sse2     |   18.978 µs |   21.930 µs |   19.296 µs |   22.296 µs |
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr_double      |   32.434 µs |   53.547 µs |   33.135 µs |   53.164 µs |
-| memchr_memrchr_double   |   38.737 µs |   53.952 µs |   39.950 µs |   55.311 µs |
-| memx_memrchr_double     |   26.044 µs |   29.574 µs |   27.170 µs |   30.613 µs |
-| memx_memrchr_w_basic    |   30.237 µs |   44.752 µs |   30.073 µs |   44.622 µs |
-| memx_memrchr_w_sse2     |   25.523 µs |   27.700 µs |   24.942 µs |   27.348 µs |
+| std_memrchr_dbl         |   33.137 µs |   53.089 µs |   33.147 µs |   53.273 µs |
+| memchr_memrchr_dbl      |   38.929 µs |   53.550 µs |   39.695 µs |   55.342 µs |
+| memx_memrchr_dbl        |   27.640 µs |   31.709 µs |   27.090 µs |   32.048 µs |
+| memx_memrchr_w_basic    |   31.747 µs |   47.265 µs |   34.754 µs |   51.597 µs |
+| memx_memrchr_w_sse2     |   26.858 µs |   29.387 µs |   26.953 µs |   31.395 µs |
 
   3. i586-unknown-linux- @Q6600:
 
@@ -92,4 +92,5 @@
 - `:ja` is japanese haystack or long length.
 - `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
-- bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
+- @i5-4570: bench on intel i5-4570 @ 3.2GHz
+- @Q6600: bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz

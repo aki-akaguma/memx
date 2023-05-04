@@ -1,37 +1,37 @@
 ## Benchmark results
 
-- compile by rustc 1.68.1 (8460ca823 2023-03-20)
+- compile by rustc 1.69.0 (84c898d65 2023-04-16)
 
-  0. x86_64-unknown-linux- @Broadwell:
+  0. x86_64-unknown-linux- @i5-4570:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |    4.717 µs |    5.114 µs |   29.647 µs |    7.031 µs |
-| libc_memcpy             |    4.663 µs |    4.910 µs |   29.559 µs |    7.199 µs |
-| memx_memcpy             |    9.436 µs |    5.082 µs |   10.267 µs |    5.086 µs |
-| memx_memcpy_basic       |   10.316 µs |    9.079 µs |   10.548 µs |    7.622 µs |
-| memx_memcpy_sse2        |   10.199 µs |    4.878 µs |   10.002 µs |    5.084 µs |
-| memx_memcpy_avx2        |    9.585 µs |    4.958 µs |   10.207 µs |    4.942 µs |
+| std_memcpy              |    3.154 µs |    3.358 µs |   20.511 µs |    4.923 µs |
+| libc_memcpy             |    3.464 µs |    3.236 µs |   20.548 µs |    5.024 µs |
+| memx_memcpy             |    6.536 µs |    3.258 µs |    7.064 µs |    3.342 µs |
+| memx_memcpy_basic       |    7.342 µs |    6.288 µs |    7.023 µs |    5.179 µs |
+| memx_memcpy_sse2        |    7.061 µs |    3.424 µs |    6.924 µs |    3.128 µs |
+| memx_memcpy_avx2        |    6.548 µs |    3.224 µs |    7.072 µs |    3.354 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |    7.405 µs |    7.555 µs |   38.428 µs |    9.597 µs |
-| libc_memcpy             |    7.312 µs |    7.515 µs |   45.793 µs |    9.655 µs |
-| memx_memcpy             |   13.836 µs |    6.893 µs |   13.645 µs |    6.850 µs |
-| memx_memcpy_basic       |   13.972 µs |   10.501 µs |   13.481 µs |   13.112 µs |
-| memx_memcpy_sse2        |   13.813 µs |    6.872 µs |   13.669 µs |    6.874 µs |
+| std_memcpy              |    7.529 µs |    9.469 µs |   40.096 µs |    9.819 µs |
+| libc_memcpy             |    7.724 µs |    9.301 µs |   46.730 µs |    9.836 µs |
+| memx_memcpy             |   14.133 µs |    7.013 µs |   13.976 µs |    6.987 µs |
+| memx_memcpy_basic       |   15.395 µs |   13.385 µs |   13.992 µs |   10.722 µs |
+| memx_memcpy_sse2        |   14.023 µs |    6.999 µs |   13.969 µs |    7.031 µs |
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memcpy              |   16.389 µs |   10.308 µs |   30.689 µs |   14.848 µs |
-| libc_memcpy             |   14.882 µs |    9.883 µs |   30.687 µs |   14.821 µs |
-| memx_memcpy             |   21.152 µs |    9.938 µs |   21.752 µs |   10.049 µs |
-| memx_memcpy_basic       |   18.042 µs |   24.151 µs |   19.232 µs |   24.625 µs |
-| memx_memcpy_sse2        |   20.738 µs |    9.762 µs |   21.491 µs |   10.113 µs |
+| std_memcpy              |   16.600 µs |   10.256 µs |   31.446 µs |   15.342 µs |
+| libc_memcpy             |   15.340 µs |    9.834 µs |   30.786 µs |   14.831 µs |
+| memx_memcpy             |   21.488 µs |   10.016 µs |   21.364 µs |   10.354 µs |
+| memx_memcpy_basic       |   17.950 µs |   24.144 µs |   19.343 µs |   24.634 µs |
+| memx_memcpy_sse2        |   21.220 µs |    9.854 µs |   21.223 µs |   10.253 µs |
 
   3. i586-unknown-linux- @Q6600:
 
@@ -88,4 +88,5 @@
 - `:ja` is japanese haystack or long length.
 - `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
-- bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
+- @i5-4570: bench on intel i5-4570 @ 3.2GHz
+- @Q6600: bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
