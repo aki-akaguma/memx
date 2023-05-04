@@ -1,39 +1,39 @@
 ## Benchmark results
 
-- compile by rustc 1.68.1 (8460ca823 2023-03-20)
+- compile by rustc 1.69.0 (84c898d65 2023-04-16)
 
-  0. x86_64-unknown-linux- @Broadwell:
+  0. x86_64-unknown-linux- @i5-4570:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |   15.445 µs |   16.863 µs |   15.282 µs |   16.571 µs |
-| libc_memrmem            |   57.657 µs |  118.290 µs |   49.718 µs |  105.240 µs |
-| memchr_memrmem          |   14.150 µs |   14.635 µs |   14.295 µs |   14.313 µs |
-| memx_memrmem            |    0.870 µs |    1.475 µs |    0.778 µs |    1.420 µs |
-| memx_memrmem_basic      |    2.891 µs |    3.435 µs |    2.845 µs |    3.484 µs |
-| memx_memrmem_sse2       |    1.012 µs |    1.885 µs |    1.038 µs |    1.941 µs |
-| memx_memrmem_avx2       |    0.855 µs |    1.441 µs |    0.766 µs |    1.400 µs |
+| std_memrmem             |   10.646 µs |   11.440 µs |   10.667 µs |   11.331 µs |
+| libc_memrmem            |   39.404 µs |   80.604 µs |   25.872 µs |   55.201 µs |
+| memchr_memrmem          |    9.673 µs |   10.075 µs |    9.730 µs |   10.018 µs |
+| memx_memrmem            |    0.712 µs |    1.228 µs |    0.675 µs |    1.188 µs |
+| memx_memrmem_basic      |    1.803 µs |    3.487 µs |    1.800 µs |    3.493 µs |
+| memx_memrmem_sse2       |    0.834 µs |    1.522 µs |    0.832 µs |    1.531 µs |
+| memx_memrmem_avx2       |    0.706 µs |    1.223 µs |    0.675 µs |    1.185 µs |
 
   1. x86_64-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |   32.437 µs |   38.235 µs |   32.010 µs |   37.789 µs |
-| libc_memrmem            |  121.190 µs |  340.790 µs |   57.338 µs |  120.210 µs |
-| memchr_memrmem          |   35.172 µs |   35.361 µs |   34.609 µs |   35.386 µs |
-| memx_memrmem            |    1.771 µs |    3.662 µs |    1.997 µs |    3.732 µs |
-| memx_memrmem_basic      |    5.786 µs |    8.147 µs |    5.267 µs |    8.239 µs |
-| memx_memrmem_sse2       |    1.758 µs |    3.657 µs |    1.928 µs |    3.727 µs |
+| std_memrmem             |   33.140 µs |   38.388 µs |   33.314 µs |   39.369 µs |
+| libc_memrmem            |  127.580 µs |  360.580 µs |   52.124 µs |  110.220 µs |
+| memchr_memrmem          |   35.112 µs |   36.081 µs |   34.711 µs |   35.937 µs |
+| memx_memrmem            |    2.347 µs |    4.372 µs |    2.515 µs |    4.431 µs |
+| memx_memrmem_basic      |    4.951 µs |    9.539 µs |    5.120 µs |    9.406 µs |
+| memx_memrmem_sse2       |    2.199 µs |    4.371 µs |    2.319 µs |    4.467 µs |
 
   2. i686-unknown-linux-:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrmem             |   38.599 µs |   45.307 µs |   40.774 µs |   50.612 µs |
-| memchr_memrmem          |   40.733 µs |   44.172 µs |   42.166 µs |   46.761 µs |
-| memx_memrmem            |    2.127 µs |    3.669 µs |    2.201 µs |    4.094 µs |
-| memx_memrmem_basic      |    8.680 µs |   11.751 µs |    8.771 µs |   11.470 µs |
-| memx_memrmem_sse2       |    2.183 µs |    3.715 µs |    2.170 µs |    4.037 µs |
+| std_memrmem             |   38.452 µs |   45.316 µs |   40.392 µs |   49.508 µs |
+| memchr_memrmem          |   40.873 µs |   43.975 µs |   42.112 µs |   46.161 µs |
+| memx_memrmem            |    2.339 µs |    4.339 µs |    2.378 µs |    4.780 µs |
+| memx_memrmem_basic      |    8.248 µs |   16.257 µs |    8.386 µs |   16.906 µs |
+| memx_memrmem_sse2       |    2.211 µs |    4.407 µs |    2.253 µs |    4.772 µs |
 
   3. i586-unknown-linux-:
 
@@ -91,4 +91,5 @@
 - `:ja` is japanese haystack or long length.
 - `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
-- bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
+- @i5-4570: bench on intel i5-4570 @ 3.2GHz
+- @Q6600: bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz

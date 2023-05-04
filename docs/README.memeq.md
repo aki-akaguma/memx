@@ -1,37 +1,37 @@
 ## Benchmark results
 
-- compile by rustc 1.68.1 (8460ca823 2023-03-20)
+- compile by rustc 1.69.0 (84c898d65 2023-04-16)
 
-  0. x86_64-unknown-linux- @Broadwell:
+  0. x86_64-unknown-linux- @i5-4570:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |    2.003 µs |    1.931 µs |    3.746 µs |   10.377 µs |
-| libc_memeq              |    1.996 µs |    1.941 µs |    3.704 µs |   10.477 µs |
-| memx_memeq              |    3.220 µs |    2.131 µs |    3.351 µs |    2.035 µs |
-| memx_memeq_basic        |    3.865 µs |    1.995 µs |    3.256 µs |    2.063 µs |
-| memx_memeq_sse2         |    3.767 µs |    2.282 µs |    3.090 µs |    2.259 µs |
-| memx_memeq_avx2         |    3.096 µs |    2.114 µs |    3.319 µs |    2.049 µs |
+| std_memeq               |    1.368 µs |    1.298 µs |    2.948 µs |    7.649 µs |
+| libc_memeq              |    1.360 µs |    1.300 µs |    3.004 µs |    7.666 µs |
+| memx_memeq              |    2.249 µs |    1.658 µs |    2.249 µs |    1.662 µs |
+| memx_memeq_basic        |    2.184 µs |    1.461 µs |    2.160 µs |    1.459 µs |
+| memx_memeq_sse2         |    2.060 µs |    1.669 µs |    2.061 µs |    1.671 µs |
+| memx_memeq_avx2         |    2.157 µs |    1.589 µs |    2.146 µs |    1.589 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |    6.878 µs |    6.810 µs |    9.681 µs |   17.853 µs |
-| libc_memeq              |    6.959 µs |    6.806 µs |    9.675 µs |   17.829 µs |
-| memx_memeq              |    7.187 µs |    5.199 µs |    7.447 µs |    5.183 µs |
-| memx_memeq_basic        |    6.395 µs |    3.312 µs |    6.743 µs |    3.348 µs |
-| memx_memeq_sse2         |    6.966 µs |    4.357 µs |    7.204 µs |    4.589 µs |
+| std_memeq               |    6.998 µs |    6.925 µs |    8.882 µs |   17.492 µs |
+| libc_memeq              |    6.983 µs |    6.948 µs |    8.879 µs |   17.459 µs |
+| memx_memeq              |    6.603 µs |    5.129 µs |    6.456 µs |    5.393 µs |
+| memx_memeq_basic        |    6.042 µs |    3.523 µs |    6.006 µs |    3.562 µs |
+| memx_memeq_sse2         |    6.332 µs |    5.443 µs |    6.240 µs |    5.381 µs |
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memeq               |    7.699 µs |    7.789 µs |   12.389 µs |   21.250 µs |
-| libc_memeq              |    7.640 µs |    7.303 µs |   11.858 µs |   21.214 µs |
-| memx_memeq              |    8.839 µs |    7.149 µs |    9.266 µs |    7.093 µs |
-| memx_memeq_basic        |    7.753 µs |    6.610 µs |    8.524 µs |    6.948 µs |
-| memx_memeq_sse2         |    8.678 µs |    6.097 µs |    9.126 µs |    6.914 µs |
+| std_memeq               |    7.706 µs |    7.445 µs |   11.967 µs |   20.954 µs |
+| libc_memeq              |    7.685 µs |    7.289 µs |   12.364 µs |   20.447 µs |
+| memx_memeq              |    7.898 µs |    6.958 µs |    8.989 µs |    7.378 µs |
+| memx_memeq_basic        |    7.428 µs |    6.545 µs |    7.664 µs |    6.700 µs |
+| memx_memeq_sse2         |    7.884 µs |    6.855 µs |    8.511 µs |    7.060 µs |
 
   3. i586-unknown-linux- @Q6600:
 
@@ -85,4 +85,5 @@
 - `:ja` is japanese haystack or long length.
 - `gnu` is x86_64-unknown-linux-gnu
 - `musl` is x86_64-unknown-linux-musl
-- bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
+- @i5-4570: bench on intel i5-4570 @ 3.2GHz
+- @Q6600: bench on intel Q6600 @ 2.40GHz or armv7 1.5GHz
