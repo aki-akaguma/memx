@@ -37,7 +37,6 @@ cfg-iif = "0.2"
 x86-alignment-check = "0.1"
 
 [build-dependencies]
-rustc_version = "0.4"
 
 [workspace]
 members = [
