@@ -75,3 +75,13 @@ harness = false
 name = "bench-memrchr_dbl"
 path = "benches/bench-memrchr_dbl.rs"
 harness = false
+
+[[bench]]
+name = "bench-memchr_tpl"
+path = "benches/bench-memchr_tpl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrchr_tpl"
+path = "benches/bench-memrchr_tpl.rs"
+harness = false

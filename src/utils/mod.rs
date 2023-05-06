@@ -290,7 +290,7 @@ mod multi;
 pub(crate) use multi::dbl::{B16Dbl, B1Dbl, B2Dbl, B4Dbl, B8Dbl};
 //pub(crate) use multi::qpl::{B16Qpl, B1Qpl, B2Qpl, B4Qpl, B8Qpl};
 pub(crate) use multi::sgl::{B16Sgl, B1Sgl, B2Sgl, B4Sgl, B8Sgl};
-//pub(crate) use multi::tpl::{B16Tpl, B1Tpl, B2Tpl, B4Tpl, B8Tpl};
+pub(crate) use multi::tpl::{B16Tpl, B1Tpl, B2Tpl, B4Tpl, B8Tpl};
 
 // ascii stochastics
 #[rustfmt::skip]

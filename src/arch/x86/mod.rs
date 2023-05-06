@@ -10,6 +10,12 @@ pub(crate) use x86_chr_dbl::_memchr_dbl_impl;
 mod x86_rchr_dbl;
 pub(crate) use x86_rchr_dbl::_memrchr_dbl_impl;
 
+mod x86_chr_tpl;
+pub(crate) use x86_chr_tpl::_memchr_tpl_impl;
+
+mod x86_rchr_tpl;
+pub(crate) use x86_rchr_tpl::_memrchr_tpl_impl;
+
 mod x86_nechr;
 pub(crate) use x86_nechr::_memnechr_impl;
 
@@ -56,6 +62,12 @@ pub use x86_chr_dbl::_memchr_dbl_sse2;
 
 pub use x86_rchr_dbl::_memrchr_dbl_avx2;
 pub use x86_rchr_dbl::_memrchr_dbl_sse2;
+
+pub use x86_chr_tpl::_memchr_tpl_avx2;
+pub use x86_chr_tpl::_memchr_tpl_sse2;
+
+pub use x86_rchr_tpl::_memrchr_tpl_avx2;
+pub use x86_rchr_tpl::_memrchr_tpl_sse2;
 
 pub use x86_mem::_memmem_avx2;
 pub use x86_mem::_memmem_sse2;
@@ -151,5 +163,5 @@ cpufeatures::new!(cpuid_sse2, "sse2");
 mod multi;
 pub(crate) use multi::dbl::{MMB16Dbl, MMB32Dbl};
 pub(crate) use multi::sgl::{MMB16Sgl, MMB32Sgl};
-//pub(crate) use multi::tpl::{MMB16Tpl, MMB32Tpl};
+pub(crate) use multi::tpl::{MMB16Tpl, MMB32Tpl};
 //pub(crate) use multi::qpl::{MMB16Qpl, MMB32Qpl};
