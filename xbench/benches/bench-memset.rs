@@ -15,8 +15,8 @@ fn statistics_std_memset(
     len: usize,
 ) -> std::collections::HashMap<u32, usize> {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        buf.fill(c)
+    fn _t_(buf: &mut [u8], by1: u8) {
+        buf.fill(by1)
     }
     //
     use std::collections::HashMap;
@@ -59,8 +59,8 @@ fn print_statistics_std_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 #[inline(never)]
 fn process_std_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        buf.fill(c)
+    fn _t_(buf: &mut [u8], by1: u8) {
+        buf.fill(by1)
     }
     //
     for line in texts {
@@ -84,14 +84,14 @@ fn process_libc_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
         fn memset(dest: *mut u8, c: i32, n: usize) -> *mut u8;
     }
     #[inline(always)]
-    fn _x_libc_memset(dest: &mut [u8], c: u8) -> bool {
+    fn _x_libc_memset(dest: &mut [u8], by1: u8) -> bool {
         let dest_ptr = dest.as_mut_ptr();
-        let _r = unsafe { memset(dest_ptr, c.into(), dest.len()) };
+        let _r = unsafe { memset(dest_ptr, by1.into(), dest.len()) };
         true
     }
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        let _ = _x_libc_memset(buf, c);
+    fn _t_(buf: &mut [u8], by1: u8) {
+        let _ = _x_libc_memset(buf, by1);
     }
     //
     for line in texts {
@@ -111,8 +111,8 @@ fn process_libc_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 #[inline(never)]
 fn process_memx_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        memx::memset(buf, c)
+    fn _t_(buf: &mut [u8], by1: u8) {
+        memx::memset(buf, by1)
     }
     //
     for line in texts {
@@ -132,8 +132,8 @@ fn process_memx_memset(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 #[inline(never)]
 fn process_memx_memset_basic(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        memx::mem::memset_basic(buf, c)
+    fn _t_(buf: &mut [u8], by1: u8) {
+        memx::mem::memset_basic(buf, by1)
     }
     //
     for line in texts {
@@ -157,8 +157,8 @@ fn process_memx_memset_basic(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 #[inline(never)]
 fn process_memx_memset_sse2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        unsafe { memx::arch::x86::_memset_sse2(buf, c) }
+    fn _t_(buf: &mut [u8], by1: u8) {
+        unsafe { memx::arch::x86::_memset_sse2(buf, by1) }
     }
     //
     for line in texts {
@@ -182,8 +182,8 @@ fn process_memx_memset_sse2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 #[inline(never)]
 fn process_memx_memset_avx2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
-    fn _t_(buf: &mut [u8], c: u8) {
-        unsafe { memx::arch::x86::_memset_avx2(buf, c) }
+    fn _t_(buf: &mut [u8], by1: u8) {
+        unsafe { memx::arch::x86::_memset_avx2(buf, by1) }
     }
     //
     for line in texts {
@@ -209,7 +209,7 @@ fn cache_flush(texts: &[Vec<u8>]) {
 
 mod create_data;
 
-fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(cr: &mut Criterion) {
     let (mut v, len) = create_data::create_data_set();
     let pat_u8 = b'A';
     //
@@ -240,28 +240,28 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     cache_flush(&v);
     //
-    c.bench_function("std_memset", |b| {
+    cr.bench_function("std_memset", |b| {
         b.iter(|| {
             process_std_memset(black_box(&mut v), black_box(pat_u8), len);
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v);
-    c.bench_function("libc_memset", |b| {
+    cr.bench_function("libc_memset", |b| {
         b.iter(|| {
             process_libc_memset(black_box(&mut v), black_box(pat_u8), len);
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v);
-    c.bench_function("memx_memset", |b| {
+    cr.bench_function("memx_memset", |b| {
         b.iter(|| {
             process_memx_memset(black_box(&mut v), black_box(pat_u8), len);
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v);
-    c.bench_function("memx_memset_basic", |b| {
+    cr.bench_function("memx_memset_basic", |b| {
         b.iter(|| {
             process_memx_memset_basic(black_box(&mut v), black_box(pat_u8), len);
             memory_barrier(&mut v);
@@ -272,7 +272,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         any(target_arch = "x86_64", target_arch = "x86"),
         target_feature = "sse2"
     ))]
-    c.bench_function("memx_memset_sse2", |b| {
+    cr.bench_function("memx_memset_sse2", |b| {
         b.iter(|| {
             process_memx_memset_sse2(black_box(&mut v), black_box(pat_u8), len);
             memory_barrier(&mut v);
@@ -284,7 +284,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memset_avx2", |b| {
+        cr.bench_function("memx_memset_avx2", |b| {
             b.iter(|| {
                 process_memx_memset_avx2(black_box(&mut v), black_box(pat_u8), len);
                 memory_barrier(&mut v);

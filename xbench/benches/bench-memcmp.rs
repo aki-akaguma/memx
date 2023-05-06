@@ -275,7 +275,7 @@ fn cache_flush(texts: &[&str], pattern: &str) {
 
 mod create_data;
 
-fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(cr: &mut Criterion) {
     let (v, pat_string_s, match_cnt, less_cnt, greater_count) = create_data::create_data_cmp();
     let vv: Vec<&str> = v.iter().map(|item| item.as_str()).collect();
     let pat_string = pat_string_s.to_string();
@@ -329,25 +329,25 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     cache_flush(&vv, &pat_string);
     //
-    c.bench_function("std_memcmp", |b| {
+    cr.bench_function("std_memcmp", |b| {
         b.iter(|| {
             let _r = process_std_memcmp(black_box(&vv), black_box(&pat_string));
         })
     });
     cache_flush(&vv, &pat_string);
-    c.bench_function("libc_memcmp", |b| {
+    cr.bench_function("libc_memcmp", |b| {
         b.iter(|| {
             let _r = process_libc_memcmp(black_box(&vv), black_box(&pat_string));
         })
     });
     cache_flush(&vv, &pat_string);
-    c.bench_function("memx_memcmp", |b| {
+    cr.bench_function("memx_memcmp", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp(black_box(&vv), black_box(&pat_string));
         })
     });
     cache_flush(&vv, &pat_string);
-    c.bench_function("memx_memcmp_basic", |b| {
+    cr.bench_function("memx_memcmp_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_basic(black_box(&vv), black_box(&pat_string));
         })
@@ -357,7 +357,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         any(target_arch = "x86_64", target_arch = "x86"),
         target_feature = "sse2"
     ))]
-    c.bench_function("memx_memcmp_sse2", |b| {
+    cr.bench_function("memx_memcmp_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memcmp_sse2(black_box(&vv), black_box(&pat_string));
         })
@@ -368,7 +368,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memcmp_avx2", |b| {
+        cr.bench_function("memx_memcmp_avx2", |b| {
             b.iter(|| {
                 let _r = process_memx_memcmp_avx2(black_box(&vv), black_box(&pat_string));
             })

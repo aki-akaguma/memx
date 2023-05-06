@@ -24,13 +24,13 @@ use super::cpuid;
 
 use core::sync::atomic::AtomicPtr;
 use core::sync::atomic::Ordering;
-type FuncType = fn(&[u8], u8, u8) -> Option<usize>;
+type FuncType = fn(&[u8], B1Dbl) -> Option<usize>;
 
 const FUNC: FuncType = fnptr_setup_func;
 static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
 
 #[inline(never)]
-fn fnptr_setup_func(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+fn fnptr_setup_func(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     #[cfg(target_arch = "x86_64")]
     let func = if cpuid::has_avx2() {
         _memchr_dbl_avx2
@@ -47,37 +47,37 @@ fn fnptr_setup_func(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     };
     //
     FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
-    unsafe { func(buf, c1, c2) }
+    unsafe { func(buf, needle) }
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub(crate) fn _memchr_dbl_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
     #[allow(clippy::crosspointer_transmute)]
     let func: FuncType = unsafe { core::mem::transmute(func_u) };
-    func(buf, c1, c2)
+    func(buf, needle)
 }
 
-unsafe fn _memchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    basic::_memchr_dbl_impl(buf, c1, c2)
+unsafe fn _memchr_dbl_basic(buf: &[u8], needle: B1Dbl) -> Option<usize> {
+    basic::_memchr_dbl_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memchr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memchr_dbl_sse2_impl(buf, c1, c2)
+pub unsafe fn _memchr_dbl_sse2(buf: &[u8], needle: B1Dbl) -> Option<usize> {
+    _memchr_dbl_sse2_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memchr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    _memchr_dbl_avx2_impl(buf, c1, c2)
+pub unsafe fn _memchr_dbl_avx2(buf: &[u8], needle: B1Dbl) -> Option<usize> {
+    _memchr_dbl_avx2_impl(buf, needle)
 }
 
 #[inline(always)]
-fn _memchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+fn _memchr_dbl_sse2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -85,7 +85,7 @@ fn _memchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
-        let cc = MMB16Dbl::new(c1, c2);
+        let cc: MMB16Dbl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
@@ -100,8 +100,7 @@ fn _memchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Dbl::new(c1, c2);
-                    let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
+                    let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -161,12 +160,12 @@ fn _memchr_dbl_sse2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Dbl::new(c1, c2);
+    let cc: B8Dbl = needle.into();
     basic::_memchr_dbl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
 #[inline(always)]
-fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+fn _memchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -174,7 +173,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 32 {
-        let cc = MMB32Dbl::new(c1, c2);
+        let cc: MMB32Dbl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u256() {
@@ -189,8 +188,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Dbl::new(c1, c2);
-                    let r = basic::_chr_dbl_to_aligned_u256(buf_ptr, c, start_ptr);
+                    let r = basic::_chr_dbl_to_aligned_u256(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -250,7 +248,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
             }
         }
         {
-            let cc = MMB16Dbl::new(c1, c2);
+            let cc: MMB16Dbl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -263,7 +261,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc = MMB16Dbl::new(c1, c2);
+            let cc: MMB16Dbl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             if buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -290,8 +288,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
-                        let c = B1Dbl::new(c1, c2);
-                        let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
+                        let r = basic::_chr_dbl_to_aligned_u128(buf_ptr, needle, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
                         } else if let Some(v) = r.1 {
@@ -310,7 +307,7 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Dbl::new(c1, c2);
+    let cc: B8Dbl = needle.into();
     basic::_memchr_dbl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 

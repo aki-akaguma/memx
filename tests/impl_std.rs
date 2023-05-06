@@ -1,17 +1,17 @@
-pub fn _std_memchr(buf: &[u8], byte: u8) -> Option<usize> {
-    buf.iter().position(|&x| x == byte)
+pub fn _std_memchr(buf: &[u8], by1: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == by1)
 }
 
-pub fn _std_memrchr(buf: &[u8], byte: u8) -> Option<usize> {
-    buf.iter().rposition(|&x| x == byte)
+pub fn _std_memrchr(buf: &[u8], by1: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x == by1)
 }
 
-pub fn _std_memnechr(buf: &[u8], byte: u8) -> Option<usize> {
-    buf.iter().position(|&x| x != byte)
+pub fn _std_memnechr(buf: &[u8], by1: u8) -> Option<usize> {
+    buf.iter().position(|&x| x != by1)
 }
 
-pub fn _std_memrnechr(buf: &[u8], byte: u8) -> Option<usize> {
-    buf.iter().rposition(|&x| x != byte)
+pub fn _std_memrnechr(buf: &[u8], by1: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x != by1)
 }
 
 pub fn _std_memcmp(buf: &[u8], pat_bytes: &[u8]) -> std::cmp::Ordering {
@@ -31,14 +31,14 @@ pub fn _std_memcpy(dst: &mut [u8], src: &[u8]) -> Result<(), memx::RangeError> {
 }
 
 #[rustversion::since(1.50)]
-pub fn _std_memset(dst: &mut [u8], byte: u8) {
-    dst.fill(byte);
+pub fn _std_memset(dst: &mut [u8], by1: u8) {
+    dst.fill(by1);
 }
 
 #[rustversion::before(1.50)]
-pub fn _std_memset(dst: &mut [u8], byte: u8) {
+pub fn _std_memset(dst: &mut [u8], by1: u8) {
     for i in 0..dst.len() {
-        dst[i] = byte;
+        dst[i] = by1;
     }
 }
 
@@ -65,44 +65,44 @@ pub fn _std_memrmem(buf: &[u8], pat_bytes: &[u8]) -> Option<usize> {
     None
 }
 
-pub fn _std_memchr_dbl(buf: &[u8], byte1: u8, byte2: u8) -> Option<usize> {
-    buf.iter().position(|&x| x == byte1 || x == byte2)
+pub fn _std_memchr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == by1 || x == by2)
 }
 
-pub fn _std_memrchr_dbl(buf: &[u8], byte1: u8, byte2: u8) -> Option<usize> {
-    buf.iter().rposition(|&x| x == byte1 || x == byte2)
+pub fn _std_memrchr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x == by1 || x == by2)
 }
 
-pub fn _std_memchr_tpl(buf: &[u8], byte1: u8, byte2: u8, byte3: u8) -> Option<usize> {
-    buf.iter().position(|&x| x == byte1 || x == byte2 || x == byte3)
+pub fn _std_memchr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == by1 || x == by2 || x == by3)
 }
 
-pub fn _std_memrchr_tpl(buf: &[u8], byte1: u8, byte2: u8, byte3: u8) -> Option<usize> {
-    buf.iter().rposition(|&x| x == byte1 || x == byte2 || x == byte3)
+pub fn _std_memrchr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x == by1 || x == by2 || x == by3)
 }
 
-pub fn _std_memchr_iter(haystack: &[u8], needle1: u8) -> StdMemchrSglIter {
-    StdMemchrSglIter::new(haystack, needle1)
+pub fn _std_memchr_iter(buf: &[u8], by1: u8) -> StdMemchrSglIter {
+    StdMemchrSglIter::new(buf, by1)
 }
 
-pub fn _std_memrchr_iter(haystack: &[u8], needle1: u8) -> StdMemrchrSglIter {
-    StdMemrchrSglIter::new(haystack, needle1)
+pub fn _std_memrchr_iter(buf: &[u8], by1: u8) -> StdMemrchrSglIter {
+    StdMemrchrSglIter::new(buf, by1)
 }
 
-pub fn _std_memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemchrDblIter {
-    StdMemchrDblIter::new(haystack, needle1, needle2)
+pub fn _std_memchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemchrDblIter {
+    StdMemchrDblIter::new(buf, by1, by2)
 }
 
-pub fn _std_memrchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemrchrDblIter {
-    StdMemrchrDblIter::new(haystack, needle1, needle2)
+pub fn _std_memrchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemrchrDblIter {
+    StdMemrchrDblIter::new(buf, by1, by2)
 }
 
-pub fn _std_memchr_tpl_iter(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter {
-    StdMemchrTplIter::new(haystack, needle1, needle2, needle3)
+pub fn _std_memchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemchrTplIter {
+    StdMemchrTplIter::new(buf, by1, by2, by3)
 }
 
-pub fn _std_memrchr_tpl_iter(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter {
-    StdMemrchrTplIter::new(haystack, needle1, needle2, needle3)
+pub fn _std_memrchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemrchrTplIter {
+    StdMemrchrTplIter::new(buf, by1, by2, by3)
 }
 
 pub fn _std_memmem_iter<'a>(buf: &'a [u8], pat: &'a [u8]) -> StdMemmemIter<'a> {
@@ -388,7 +388,12 @@ impl<'a> Iterator for StdMemchrTplIter<'a> {
         if self.position > self.haystack.len() {
             return None;
         }
-        match _std_memchr_tpl(&self.haystack[self.position..], self.needle1, self.needle2, self.needle3) {
+        match _std_memchr_tpl(
+            &self.haystack[self.position..],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+        ) {
             Some(idx) => {
                 let found = self.position + idx;
                 self.position = self.position + idx + 1;
@@ -483,7 +488,12 @@ impl<'a> DoubleEndedIterator for StdMemrchrTplIter<'a> {
         if self.position > self.haystack.len() {
             return None;
         }
-        match _std_memchr_tpl(&self.haystack[self.position..], self.needle1, self.needle2, self.needle3) {
+        match _std_memchr_tpl(
+            &self.haystack[self.position..],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+        ) {
             Some(idx) => {
                 let found = self.position + idx;
                 self.position = self.position + idx + 1;

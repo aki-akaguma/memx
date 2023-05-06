@@ -8,8 +8,8 @@ use barrier::cache_line_flush;
 cpufeatures::new!(cpuid_avx2, "avx2");
 
 #[inline(always)]
-pub fn std_memchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    buf.iter().position(|&x| x == c1 || x == c2)
+pub fn std_memchr_dbl_impl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == by1 || x == by2)
 }
 
 #[inline(never)]
@@ -18,8 +18,8 @@ fn statistics_std_memchr_dbl(
     pat: (u8, u8),
 ) -> std::collections::HashMap<usize, usize> {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        std_memchr_dbl_impl(buf, c1, c2)
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        std_memchr_dbl_impl(buf, by1, by2)
     }
     //
     use std::collections::HashMap;
@@ -61,8 +61,8 @@ fn print_statistics_std_memchr_dbl(texts: &[&str], pat: (u8, u8)) {
 #[inline(never)]
 fn process_std_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        std_memchr_dbl_impl(buf, c1, c2)
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        std_memchr_dbl_impl(buf, by1, by2)
     }
     //
     let mut found: usize = 0;
@@ -86,8 +86,8 @@ fn process_std_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
 #[inline(never)]
 fn process_memchr_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        memchr::memchr2(c1, c2, buf)
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        memchr::memchr2(by1, by2, buf)
     }
     //
     let mut found: usize = 0;
@@ -111,8 +111,8 @@ fn process_memchr_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
 #[inline(never)]
 fn process_memx_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        memx::memchr_dbl(buf, c1, c2)
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        memx::memchr_dbl(buf, by1, by2)
     }
     //
     let mut found: usize = 0;
@@ -136,8 +136,8 @@ fn process_memx_memchr_dbl(texts: &[&str], pat: (u8, u8)) -> usize {
 #[inline(never)]
 fn process_memx_memchr_dbl_basic(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        memx::mem::memchr_dbl_basic(buf, c1, c2)
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        memx::mem::memchr_dbl_basic(buf, by1, by2)
     }
     //
     let mut found: usize = 0;
@@ -165,8 +165,9 @@ fn process_memx_memchr_dbl_basic(texts: &[&str], pat: (u8, u8)) -> usize {
 #[inline(never)]
 fn process_memx_memchr_dbl_sse2(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memchr_dbl_sse2(buf, c1, c2) }
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        let needle = memx::B1Dbl::new(by1, by2);
+        unsafe { memx::arch::x86::_memchr_dbl_sse2(buf, needle) }
     }
     //
     let mut found: usize = 0;
@@ -194,8 +195,9 @@ fn process_memx_memchr_dbl_sse2(texts: &[&str], pat: (u8, u8)) -> usize {
 #[inline(never)]
 fn process_memx_memchr_dbl_avx2(texts: &[&str], pat: (u8, u8)) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memchr_dbl_avx2(buf, c1, c2) }
+    fn _t_(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+        let needle = memx::B1Dbl::new(by1, by2);
+        unsafe { memx::arch::x86::_memchr_dbl_avx2(buf, needle) }
     }
     //
     let mut found: usize = 0;
@@ -225,7 +227,7 @@ fn cache_flush(texts: &[&str]) {
 
 mod create_data;
 
-fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(cr: &mut Criterion) {
     let (v, pats, match_cnt) = create_data::create_data_chr_dbl();
     let vv: Vec<&str> = v.iter().map(|item| item.as_str()).collect();
     //
@@ -264,25 +266,25 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     cache_flush(&vv);
     //
-    c.bench_function("std_memchr_dbl", |b| {
+    cr.bench_function("std_memchr_dbl", |b| {
         b.iter(|| {
             let _r = process_std_memchr_dbl(black_box(&vv), black_box(pats));
         })
     });
     cache_flush(&vv);
-    c.bench_function("memchr_memchr_dbl", |b| {
+    cr.bench_function("memchr_memchr_dbl", |b| {
         b.iter(|| {
             let _r = process_memchr_memchr_dbl(black_box(&vv), black_box(pats));
         })
     });
     cache_flush(&vv);
-    c.bench_function("memx_memchr_dbl", |b| {
+    cr.bench_function("memx_memchr_dbl", |b| {
         b.iter(|| {
             let _r = process_memx_memchr_dbl(black_box(&vv), black_box(pats));
         })
     });
     cache_flush(&vv);
-    c.bench_function("memx_memchr_w_basic", |b| {
+    cr.bench_function("memx_memchr_w_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memchr_dbl_basic(black_box(&vv), black_box(pats));
         })
@@ -292,7 +294,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         any(target_arch = "x86_64", target_arch = "x86"),
         target_feature = "sse2"
     ))]
-    c.bench_function("memx_memchr_w_sse2", |b| {
+    cr.bench_function("memx_memchr_w_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memchr_dbl_sse2(black_box(&vv), black_box(pats));
         })
@@ -303,7 +305,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memchr_w_avx2", |b| {
+        cr.bench_function("memx_memchr_w_avx2", |b| {
             b.iter(|| {
                 let _r = process_memx_memchr_dbl_avx2(black_box(&vv), black_box(pats));
             })

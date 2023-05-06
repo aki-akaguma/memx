@@ -24,13 +24,13 @@ use super::cpuid;
 
 use core::sync::atomic::AtomicPtr;
 use core::sync::atomic::Ordering;
-type FuncType = fn(&[u8], u8) -> Option<usize>;
+type FuncType = fn(&[u8], B1Sgl) -> Option<usize>;
 
 const FUNC: FuncType = fnptr_setup_func;
 static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
 
 #[inline(never)]
-fn fnptr_setup_func(buf: &[u8], c: u8) -> Option<usize> {
+fn fnptr_setup_func(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     #[cfg(target_arch = "x86_64")]
     let func = if cpuid::has_avx2() {
         _memrchr_avx2
@@ -47,43 +47,43 @@ fn fnptr_setup_func(buf: &[u8], c: u8) -> Option<usize> {
     };
     //
     FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
-    unsafe { func(buf, c) }
+    unsafe { func(buf, needle) }
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memrchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
     #[allow(clippy::crosspointer_transmute)]
     let func: FuncType = unsafe { core::mem::transmute(func_u) };
-    func(buf, c)
+    func(buf, needle)
 }
 
-unsafe fn _memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    basic::_memrchr_impl(buf, c)
+unsafe fn _memrchr_basic(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    basic::_memrchr_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_sse2(buf: &[u8], c: u8) -> Option<usize> {
-    _memrchr_sse2_impl(buf, c)
+pub unsafe fn _memrchr_sse2(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    _memrchr_sse2_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memrchr_avx2(buf: &[u8], c: u8) -> Option<usize> {
-    _memrchr_avx2_impl(buf, c)
+pub unsafe fn _memrchr_avx2(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    _memrchr_avx2_impl(buf, needle)
 }
 
 #[inline(always)]
-fn _memrchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
+fn _memrchr_sse2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 16 {
-        let cc = MMB16Sgl::new(c1);
+        let cc: MMB16Sgl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
@@ -100,8 +100,7 @@ fn _memrchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c1);
-                    let r = basic::_rchr_to_aligned_u128(buf_ptr, c, start_ptr);
+                    let r = basic::_rchr_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -135,19 +134,19 @@ fn _memrchr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Sgl::new(c1);
+    let cc: B8Sgl = needle.into();
     basic::_memrchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 
 #[allow(clippy::missing_safety_doc)]
 #[inline(always)]
-fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
+fn _memrchr_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
     //
     if buf_len >= 32 {
-        let cc = MMB32Sgl::new(c1);
+        let cc: MMB32Sgl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u256() {
@@ -164,8 +163,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c1);
-                    let r = basic::_rchr_to_aligned_u256(buf_ptr, c, start_ptr);
+                    let r = basic::_rchr_to_aligned_u256(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -198,7 +196,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             }
         }
         {
-            let cc = MMB16Sgl::new(c1);
+            let cc: MMB16Sgl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
@@ -211,7 +209,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc = MMB16Sgl::new(c1);
+            let cc: MMB16Sgl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             if buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
@@ -238,8 +236,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
-                        let c = B1Sgl::new(c1);
-                        let r = basic::_rchr_to_aligned_u128(buf_ptr, c, start_ptr);
+                        let r = basic::_rchr_to_aligned_u128(buf_ptr, needle, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
                         } else if let Some(v) = r.1 {
@@ -258,7 +255,7 @@ fn _memrchr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Sgl::new(c1);
+    let cc: B8Sgl = needle.into();
     basic::_memrchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 

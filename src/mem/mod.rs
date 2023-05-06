@@ -1,5 +1,7 @@
 #![doc(hidden)]
 
+use crate::utils::{B1Dbl, B1Sgl, B1Tpl};
+
 mod mem_chr;
 pub(crate) use mem_chr::_memchr_impl;
 
@@ -141,28 +143,34 @@ pub(crate) use mem_set::_set_to_aligned_u256;
 use super::RangeError;
 use core::cmp::Ordering;
 
-pub fn memchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    crate::mem::_memchr_impl(buf, c)
+pub fn memchr_basic(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    crate::mem::_memchr_impl(buf, needle)
 }
 
-pub fn memrchr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    crate::mem::_memrchr_impl(buf, c)
+pub fn memrchr_basic(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    crate::mem::_memrchr_impl(buf, needle)
 }
 
 pub fn memchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    crate::mem::_memchr_dbl_impl(buf, c1, c2)
+    let needle = B1Dbl::new(c1, c2);
+    crate::mem::_memchr_dbl_impl(buf, needle)
 }
 
 pub fn memrchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    crate::mem::_memrchr_dbl_impl(buf, c1, c2)
+    let needle = B1Dbl::new(c1, c2);
+    crate::mem::_memrchr_dbl_impl(buf, needle)
 }
 
 pub fn memchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    crate::mem::_memchr_tpl_impl(buf, c1, c2, c3)
+    let needle = B1Tpl::new(c1, c2, c3);
+    crate::mem::_memchr_tpl_impl(buf, needle)
 }
 
 pub fn memrchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    crate::mem::_memrchr_tpl_impl(buf, c1, c2, c3)
+    let needle = B1Tpl::new(c1, c2, c3);
+    crate::mem::_memrchr_tpl_impl(buf, needle)
 }
 
 pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {

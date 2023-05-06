@@ -1,5 +1,6 @@
 use super::{__m128i, __m256i};
 use super::{_b16_eq, _b16_from_b32, _b16_value, _b32_eq, _b32_value};
+use crate::utils::B1Dbl;
 
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB16Dbl {
@@ -23,6 +24,12 @@ impl PartialEq for MMB16Dbl {
     }
 }
 
+impl From<B1Dbl> for MMB16Dbl {
+    fn from(cc: B1Dbl) -> Self {
+        Self::new(cc.v1, cc.v2)
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB32Dbl {
     pub v1: __m256i,
@@ -42,6 +49,12 @@ impl PartialEq for MMB32Dbl {
         let a = unsafe { _b32_eq(self.v1, other.v1) };
         let b = unsafe { _b32_eq(self.v2, other.v2) };
         a && b
+    }
+}
+
+impl From<B1Dbl> for MMB32Dbl {
+    fn from(cc: B1Dbl) -> Self {
+        Self::new(cc.v1, cc.v2)
     }
 }
 

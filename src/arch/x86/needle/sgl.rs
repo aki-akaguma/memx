@@ -1,5 +1,6 @@
 use super::{__m128i, __m256i};
 use super::{_b16_eq, _b16_from_b32, _b16_value, _b32_eq, _b32_value};
+use crate::utils::B1Sgl;
 
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB16Sgl {
@@ -19,6 +20,12 @@ impl PartialEq for MMB16Sgl {
     }
 }
 
+impl From<B1Sgl> for MMB16Sgl {
+    fn from(cc: B1Sgl) -> Self {
+        Self::new(cc.v1)
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct MMB32Sgl {
     pub v1: __m256i,
@@ -34,6 +41,12 @@ impl MMB32Sgl {
 impl PartialEq for MMB32Sgl {
     fn eq(&self, other: &Self) -> bool {
         unsafe { _b32_eq(self.v1, other.v1) }
+    }
+}
+
+impl From<B1Sgl> for MMB32Sgl {
+    fn from(cc: B1Sgl) -> Self {
+        Self::new(cc.v1)
     }
 }
 

@@ -8,8 +8,8 @@ use barrier::cache_line_flush;
 cpufeatures::new!(cpuid_avx2, "avx2");
 
 #[inline(always)]
-pub fn std_memnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
-    buf.iter().position(|&x| x != c)
+pub fn std_memnechr_impl(buf: &[u8], by1: u8) -> Option<usize> {
+    buf.iter().position(|&x| x != by1)
 }
 
 #[inline(never)]
@@ -18,8 +18,8 @@ fn statistics_std_memnechr(
     pat_byte: u8,
 ) -> std::collections::HashMap<usize, usize> {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        std_memnechr_impl(buf, c)
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        std_memnechr_impl(buf, by1)
     }
     //
     use std::collections::HashMap;
@@ -61,8 +61,8 @@ fn print_statistics_std_memnechr(texts: &[&str], pat_byte: u8) {
 #[inline(never)]
 fn process_std_memnechr(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        std_memnechr_impl(buf, c)
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        std_memnechr_impl(buf, by1)
     }
     //
     let mut found: usize = 0;
@@ -86,8 +86,8 @@ fn process_std_memnechr(texts: &[&str], pat_byte: u8) -> usize {
 #[inline(never)]
 fn process_memx_memnechr(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        memx::memnechr(buf, c)
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        memx::memnechr(buf, by1)
     }
     //
     let mut found: usize = 0;
@@ -111,8 +111,8 @@ fn process_memx_memnechr(texts: &[&str], pat_byte: u8) -> usize {
 #[inline(never)]
 fn process_memx_memnechr_basic(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        memx::mem::memnechr_basic(buf, c)
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        memx::mem::memnechr_basic(buf, by1)
     }
     //
     let mut found: usize = 0;
@@ -140,8 +140,8 @@ fn process_memx_memnechr_basic(texts: &[&str], pat_byte: u8) -> usize {
 #[inline(never)]
 fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memnechr_sse2(buf, c) }
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        unsafe { memx::arch::x86::_memnechr_sse2(buf, by1) }
     }
     //
     let mut found: usize = 0;
@@ -169,8 +169,8 @@ fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
 #[inline(never)]
 fn process_memx_memnechr_avx2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
-    fn _t_(buf: &[u8], c: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memnechr_avx2(buf, c) }
+    fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
+        unsafe { memx::arch::x86::_memnechr_avx2(buf, by1) }
     }
     //
     let mut found: usize = 0;
@@ -200,7 +200,7 @@ fn cache_flush(texts: &[&str]) {
 
 mod create_data;
 
-fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(cr: &mut Criterion) {
     let (v, pat_byte, match_cnt) = create_data::create_data_nechr();
     let vv: Vec<&str> = v.iter().map(|item| item.as_str()).collect();
     //
@@ -237,19 +237,19 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     cache_flush(&vv);
     //
-    c.bench_function("std_memnechr", |b| {
+    cr.bench_function("std_memnechr", |b| {
         b.iter(|| {
             let _r = process_std_memnechr(black_box(&vv), black_box(pat_byte));
         })
     });
     cache_flush(&vv);
-    c.bench_function("memx_memnechr", |b| {
+    cr.bench_function("memx_memnechr", |b| {
         b.iter(|| {
             let _r = process_memx_memnechr(black_box(&vv), black_box(pat_byte));
         })
     });
     cache_flush(&vv);
-    c.bench_function("memx_memnechr_basic", |b| {
+    cr.bench_function("memx_memnechr_basic", |b| {
         b.iter(|| {
             let _r = process_memx_memnechr_basic(black_box(&vv), black_box(pat_byte));
         })
@@ -259,7 +259,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         any(target_arch = "x86_64", target_arch = "x86"),
         target_feature = "sse2"
     ))]
-    c.bench_function("memx_memnechr_sse2", |b| {
+    cr.bench_function("memx_memnechr_sse2", |b| {
         b.iter(|| {
             let _r = process_memx_memnechr_sse2(black_box(&vv), black_box(pat_byte));
         })
@@ -270,7 +270,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memnechr_avx2", |b| {
+        cr.bench_function("memx_memnechr_avx2", |b| {
             b.iter(|| {
                 let _r = process_memx_memnechr_avx2(black_box(&vv), black_box(pat_byte));
             })

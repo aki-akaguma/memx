@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memrchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn _memrchr_dbl_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -12,11 +12,11 @@ pub fn _memrchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_rchr_128(buf, c1, c2);
+        let r = _start_rchr_128(buf, needle);
         #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_rchr_64(buf, c1, c2);
+        let r = _start_rchr_64(buf, needle);
         #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_rchr_32(buf, c1, c2);
+        let r = _start_rchr_32(buf, needle);
         //
         r
     }
@@ -30,11 +30,11 @@ pub fn _memrchr_dbl_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        let r = _start_rchr_128(buf, c1, c2);
+        let r = _start_rchr_128(buf, needle);
         #[cfg(target_pointer_width = "64")]
-        let r = _start_rchr_64(buf, c1, c2);
+        let r = _start_rchr_64(buf, needle);
         #[cfg(target_pointer_width = "32")]
-        let r = _start_rchr_32(buf, c1, c2);
+        let r = _start_rchr_32(buf, needle);
         //
         r
     }
@@ -143,18 +143,17 @@ fn _rchr_dbl_to_aligned_u32(
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_rchr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
+fn _start_rchr_128(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
-    let cc = B16Dbl::new(c_1, c_2);
+    let cc: B16Dbl = needle.into();
     //
     if buf_len >= 16 {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
-                let c = B1Dbl::new(c_1, c_2);
-                let r = _rchr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
+                let r = _rchr_dbl_to_aligned_u128(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
@@ -218,18 +217,17 @@ fn _start_rchr_128(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_rchr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
+fn _start_rchr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
-    let cc = B8Dbl::new(c_1, c_2);
+    let cc: B8Dbl = needle.into();
     //
     if buf_len >= 8 {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u64() {
-                let c = B1Dbl::new(c_1, c_2);
-                let r = _rchr_dbl_to_aligned_u64(buf_ptr, c, start_ptr);
+                let r = _rchr_dbl_to_aligned_u64(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
@@ -291,18 +289,17 @@ fn _start_rchr_64(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_rchr_32(buf: &[u8], c_1: u8, c_2: u8) -> Option<usize> {
+fn _start_rchr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     let buf_len = buf.len();
     let start_ptr = buf.as_ptr();
     let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
-    let cc = B4Dbl::new(c_1, c_2);
+    let cc: B4Dbl = needle.into();
     //
     if buf_len >= 4 {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u32() {
-                let c = B1Dbl::new(c_1, c_2);
-                let r = _rchr_dbl_to_aligned_u32(buf_ptr, c, start_ptr);
+                let r = _rchr_dbl_to_aligned_u32(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
