@@ -548,13 +548,11 @@ fn _rchr_tpl_c8_aa_x1(buf_ptr: *const u8, c8: B8Tpl, st_ptr: *const u8) -> Optio
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if !bits_0_c.is_zeros() {
+            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if !bits_0_b.is_zeros() {
         let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
@@ -638,13 +636,11 @@ fn _rchr_tpl_c4_aa_x1(buf_ptr: *const u8, c4: B4Tpl, st_ptr: *const u8) -> Optio
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if !bits_0_c.is_zeros() {
+            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if !bits_0_b.is_zeros() {
         let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
@@ -723,13 +719,11 @@ fn _rchr_tpl_c2_aa_x1(buf_ptr: *const u8, c2: B2Tpl, st_ptr: *const u8) -> Optio
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if !bits_0_c.is_zeros() {
+            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if !bits_0_b.is_zeros() {
         let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
