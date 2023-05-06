@@ -287,13 +287,11 @@ unsafe fn _rchr_tpl_c16_uu_x1(
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if mask_0_c != 0 {
+            let idx3 = (mask_0_c as u16).leading_zeros() as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if mask_0_c != 0 {
-                let idx3 = (mask_0_c as u16).leading_zeros() as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if mask_0_b != 0 {
         let idx2 = (mask_0_b as u16).leading_zeros() as usize;
@@ -337,13 +335,11 @@ unsafe fn _rchr_tpl_c16_aa_x1(
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if mask_0_c != 0 {
+            let idx3 = (mask_0_c as u16).leading_zeros() as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if mask_0_c != 0 {
-                let idx3 = (mask_0_c as u16).leading_zeros() as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if mask_0_b != 0 {
         let idx2 = (mask_0_b as u16).leading_zeros() as usize;
@@ -479,13 +475,11 @@ unsafe fn _rchr_tpl_c32_uu_x1(
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if mask_0_c != 0 {
+            let idx3 = (mask_0_c as u32).leading_zeros() as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if mask_0_c != 0 {
-                let idx3 = (mask_0_c as u32).leading_zeros() as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if mask_0_b != 0 {
         let idx2 = (mask_0_b as u32).leading_zeros() as usize;
@@ -529,13 +523,11 @@ unsafe fn _rchr_tpl_c32_aa_x1(
             } else {
                 Some(base - idx1.min(idx2))
             }
+        } else if mask_0_c != 0 {
+            let idx3 = (mask_0_c as u32).leading_zeros() as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            if mask_0_c != 0 {
-                let idx3 = (mask_0_c as u32).leading_zeros() as usize;
-                Some(base - idx1.min(idx3))
-            } else {
-                Some(base - idx1)
-            }
+            Some(base - idx1)
         }
     } else if mask_0_b != 0 {
         let idx2 = (mask_0_b as u32).leading_zeros() as usize;
