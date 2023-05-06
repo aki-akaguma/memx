@@ -60,6 +60,26 @@ pub(crate) use mem_rchr_dbl::_rchr_dbl_to_aligned_u128;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr_dbl::_rchr_dbl_to_aligned_u256;
 
+mod mem_chr_tpl;
+pub(crate) use mem_chr_tpl::_memchr_tpl_impl;
+
+#[allow(unused_imports)]
+pub(crate) use mem_chr_tpl::_chr_tpl_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_chr_tpl::_chr_tpl_to_aligned_u256;
+#[allow(unused_imports)]
+pub(crate) use mem_chr_tpl::_memchr_tpl_remaining_15_bytes_impl;
+
+mod mem_rchr_tpl;
+pub(crate) use mem_rchr_tpl::_memrchr_tpl_impl;
+
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_tpl::_memrchr_tpl_remaining_15_bytes_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_tpl::_rchr_tpl_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_tpl::_rchr_tpl_to_aligned_u256;
+
 mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
 
@@ -135,6 +155,14 @@ pub fn memchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
 
 pub fn memrchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     crate::mem::_memrchr_dbl_impl(buf, c1, c2)
+}
+
+pub fn memchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    crate::mem::_memchr_tpl_impl(buf, c1, c2, c3)
+}
+
+pub fn memrchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    crate::mem::_memrchr_tpl_impl(buf, c1, c2, c3)
 }
 
 pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {

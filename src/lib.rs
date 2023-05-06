@@ -140,6 +140,38 @@ pub fn memrchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     r
 }
 
+/// This is same as `buf.iter().position(|&x| x == c1 || x == c2 || x == c3)`.
+pub fn memchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memchr_tpl_impl(buf, c1, c2, c3) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memchr_tpl_impl(buf, c1, c2, c3) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memchr_tpl_impl(buf, c1, c2, c3);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2 || x == c3)`.
+pub fn memrchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrchr_tpl_impl(buf, c1, c2, c3) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrchr_tpl_impl(buf, c1, c2, c3) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrchr_tpl_impl(buf, c1, c2, c3);
+    //
+    r
+}
+
 /// This mimics `libc::memcmp()`, same as `a.cmp(&b)`.
 pub fn memcmp(a: &[u8], b: &[u8]) -> Ordering {
     /*

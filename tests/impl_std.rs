@@ -73,6 +73,14 @@ pub fn _std_memrchr_dbl(buf: &[u8], byte1: u8, byte2: u8) -> Option<usize> {
     buf.iter().rposition(|&x| x == byte1 || x == byte2)
 }
 
+pub fn _std_memchr_tpl(buf: &[u8], byte1: u8, byte2: u8, byte3: u8) -> Option<usize> {
+    buf.iter().position(|&x| x == byte1 || x == byte2 || x == byte3)
+}
+
+pub fn _std_memrchr_tpl(buf: &[u8], byte1: u8, byte2: u8, byte3: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x == byte1 || x == byte2 || x == byte3)
+}
+
 pub fn _std_memchr_iter(haystack: &[u8], needle1: u8) -> StdMemchrSglIter {
     StdMemchrSglIter::new(haystack, needle1)
 }
@@ -87,6 +95,14 @@ pub fn _std_memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> StdMem
 
 pub fn _std_memrchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemrchrDblIter {
     StdMemrchrDblIter::new(haystack, needle1, needle2)
+}
+
+pub fn _std_memchr_tpl_iter(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter {
+    StdMemchrTplIter::new(haystack, needle1, needle2, needle3)
+}
+
+pub fn _std_memrchr_tpl_iter(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter {
+    StdMemrchrTplIter::new(haystack, needle1, needle2, needle3)
 }
 
 pub fn _std_memmem_iter<'a>(buf: &'a [u8], pat: &'a [u8]) -> StdMemmemIter<'a> {
@@ -332,6 +348,142 @@ impl<'a> DoubleEndedIterator for StdMemrchrDblIter<'a> {
             return None;
         }
         match _std_memchr_dbl(&self.haystack[self.position..], self.needle1, self.needle2) {
+            Some(idx) => {
+                let found = self.position + idx;
+                self.position = self.position + idx + 1;
+                Some(found)
+            }
+            None => {
+                self.position = self.haystack.len() + 1;
+                None
+            }
+        }
+    }
+}
+
+pub struct StdMemchrTplIter<'a> {
+    haystack: &'a [u8],
+    needle1: u8,
+    needle2: u8,
+    needle3: u8,
+    position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
+}
+impl<'a> StdMemchrTplIter<'a> {
+    #[allow(dead_code)]
+    #[inline]
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter {
+        StdMemchrTplIter {
+            needle1,
+            needle2,
+            needle3,
+            haystack,
+            position: 0,
+        }
+    }
+}
+impl<'a> Iterator for StdMemchrTplIter<'a> {
+    type Item = usize;
+    #[inline]
+    fn next(&mut self) -> Option<usize> {
+        if self.position > self.haystack.len() {
+            return None;
+        }
+        match _std_memchr_tpl(&self.haystack[self.position..], self.needle1, self.needle2, self.needle3) {
+            Some(idx) => {
+                let found = self.position + idx;
+                self.position = self.position + idx + 1;
+                Some(found)
+            }
+            None => {
+                self.position = self.haystack.len() + 1;
+                None
+            }
+        }
+    }
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.haystack.len()))
+    }
+}
+impl<'a> DoubleEndedIterator for StdMemchrTplIter<'a> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.position == 0 {
+            return None;
+        }
+        match _std_memrchr_tpl(
+            &self.haystack[..(self.position - 1)],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+        ) {
+            Some(idx) => {
+                self.position = idx + 1;
+                Some(idx)
+            }
+            None => {
+                self.position = 0;
+                None
+            }
+        }
+    }
+}
+
+pub struct StdMemrchrTplIter<'a> {
+    haystack: &'a [u8],
+    needle1: u8,
+    needle2: u8,
+    needle3: u8,
+    position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
+}
+impl<'a> StdMemrchrTplIter<'a> {
+    #[allow(dead_code)]
+    #[inline]
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter {
+        StdMemrchrTplIter {
+            needle1,
+            needle2,
+            needle3,
+            haystack,
+            position: haystack.len() + 1,
+        }
+    }
+}
+impl<'a> Iterator for StdMemrchrTplIter<'a> {
+    type Item = usize;
+    #[inline]
+    fn next(&mut self) -> Option<usize> {
+        if self.position == 0 {
+            return None;
+        }
+        match _std_memrchr_tpl(
+            &self.haystack[..(self.position - 1)],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+        ) {
+            Some(idx) => {
+                self.position = idx + 1;
+                Some(idx)
+            }
+            None => {
+                self.position = 0;
+                None
+            }
+        }
+    }
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.haystack.len()))
+    }
+}
+impl<'a> DoubleEndedIterator for StdMemrchrTplIter<'a> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.position > self.haystack.len() {
+            return None;
+        }
+        match _std_memchr_tpl(&self.haystack[self.position..], self.needle1, self.needle2, self.needle3) {
             Some(idx) => {
                 let found = self.position + idx;
                 self.position = self.position + idx + 1;
