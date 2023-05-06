@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memchr_impl(buf: &[u8], c1: u8) -> Option<usize> {
+pub fn _memchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -12,11 +12,11 @@ pub fn _memchr_impl(buf: &[u8], c1: u8) -> Option<usize> {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_chr_128(buf, c1);
+        let r = _start_chr_128(buf, needle);
         #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_chr_64(buf, c1);
+        let r = _start_chr_64(buf, needle);
         #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_chr_32(buf, c1);
+        let r = _start_chr_32(buf, needle);
         //
         r
     }
@@ -30,11 +30,11 @@ pub fn _memchr_impl(buf: &[u8], c1: u8) -> Option<usize> {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        let r = _start_chr_128(buf, c1);
+        let r = _start_chr_128(buf, needle);
         #[cfg(target_pointer_width = "64")]
-        let r = _start_chr_64(buf, c1);
+        let r = _start_chr_64(buf, needle);
         #[cfg(target_pointer_width = "32")]
-        let r = _start_chr_32(buf, c1);
+        let r = _start_chr_32(buf, needle);
         //
         r
     }
@@ -139,12 +139,12 @@ fn _chr_to_aligned_u32(
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
+fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B16Sgl::new(c_1);
+    let cc: B16Sgl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
@@ -162,8 +162,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c_1);
-                    let r = _chr_to_aligned_u128(buf_ptr, c, start_ptr);
+                    let r = _chr_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -230,12 +229,12 @@ fn _start_chr_128(buf: &[u8], c_1: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
+fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B8Sgl::new(c_1);
+    let cc: B8Sgl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 8 {
@@ -253,8 +252,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c_1);
-                    let r = _chr_to_aligned_u64(buf_ptr, c, start_ptr);
+                    let r = _chr_to_aligned_u64(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -319,12 +317,12 @@ fn _start_chr_64(buf: &[u8], c_1: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
+fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B4Sgl::new(c_1);
+    let cc: B4Sgl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 4 {
@@ -342,8 +340,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c_1);
-                    let r = _chr_to_aligned_u32(buf_ptr, c, start_ptr);
+                    let r = _chr_to_aligned_u32(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {

@@ -57,7 +57,12 @@ impl<'a> DoubleEndedIterator for MemrchrTplIter<'a> {
         if self.position > self.haystack.len() {
             return None;
         }
-        match crate::memchr_tpl(&self.haystack[self.position..], self.needle1, self.needle2, self.needle3) {
+        match crate::memchr_tpl(
+            &self.haystack[self.position..],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+        ) {
             Some(idx) => {
                 let found = self.position + idx;
                 self.position = self.position + idx + 1;

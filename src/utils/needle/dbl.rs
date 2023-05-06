@@ -65,7 +65,7 @@ impl B2Dbl {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub(crate) struct B1Dbl {
+pub struct B1Dbl {
     pub v1: u8,
     pub v2: u8,
 }
@@ -110,6 +110,24 @@ impl From<B2Dbl> for B1Dbl {
             v1: cc.v1 as u8,
             v2: cc.v2 as u8,
         }
+    }
+}
+
+impl From<B1Dbl> for B16Dbl {
+    fn from(cc: B1Dbl) -> Self {
+        Self::new(cc.v1, cc.v2)
+    }
+}
+
+impl From<B1Dbl> for B8Dbl {
+    fn from(cc: B1Dbl) -> Self {
+        Self::new(cc.v1, cc.v2)
+    }
+}
+
+impl From<B1Dbl> for B4Dbl {
+    fn from(cc: B1Dbl) -> Self {
+        Self::new(cc.v1, cc.v2)
     }
 }
 

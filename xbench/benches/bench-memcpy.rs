@@ -222,7 +222,7 @@ fn cache_flush(texts: &[Vec<u8>], pattern: &[u8]) {
 
 mod create_data;
 
-fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(cr: &mut Criterion) {
     let (mut v, pat_bytes) = create_data::create_data_cpy();
     //
     if let Ok(_val) = std::env::var("AKI_TEST_DAT_CHECK") {
@@ -275,28 +275,28 @@ fn criterion_benchmark(c: &mut Criterion) {
     //
     cache_flush(&v, &pat_bytes);
     //
-    c.bench_function("std_memcpy", |b| {
+    cr.bench_function("std_memcpy", |b| {
         b.iter(|| {
             process_std_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v, &pat_bytes);
-    c.bench_function("libc_memcpy", |b| {
+    cr.bench_function("libc_memcpy", |b| {
         b.iter(|| {
             process_libc_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v, &pat_bytes);
-    c.bench_function("memx_memcpy", |b| {
+    cr.bench_function("memx_memcpy", |b| {
         b.iter(|| {
             process_memx_memcpy(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
         })
     });
     cache_flush(&v, &pat_bytes);
-    c.bench_function("memx_memcpy_basic", |b| {
+    cr.bench_function("memx_memcpy_basic", |b| {
         b.iter(|| {
             process_memx_memcpy_basic(black_box(&mut v), black_box(&pat_bytes));
             memory_barrier(&mut v);
@@ -308,7 +308,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     {
-        c.bench_function("memx_memcpy_sse2", |b| {
+        cr.bench_function("memx_memcpy_sse2", |b| {
             b.iter(|| {
                 process_memx_memcpy_sse2(black_box(&mut v), black_box(&pat_bytes));
                 memory_barrier(&mut v);
@@ -321,7 +321,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         target_feature = "sse2"
     ))]
     if cpuid_avx2::get() {
-        c.bench_function("memx_memcpy_avx2", |b| {
+        cr.bench_function("memx_memcpy_avx2", |b| {
             b.iter(|| {
                 process_memx_memcpy_avx2(black_box(&mut v), black_box(&pat_bytes));
                 memory_barrier(&mut v);

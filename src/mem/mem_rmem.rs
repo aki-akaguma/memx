@@ -1,3 +1,4 @@
+use crate::utils::B1Sgl;
 use crate::utils::_ascii_stochas;
 
 #[inline(never)]
@@ -35,7 +36,7 @@ fn _memrmem_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = hay_len - nee_len;
     while curr_idx > 0 {
-        let r = super::_memrchr_impl(&haystack[..curr_idx], nee_1st_byte);
+        let r = super::_memrchr_impl(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte));
         if let Some(pos) = r {
             let r_idx = pos;
             if super::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
@@ -57,7 +58,7 @@ fn _memrmem_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = hay_len;
     while curr_idx > 0 {
-        let r = super::_memrchr_impl(&haystack[..curr_idx], nee_last_byte);
+        let r = super::_memrchr_impl(&haystack[..curr_idx], B1Sgl::new(nee_last_byte));
         if let Some(pos) = r {
             if pos >= nee_last_idx {
                 let r_idx = pos - nee_last_idx;

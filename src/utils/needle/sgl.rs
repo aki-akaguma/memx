@@ -49,7 +49,7 @@ impl B2Sgl {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub(crate) struct B1Sgl {
+pub struct B1Sgl {
     pub v1: u8,
 }
 impl B1Sgl {
@@ -93,6 +93,24 @@ impl From<B4Sgl> for B1Sgl {
 impl From<B2Sgl> for B1Sgl {
     fn from(cc: B2Sgl) -> Self {
         Self { v1: cc.v1 as u8 }
+    }
+}
+
+impl From<B1Sgl> for B16Sgl {
+    fn from(cc: B1Sgl) -> Self {
+        Self::new(cc.v1)
+    }
+}
+
+impl From<B1Sgl> for B8Sgl {
+    fn from(cc: B1Sgl) -> Self {
+        Self::new(cc.v1)
+    }
+}
+
+impl From<B1Sgl> for B4Sgl {
+    fn from(cc: B1Sgl) -> Self {
+        Self::new(cc.v1)
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::mem as basic;
+use crate::utils::B1Sgl;
 use crate::utils::_ascii_stochas;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
@@ -93,7 +94,7 @@ fn _memrmem_sse2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = hay_len - nee_len;
     while curr_idx > 0 {
-        let r = unsafe { super::_memrchr_sse2(&haystack[..curr_idx], nee_1st_byte) };
+        let r = unsafe { super::_memrchr_sse2(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte)) };
         if let Some(pos) = r {
             let r_idx = pos;
             if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
@@ -115,7 +116,7 @@ fn _memrmem_sse2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = hay_len;
     while curr_idx > 0 {
-        let r = unsafe { super::_memrchr_sse2(&haystack[..curr_idx], nee_last_byte) };
+        let r = unsafe { super::_memrchr_sse2(&haystack[..curr_idx], B1Sgl::new(nee_last_byte)) };
         if let Some(pos) = r {
             if pos >= nee_last_idx {
                 let r_idx = pos - nee_last_idx;
@@ -168,7 +169,7 @@ fn _memrmem_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = hay_len - nee_len;
     while curr_idx > 0 {
-        let r = unsafe { super::_memrchr_avx2(&haystack[..curr_idx], nee_1st_byte) };
+        let r = unsafe { super::_memrchr_avx2(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte)) };
         if let Some(pos) = r {
             let r_idx = pos;
             if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
@@ -190,7 +191,7 @@ fn _memrmem_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = hay_len;
     while curr_idx > 0 {
-        let r = unsafe { super::_memrchr_avx2(&haystack[..curr_idx], nee_last_byte) };
+        let r = unsafe { super::_memrchr_avx2(&haystack[..curr_idx], B1Sgl::new(nee_last_byte)) };
         if let Some(pos) = r {
             if pos >= nee_last_idx {
                 let r_idx = pos - nee_last_idx;

@@ -102,15 +102,15 @@ pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
         }
     }
     let match_cnt = 834;
-    let c = {
+    let by1 = {
         let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
-    (v, c, match_cnt)
+    (v, by1, match_cnt)
 }
 
 pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
-    let bb = b'r';
+    let by1 = b'r';
     let cc = 'r';
     let s1: String = EN_DAT_S1
         .to_string()
@@ -136,23 +136,23 @@ pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
         }
     }
     let match_cnt = 768;
-    (v, bb, match_cnt)
+    (v, by1, match_cnt)
 }
 
 pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
-    let bb = b'r';
+    let by1 = b'r';
     let bbb = {
         let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
     let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
         .bytes()
-        .map(|c| if c == bbb { b'.' } else { bb })
+        .map(|c| if c == bbb { b'.' } else { by1 })
         .collect();
     let v2: Vec<u8> = JA_DAT_S2
         .to_string()
         .bytes()
-        .map(|c| if c == bbb { b'.' } else { bb })
+        .map(|c| if c == bbb { b'.' } else { by1 })
         .collect();
     let s1: String = String::from_utf8_lossy(&v1).to_string();
     let s2: String = String::from_utf8_lossy(&v2).to_string();
@@ -170,7 +170,7 @@ pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
         }
     }
     let match_cnt = 834;
-    (v, bb, match_cnt)
+    (v, by1, match_cnt)
 }
 
 pub fn create_data_chr_dbl_en_1() -> (Vec<String>, (u8, u8), usize) {
@@ -211,17 +211,16 @@ pub fn create_data_chr_dbl_ja_1() -> (Vec<String>, (u8, u8), usize) {
         }
     }
     let match_cnt = 834 + 134;
-    let c1 = {
+    let by1 = {
         let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
-    let c2 = {
+    let by2 = {
         let bytes = r"じ".as_bytes();
         bytes[bytes.len() - 1]
     };
-    (v, (c1, c2), match_cnt)
+    (v, (by1, by2), match_cnt)
 }
-
 
 pub fn create_data_chr_tpl_en_1() -> (Vec<String>, (u8, u8, u8), usize) {
     let s1 = EN_DAT_S1.to_string();
@@ -261,19 +260,19 @@ pub fn create_data_chr_tpl_ja_1() -> (Vec<String>, (u8, u8, u8), usize) {
         }
     }
     let match_cnt = 834 + 134 + 30;
-    let c1 = {
+    let by1 = {
         let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
-    let c2 = {
+    let by2 = {
         let bytes = r"じ".as_bytes();
         bytes[bytes.len() - 1]
     };
-    let c3 = {
+    let by3 = {
         let bytes = r"ぷ".as_bytes();
         bytes[bytes.len() - 1]
     };
-    (v, (c1, c2, c3), match_cnt)
+    (v, (by1, by2, by3), match_cnt)
 }
 
 pub fn create_data_mem_en_1() -> (Vec<String>, &'static str, usize) {
@@ -352,7 +351,7 @@ pub fn create_data_cmp_en_1() -> (Vec<String>, &'static str, usize, usize, usize
 }
 
 pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize) {
-    let bb = b'r';
+    let by1 = b'r';
     let bbb = {
         let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
@@ -360,12 +359,12 @@ pub fn create_data_cmp_ja_1() -> (Vec<String>, &'static str, usize, usize, usize
     let v1: Vec<u8> = JA_DAT_S1
         .to_string()
         .bytes()
-        .map(|c| if c == bbb { b'a' } else { bb })
+        .map(|c| if c == bbb { b'a' } else { by1 })
         .collect();
     let v2: Vec<u8> = JA_DAT_S2
         .to_string()
         .bytes()
-        .map(|c| if c == bbb { b'z' } else { bb })
+        .map(|c| if c == bbb { b'z' } else { by1 })
         .collect();
     let s1: String = String::from_utf8_lossy(&v1).to_string();
     let s2: String = String::from_utf8_lossy(&v2).to_string();

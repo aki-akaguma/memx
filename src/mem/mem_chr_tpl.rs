@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memchr_tpl_impl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+pub fn _memchr_tpl_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -12,11 +12,11 @@ pub fn _memchr_tpl_impl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_chr_128(buf, c1, c2, c3);
+        let r = _start_chr_128(buf, needle);
         #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_chr_64(buf, c1, c2, c3);
+        let r = _start_chr_64(buf, needle);
         #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_chr_32(buf, c1, c2, c3);
+        let r = _start_chr_32(buf, needle);
         //
         r
     }
@@ -30,11 +30,11 @@ pub fn _memchr_tpl_impl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        let r = _start_chr_128(buf, c1, c2, c3);
+        let r = _start_chr_128(buf, needle);
         #[cfg(target_pointer_width = "64")]
-        let r = _start_chr_64(buf, c1, c2, c3);
+        let r = _start_chr_64(buf, needle);
         #[cfg(target_pointer_width = "32")]
-        let r = _start_chr_32(buf, c1, c2, c3);
+        let r = _start_chr_32(buf, needle);
         //
         r
     }
@@ -139,12 +139,12 @@ fn _chr_tpl_to_aligned_u32(
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
+fn _start_chr_128(buf: &[u8], needle: B1Tpl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B16Tpl::new(c_1, c_2, c_3);
+    let cc: B16Tpl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
@@ -172,8 +172,7 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
                     }
                 }
                 */
-                let c = B1Tpl::new(c_1, c_2, c_3);
-                let r = _chr_tpl_to_aligned_u128(buf_ptr, c, start_ptr);
+                let r = _chr_tpl_to_aligned_u128(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
@@ -239,12 +238,12 @@ fn _start_chr_128(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
+fn _start_chr_64(buf: &[u8], needle: B1Tpl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B8Tpl::new(c_1, c_2, c_3);
+    let cc: B8Tpl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 8 {
@@ -272,8 +271,7 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
                     }
                 }
                 */
-                let c = B1Tpl::new(c_1, c_2, c_3);
-                let r = _chr_tpl_to_aligned_u64(buf_ptr, c, start_ptr);
+                let r = _chr_tpl_to_aligned_u64(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
@@ -337,12 +335,12 @@ fn _start_chr_64(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
+fn _start_chr_32(buf: &[u8], needle: B1Tpl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
-    let cc = B4Tpl::new(c_1, c_2, c_3);
+    let cc: B4Tpl = needle.into();
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 4 {
@@ -370,8 +368,7 @@ fn _start_chr_32(buf: &[u8], c_1: u8, c_2: u8, c_3: u8) -> Option<usize> {
                     }
                 }
                 */
-                let c = B1Tpl::new(c_1, c_2, c_3);
-                let r = _chr_tpl_to_aligned_u32(buf_ptr, c, start_ptr);
+                let r = _chr_tpl_to_aligned_u32(buf_ptr, needle, start_ptr);
                 if let Some(p) = r.0 {
                     buf_ptr = p;
                 } else if let Some(v) = r.1 {
@@ -507,6 +504,41 @@ pub(crate) fn _memchr_tpl_remaining_3_bytes_impl(
     None
 }
 
+macro_rules! _return_chr_tpl {
+    ($base:expr, $bits_0_a:expr, $bits_0_b:expr, $bits_0_c:expr) => {{
+        if !$bits_0_a.is_zeros() {
+            let idx1 = ($bits_0_a.trailing_zeros() / 8) as usize;
+            if !$bits_0_b.is_zeros() {
+                let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
+                if !$bits_0_c.is_zeros() {
+                    let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
+                    Some($base + idx1.min(idx2.min(idx3)))
+                } else {
+                    Some($base + idx1.min(idx2))
+                }
+            } else if !$bits_0_c.is_zeros() {
+                let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
+                Some($base + idx1.min(idx3))
+            } else {
+                Some($base + idx1)
+            }
+        } else if !$bits_0_b.is_zeros() {
+            let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
+            if !$bits_0_c.is_zeros() {
+                let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
+                Some($base + idx2.min(idx3))
+            } else {
+                Some($base + idx2)
+            }
+        } else if !$bits_0_c.is_zeros() {
+            let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
+            Some($base + idx3)
+        } else {
+            None
+        }
+    }};
+}
+
 #[inline(always)]
 fn _chr_tpl_c16_uu_x1(buf_ptr: *const u8, c16: B16Tpl, st_ptr: *const u8) -> Option<usize> {
     _chr_tpl_c16_aa_x1(buf_ptr, c16, st_ptr)
@@ -523,36 +555,7 @@ fn _chr_tpl_c16_aa_x1(buf_ptr: *const u8, c16: B16Tpl, st_ptr: *const u8) -> Opt
     let bits_0_c = PackedU128::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-        if !bits_0_b.is_zeros() {
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base + idx1.min(idx2.min(idx3)))
-            } else {
-                Some(base + idx1.min(idx2))
-            }
-        } else if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx3))
-        } else {
-            Some(base + idx1)
-        }
-    } else if !bits_0_b.is_zeros() {
-        let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-        if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx2.min(idx3))
-        } else {
-            Some(base + idx2)
-        }
-    } else if !bits_0_c.is_zeros() {
-        let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-        Some(base + idx3)
-    } else {
-        None
-    }
+    _return_chr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -610,36 +613,7 @@ fn _chr_tpl_c8_aa_x1(buf_ptr: *const u8, c8: B8Tpl, st_ptr: *const u8) -> Option
     let bits_0_c = PackedU64::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-        if !bits_0_b.is_zeros() {
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base + idx1.min(idx2.min(idx3)))
-            } else {
-                Some(base + idx1.min(idx2))
-            }
-        } else if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx3))
-        } else {
-            Some(base + idx1)
-        }
-    } else if !bits_0_b.is_zeros() {
-        let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-        if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx2.min(idx3))
-        } else {
-            Some(base + idx2)
-        }
-    } else if !bits_0_c.is_zeros() {
-        let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-        Some(base + idx3)
-    } else {
-        None
-    }
+    _return_chr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -697,36 +671,7 @@ fn _chr_tpl_c4_aa_x1(buf_ptr: *const u8, c4: B4Tpl, st_ptr: *const u8) -> Option
     let bits_0_c = PackedU32::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-        if !bits_0_b.is_zeros() {
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base + idx1.min(idx2.min(idx3)))
-            } else {
-                Some(base + idx1.min(idx2))
-            }
-        } else if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx3))
-        } else {
-            Some(base + idx1)
-        }
-    } else if !bits_0_b.is_zeros() {
-        let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-        if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx2.min(idx3))
-        } else {
-            Some(base + idx2)
-        }
-    } else if !bits_0_c.is_zeros() {
-        let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-        Some(base + idx3)
-    } else {
-        None
-    }
+    _return_chr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -779,36 +724,7 @@ fn _chr_tpl_c2_aa_x1(buf_ptr: *const u8, c2: B2Tpl, st_ptr: *const u8) -> Option
     let bits_0_c = PackedU16::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-        if !bits_0_b.is_zeros() {
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            if !bits_0_c.is_zeros() {
-                let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-                Some(base + idx1.min(idx2.min(idx3)))
-            } else {
-                Some(base + idx1.min(idx2))
-            }
-        } else if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx3))
-        } else {
-            Some(base + idx1)
-        }
-    } else if !bits_0_b.is_zeros() {
-        let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-        if !bits_0_c.is_zeros() {
-            let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-            Some(base + idx2.min(idx3))
-        } else {
-            Some(base + idx2)
-        }
-    } else if !bits_0_c.is_zeros() {
-        let idx3 = (bits_0_c.trailing_zeros() / 8) as usize;
-        Some(base + idx3)
-    } else {
-        None
-    }
+    _return_chr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]

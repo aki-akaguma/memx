@@ -160,8 +160,8 @@ mod cpuid {
 cpufeatures::new!(cpuid_avx2, "avx2");
 cpufeatures::new!(cpuid_sse2, "sse2");
 
-mod multi;
-pub(crate) use multi::dbl::{MMB16Dbl, MMB32Dbl};
-pub(crate) use multi::sgl::{MMB16Sgl, MMB32Sgl};
-pub(crate) use multi::tpl::{MMB16Tpl, MMB32Tpl};
-//pub(crate) use multi::qpl::{MMB16Qpl, MMB32Qpl};
+mod needle;
+pub(crate) use needle::dbl::{MMB16Dbl, MMB32Dbl};
+pub(crate) use needle::sgl::{MMB16Sgl, MMB32Sgl};
+pub(crate) use needle::tpl::{MMB16Tpl, MMB32Tpl};
+//pub(crate) use needle::qpl::{MMB16Qpl, MMB32Qpl};

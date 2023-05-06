@@ -83,6 +83,7 @@ impl PtrOps for *const u8 {
         !overflowing && (*self as usize) <= end_val
         // (unsafe { end_ptr.offset_from(*self) }) >= loop_unroll as isize
     }
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     #[inline(always)]
     fn is_not_under(&self, start_ptr: *const u8, loop_unroll: usize) -> bool {
         /*
@@ -286,11 +287,16 @@ packed_integers! {
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */
 
-mod multi;
-pub(crate) use multi::dbl::{B16Dbl, B1Dbl, B2Dbl, B4Dbl, B8Dbl};
-//pub(crate) use multi::qpl::{B16Qpl, B1Qpl, B2Qpl, B4Qpl, B8Qpl};
-pub(crate) use multi::sgl::{B16Sgl, B1Sgl, B2Sgl, B4Sgl, B8Sgl};
-pub(crate) use multi::tpl::{B16Tpl, B1Tpl, B2Tpl, B4Tpl, B8Tpl};
+mod needle;
+pub(crate) use needle::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
+//pub(crate) use needle::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
+pub(crate) use needle::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
+pub(crate) use needle::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
+
+pub use needle::dbl::B1Dbl;
+pub use needle::qpl::B1Qpl;
+pub use needle::sgl::B1Sgl;
+pub use needle::tpl::B1Tpl;
 
 // ascii stochastics
 #[rustfmt::skip]

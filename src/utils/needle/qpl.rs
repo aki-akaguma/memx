@@ -81,7 +81,7 @@ impl B2Qpl {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub(crate) struct B1Qpl {
+pub struct B1Qpl {
     pub v1: u8,
     pub v2: u8,
     pub v3: u8,
@@ -141,6 +141,24 @@ impl From<B2Qpl> for B1Qpl {
             v3: cc.v3 as u8,
             v4: cc.v4 as u8,
         }
+    }
+}
+
+impl From<B1Qpl> for B16Qpl {
+    fn from(cc: B1Qpl) -> Self {
+        Self::new(cc.v1, cc.v2, cc.v3, cc.v4)
+    }
+}
+
+impl From<B1Qpl> for B8Qpl {
+    fn from(cc: B1Qpl) -> Self {
+        Self::new(cc.v1, cc.v2, cc.v3, cc.v4)
+    }
+}
+
+impl From<B1Qpl> for B4Qpl {
+    fn from(cc: B1Qpl) -> Self {
+        Self::new(cc.v1, cc.v2, cc.v3, cc.v4)
     }
 }
 
