@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] *
 ### Added
-* `memchr_tpl()`, `memrchr_tpl()`
+* `memchr_tpl()`, `memrchr_tpl()`, `memchr_qpl()`, `memrchr_qpl()`
 
 ### Changed
 * update depends: `regex(=1.7)`

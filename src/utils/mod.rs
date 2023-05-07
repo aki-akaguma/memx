@@ -289,7 +289,7 @@ packed_integers! {
 
 mod needle;
 pub(crate) use needle::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
-//pub(crate) use needle::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
+pub(crate) use needle::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
 pub(crate) use needle::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
 pub(crate) use needle::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
 

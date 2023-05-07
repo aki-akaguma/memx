@@ -1,6 +1,6 @@
 #![doc(hidden)]
 
-use crate::utils::{B1Dbl, B1Sgl, B1Tpl};
+use crate::utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
 
 mod mem_chr;
 pub(crate) use mem_chr::_memchr_impl;
@@ -81,6 +81,26 @@ pub(crate) use mem_rchr_tpl::_memrchr_tpl_remaining_15_bytes_impl;
 pub(crate) use mem_rchr_tpl::_rchr_tpl_to_aligned_u128;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr_tpl::_rchr_tpl_to_aligned_u256;
+
+mod mem_chr_qpl;
+pub(crate) use mem_chr_qpl::_memchr_qpl_impl;
+
+#[allow(unused_imports)]
+pub(crate) use mem_chr_qpl::_chr_qpl_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_chr_qpl::_chr_qpl_to_aligned_u256;
+#[allow(unused_imports)]
+pub(crate) use mem_chr_qpl::_memchr_qpl_remaining_15_bytes_impl;
+
+mod mem_rchr_qpl;
+pub(crate) use mem_rchr_qpl::_memrchr_qpl_impl;
+
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_qpl::_memrchr_qpl_remaining_15_bytes_impl;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_qpl::_rchr_qpl_to_aligned_u128;
+#[allow(unused_imports)]
+pub(crate) use mem_rchr_qpl::_rchr_qpl_to_aligned_u256;
 
 mod mem_cmp;
 pub(crate) use mem_cmp::_memcmp_impl;
@@ -171,6 +191,16 @@ pub fn memchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
 pub fn memrchr_tpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     let needle = B1Tpl::new(c1, c2, c3);
     crate::mem::_memrchr_tpl_impl(buf, needle)
+}
+
+pub fn memchr_qpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    crate::mem::_memchr_qpl_impl(buf, needle)
+}
+
+pub fn memrchr_qpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    crate::mem::_memrchr_qpl_impl(buf, needle)
 }
 
 pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {

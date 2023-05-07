@@ -16,7 +16,7 @@ test:
 	cargo test --offline --features test_alignment_check $(TEST_THR)
 
 AC_TESTS=--test memeq
-AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl
+AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
 
 test-alignment-check:
 	cargo test --offline --features test_alignment_check $(AC_TESTS)
@@ -28,8 +28,8 @@ test-no-default-features:
 	cargo test --offline --no-default-features
 
 MIRI_TESTS=
-MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl
-MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl
+MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
+MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
 
 MIRI=env MIRIFLAGS=-Zmiri-backtrace=full cargo +nightly miri test
 MIRI=cargo +nightly miri test
@@ -121,8 +121,8 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl
-bench_nms = bench-memchr_tpl bench-memrchr_tpl
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
+bench_nms = bench-memchr_qpl bench-memrchr_qpl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
 #bench_nms = bench-memrchr_tpl
@@ -208,6 +208,10 @@ bench-dat-check:
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_tpl
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_tpl
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_tpl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memchr_qpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_qpl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_qpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_qpl
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 
