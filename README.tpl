@@ -18,6 +18,8 @@
 | [`memnechr()`]   | [`memrnechr()`]   |
 | [`memmem()`]     | [`memrmem()`]     |
 | [`memchr_dbl()`] | [`memrchr_dbl()`] |
+| [`memchr_tpl()`] | [`memrchr_tpl()`] |
+| [`memchr_qpl()`] | [`memrchr_qpl()`] |
 
 | memory op      |
 |:---------------|
@@ -38,6 +40,10 @@
 [`memset()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md
 [`memchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_dbl.md
 [`memrchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_dbl.md
+[`memchr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_tpl.md
+[`memrchr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_tpl.md
+[`memchr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_qpl.md
+[`memrchr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_qpl.md
 
 # Changelogs
 
