@@ -40,7 +40,7 @@ pub mod iter;
 pub mod mem;
 pub mod utils;
 
-pub use utils::{B1Dbl, B1Sgl, B1Tpl};
+pub use utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
 
 /// used by memcpy()
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
@@ -176,6 +176,40 @@ pub fn memrchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     };
     #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrchr_tpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().position(|&x| x == c1 || x == c2 || x == c3 || x == c4)`.
+pub fn memchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memchr_qpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memchr_qpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memchr_qpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2 || x == c3 || x == c4)`.
+pub fn memrchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrchr_qpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrchr_qpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrchr_qpl_impl(buf, needle);
     //
     r
 }

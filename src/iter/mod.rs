@@ -22,6 +22,14 @@ mod iter_rchr_tpl;
 pub use iter_rchr_tpl::memrchr_tpl_iter;
 pub use iter_rchr_tpl::MemrchrTplIter;
 
+mod iter_chr_qpl;
+pub use iter_chr_qpl::memchr_qpl_iter;
+pub use iter_chr_qpl::MemchrQplIter;
+
+mod iter_rchr_qpl;
+pub use iter_rchr_qpl::memrchr_qpl_iter;
+pub use iter_rchr_qpl::MemrchrQplIter;
+
 mod iter_mem;
 pub use iter_mem::memmem_iter;
 pub use iter_mem::MemmemIter;

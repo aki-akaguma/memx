@@ -81,6 +81,16 @@ pub fn _std_memrchr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> 
     buf.iter().rposition(|&x| x == by1 || x == by2 || x == by3)
 }
 
+pub fn _std_memchr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    buf.iter()
+        .position(|&x| x == by1 || x == by2 || x == by3 || x == by4)
+}
+
+pub fn _std_memrchr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    buf.iter()
+        .rposition(|&x| x == by1 || x == by2 || x == by3 || x == by4)
+}
+
 pub fn _std_memchr_iter(buf: &[u8], by1: u8) -> StdMemchrSglIter {
     StdMemchrSglIter::new(buf, by1)
 }
@@ -103,6 +113,14 @@ pub fn _std_memchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemchrT
 
 pub fn _std_memrchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemrchrTplIter {
     StdMemrchrTplIter::new(buf, by1, by2, by3)
+}
+
+pub fn _std_memchr_qpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> StdMemchrQplIter {
+    StdMemchrQplIter::new(buf, by1, by2, by3, by4)
+}
+
+pub fn _std_memrchr_qpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> StdMemrchrQplIter {
+    StdMemrchrQplIter::new(buf, by1, by2, by3, by4)
 }
 
 pub fn _std_memmem_iter<'a>(buf: &'a [u8], pat: &'a [u8]) -> StdMemmemIter<'a> {
@@ -493,6 +511,172 @@ impl<'a> DoubleEndedIterator for StdMemrchrTplIter<'a> {
             self.needle1,
             self.needle2,
             self.needle3,
+        ) {
+            Some(idx) => {
+                let found = self.position + idx;
+                self.position = self.position + idx + 1;
+                Some(found)
+            }
+            None => {
+                self.position = self.haystack.len() + 1;
+                None
+            }
+        }
+    }
+}
+
+pub struct StdMemchrQplIter<'a> {
+    haystack: &'a [u8],
+    needle1: u8,
+    needle2: u8,
+    needle3: u8,
+    needle4: u8,
+    position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
+}
+impl<'a> StdMemchrQplIter<'a> {
+    #[allow(dead_code)]
+    #[inline]
+    pub fn new(
+        haystack: &[u8],
+        needle1: u8,
+        needle2: u8,
+        needle3: u8,
+        needle4: u8,
+    ) -> StdMemchrQplIter {
+        StdMemchrQplIter {
+            needle1,
+            needle2,
+            needle3,
+            needle4,
+            haystack,
+            position: 0,
+        }
+    }
+}
+impl<'a> Iterator for StdMemchrQplIter<'a> {
+    type Item = usize;
+    #[inline]
+    fn next(&mut self) -> Option<usize> {
+        if self.position > self.haystack.len() {
+            return None;
+        }
+        match _std_memchr_qpl(
+            &self.haystack[self.position..],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+            self.needle4,
+        ) {
+            Some(idx) => {
+                let found = self.position + idx;
+                self.position = self.position + idx + 1;
+                Some(found)
+            }
+            None => {
+                self.position = self.haystack.len() + 1;
+                None
+            }
+        }
+    }
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.haystack.len()))
+    }
+}
+impl<'a> DoubleEndedIterator for StdMemchrQplIter<'a> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.position == 0 {
+            return None;
+        }
+        match _std_memrchr_qpl(
+            &self.haystack[..(self.position - 1)],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+            self.needle4,
+        ) {
+            Some(idx) => {
+                self.position = idx + 1;
+                Some(idx)
+            }
+            None => {
+                self.position = 0;
+                None
+            }
+        }
+    }
+}
+
+pub struct StdMemrchrQplIter<'a> {
+    haystack: &'a [u8],
+    needle1: u8,
+    needle2: u8,
+    needle3: u8,
+    needle4: u8,
+    position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
+}
+impl<'a> StdMemrchrQplIter<'a> {
+    #[allow(dead_code)]
+    #[inline]
+    pub fn new(
+        haystack: &[u8],
+        needle1: u8,
+        needle2: u8,
+        needle3: u8,
+        needle4: u8,
+    ) -> StdMemrchrQplIter {
+        StdMemrchrQplIter {
+            needle1,
+            needle2,
+            needle3,
+            needle4,
+            haystack,
+            position: haystack.len() + 1,
+        }
+    }
+}
+impl<'a> Iterator for StdMemrchrQplIter<'a> {
+    type Item = usize;
+    #[inline]
+    fn next(&mut self) -> Option<usize> {
+        if self.position == 0 {
+            return None;
+        }
+        match _std_memrchr_qpl(
+            &self.haystack[..(self.position - 1)],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+            self.needle4,
+        ) {
+            Some(idx) => {
+                self.position = idx + 1;
+                Some(idx)
+            }
+            None => {
+                self.position = 0;
+                None
+            }
+        }
+    }
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.haystack.len()))
+    }
+}
+impl<'a> DoubleEndedIterator for StdMemrchrQplIter<'a> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.position > self.haystack.len() {
+            return None;
+        }
+        match _std_memchr_qpl(
+            &self.haystack[self.position..],
+            self.needle1,
+            self.needle2,
+            self.needle3,
+            self.needle4,
         ) {
             Some(idx) => {
                 let found = self.position + idx;
