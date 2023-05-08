@@ -312,6 +312,28 @@ fn _memchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
 }
 
 #[inline(always)]
+fn _return_chr_dbl<T, PU>(base: T, mask_a: PU, mask_b: PU) -> Option<usize>
+where
+    T: core::ops::Add<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !mask_a.is_zeros() {
+        let idx1 = mask_a.trailing_zeros() as usize;
+        if !mask_b.is_zeros() {
+            let idx2 = mask_b.trailing_zeros() as usize;
+            Some(base + idx1.min(idx2))
+        } else {
+            Some(base + idx1)
+        }
+    } else if !mask_b.is_zeros() {
+        let idx2 = mask_b.trailing_zeros() as usize;
+        Some(base + idx2)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
 unsafe fn _chr_dbl_c16_uu_x1(
     buf_ptr: *const u8,
     mm_c16: MMB16Dbl,
@@ -321,23 +343,11 @@ unsafe fn _chr_dbl_c16_uu_x1(
     let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
     let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
-    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u16;
+    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b) as u16;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, mask_0_a, mask_0_b)
 }
 
 #[inline(always)]
@@ -350,23 +360,11 @@ unsafe fn _chr_dbl_c16_aa_x1(
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
     let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
-    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u16;
+    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b) as u16;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, mask_0_a, mask_0_b)
 }
 
 #[inline(always)]
@@ -375,49 +373,15 @@ unsafe fn _chr_dbl_c16_aa_x2(
     mm_c16: MMB16Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
-    let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
-    //
-    let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
-    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
-    //
-    let mm_1_eq_a = _mm_cmpeq_epi8(mm_1, mm_c16.v1);
-    let mm_1_eq_b = _mm_cmpeq_epi8(mm_1, mm_c16.v2);
-    let mask_1_a = _mm_movemask_epi8(mm_1_eq_a);
-    let mask_1_b = _mm_movemask_epi8(mm_1_eq_b);
-    //
-    let base = buf_ptr.usz_offset_from(st_ptr);
-    //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else if mask_1_a != 0 {
-        if mask_1_b != 0 {
-            let idx1 = mask_1_a.trailing_zeros() as usize;
-            let idx2 = mask_1_b.trailing_zeros() as usize;
-            if idx1 < idx2 {
-                Some(base + idx1 + 16)
-            } else {
-                Some(base + idx2 + 16)
-            }
-        } else {
-            Some(base + mask_1_a.trailing_zeros() as usize + 16)
-        }
-    } else if mask_1_b != 0 {
-        Some(base + mask_1_b.trailing_zeros() as usize + 16)
-    } else {
-        None
+    let r = _chr_dbl_c16_aa_x1(buf_ptr, mm_c16, st_ptr);
+    if r.is_some() {
+        return r;
     }
+    let r = _chr_dbl_c16_aa_x1(buf_ptr.add(16), mm_c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
 }
 
 #[inline(always)]
@@ -464,23 +428,11 @@ unsafe fn _chr_dbl_c32_uu_x1(
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
     let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
-    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, mask_0_a, mask_0_b)
 }
 
 #[inline(always)]
@@ -493,23 +445,11 @@ unsafe fn _chr_dbl_c32_aa_x1(
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
     let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
-    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, mask_0_a, mask_0_b)
 }
 
 #[inline(always)]
@@ -518,45 +458,15 @@ unsafe fn _chr_dbl_c32_aa_x2(
     mm_c32: MMB32Dbl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
-    let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
-    //
-    let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
-    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
-    //
-    let mm_1_eq_a = _mm256_cmpeq_epi8(mm_1, mm_c32.v1);
-    let mm_1_eq_b = _mm256_cmpeq_epi8(mm_1, mm_c32.v2);
-    let mask_1_a = _mm256_movemask_epi8(mm_1_eq_a);
-    let mask_1_b = _mm256_movemask_epi8(mm_1_eq_b);
-    //
-    let base = buf_ptr.usz_offset_from(st_ptr);
-    //
-    if mask_0_a != 0 {
-        if mask_0_b != 0 {
-            let idx1 = mask_0_a.trailing_zeros() as usize;
-            let idx2 = mask_0_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + mask_0_a.trailing_zeros() as usize)
-        }
-    } else if mask_0_b != 0 {
-        Some(base + mask_0_b.trailing_zeros() as usize)
-    } else if mask_1_a != 0 {
-        if mask_1_b != 0 {
-            let idx1 = mask_1_a.trailing_zeros() as usize;
-            let idx2 = mask_1_b.trailing_zeros() as usize;
-            Some(base + idx1.min(idx2) + 32)
-        } else {
-            Some(base + mask_1_a.trailing_zeros() as usize + 32)
-        }
-    } else if mask_1_b != 0 {
-        Some(base + mask_1_b.trailing_zeros() as usize + 32)
-    } else {
-        None
+    let r = _chr_dbl_c32_aa_x1(buf_ptr, mm_c32, st_ptr);
+    if r.is_some() {
+        return r;
     }
+    let r = _chr_dbl_c32_aa_x1(buf_ptr.add(32), mm_c32, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
 }
 
 #[inline(always)]

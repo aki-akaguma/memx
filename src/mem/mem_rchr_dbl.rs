@@ -434,6 +434,28 @@ pub(crate) fn _memrchr_dbl_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
+fn _return_rchr_dbl<T, PU>(base: T, bits_a: PU, bits_b: PU) -> Option<usize>
+where
+    T: core::ops::Sub<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !bits_a.is_zeros() {
+        let idx1 = (bits_a.trailing_zeros() / 8) as usize;
+        if !bits_b.is_zeros() {
+            let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx2))
+        } else {
+            Some(base - idx1)
+        }
+    } else if !bits_b.is_zeros() {
+        let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+        Some(base - idx2)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
 fn _rchr_dbl_c16_uu_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     _rchr_dbl_c16_aa_x1(buf_ptr, c16, st_ptr)
 }
@@ -443,24 +465,11 @@ fn _rchr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Op
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u128(buf_ptr) };
     let v_0_a = v_0 ^ c16.v1;
     let v_0_b = v_0 ^ c16.v2;
-    //
     let bits_0_a = PackedU128::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU128::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base - idx1.min(idx2))
-        } else {
-            Some(base - (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base - (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_rchr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -512,24 +521,11 @@ fn _rchr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Optio
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u64(buf_ptr) };
     let v_0_a = v_0 ^ c8.v1;
     let v_0_b = v_0 ^ c8.v2;
-    //
     let bits_0_a = PackedU64::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU64::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 8 - 1;
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base - idx1.min(idx2))
-        } else {
-            Some(base - (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base - (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_rchr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -581,24 +577,11 @@ fn _rchr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Optio
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u32(buf_ptr) };
     let v_0_a = v_0 ^ c4.v1;
     let v_0_b = v_0 ^ c4.v2;
-    //
     let bits_0_a = PackedU32::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU32::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 4 - 1;
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base - idx1.min(idx2))
-        } else {
-            Some(base - (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base - (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_rchr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -645,24 +628,11 @@ fn _rchr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: B2Dbl, st_ptr: *const u8) -> Optio
     let v_0 = unsafe { _read_a_big_endian_from_ptr_u16(buf_ptr) };
     let v_0_a = v_0 ^ c2.v1;
     let v_0_b = v_0 ^ c2.v2;
-    //
     let bits_0_a = PackedU16::new(v_0_a).may_have_zero_quick();
     let bits_0_b = PackedU16::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 2 - 1;
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base - idx1.min(idx2))
-        } else {
-            Some(base - (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base - (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_rchr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]

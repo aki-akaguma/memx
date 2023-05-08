@@ -505,6 +505,28 @@ pub(crate) fn _memchr_dbl_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
+fn _return_chr_dbl<T, PU>(base: T, bits_a: PU, bits_b: PU) -> Option<usize>
+where
+    T: core::ops::Add<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !bits_a.is_zeros() {
+        let idx1 = (bits_a.trailing_zeros() / 8) as usize;
+        if !bits_b.is_zeros() {
+            let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+            Some(base + idx1.min(idx2))
+        } else {
+            Some(base + idx1)
+        }
+    } else if !bits_b.is_zeros() {
+        let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+        Some(base + idx2)
+    } else {
+        None
+    }
+}
+
+#[inline(always)]
 fn _chr_dbl_c16_uu_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Option<usize> {
     _chr_dbl_c16_aa_x1(buf_ptr, c16, st_ptr)
 }
@@ -518,19 +540,7 @@ fn _chr_dbl_c16_aa_x1(buf_ptr: *const u8, c16: B16Dbl, st_ptr: *const u8) -> Opt
     let bits_0_b = PackedU128::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base + (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -586,19 +596,7 @@ fn _chr_dbl_c8_aa_x1(buf_ptr: *const u8, c8: B8Dbl, st_ptr: *const u8) -> Option
     let bits_0_b = PackedU64::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base + (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -654,19 +652,7 @@ fn _chr_dbl_c4_aa_x1(buf_ptr: *const u8, c4: B4Dbl, st_ptr: *const u8) -> Option
     let bits_0_b = PackedU32::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base + (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
@@ -717,19 +703,7 @@ fn _chr_dbl_c2_aa_x1(buf_ptr: *const u8, c2: B2Dbl, st_ptr: *const u8) -> Option
     let bits_0_b = PackedU16::new(v_0_b).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0_a.is_zeros() {
-        if !bits_0_b.is_zeros() {
-            let idx1 = (bits_0_a.trailing_zeros() / 8) as usize;
-            let idx2 = (bits_0_b.trailing_zeros() / 8) as usize;
-            Some(base + idx1.min(idx2))
-        } else {
-            Some(base + (bits_0_a.trailing_zeros() / 8) as usize)
-        }
-    } else if !bits_0_b.is_zeros() {
-        Some(base + (bits_0_b.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_dbl(base, bits_0_a, bits_0_b)
 }
 
 #[inline(always)]
