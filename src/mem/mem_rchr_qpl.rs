@@ -433,71 +433,74 @@ pub(crate) fn _memrchr_qpl_remaining_3_bytes_impl(
     None
 }
 
-macro_rules! _return_rchr_qpl {
-    ($base:expr, $bits_0_a:expr, $bits_0_b:expr, $bits_0_c:expr, $bits_0_d:expr) => {{
-        if !$bits_0_a.is_zeros() {
-            let idx1 = ($bits_0_a.trailing_zeros() / 8) as usize;
-            if !$bits_0_b.is_zeros() {
-                let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
-                if !$bits_0_c.is_zeros() {
-                    let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-                    if !$bits_0_d.is_zeros() {
-                        let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                        Some($base - idx1.min(idx2.min(idx3.min(idx4))))
-                    } else {
-                        Some($base - idx1.min(idx2.min(idx3)))
-                    }
-                } else if !$bits_0_d.is_zeros() {
-                    let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                    Some($base - idx1.min(idx2.min(idx4)))
+#[inline(always)]
+fn _return_rchr_qpl<T, PU>(base: T, bits_a: PU, bits_b: PU, bits_c: PU, bits_d: PU) -> Option<usize>
+where
+    T: core::ops::Sub<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !bits_a.is_zeros() {
+        let idx1 = (bits_a.trailing_zeros() / 8) as usize;
+        if !bits_b.is_zeros() {
+            let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+            if !bits_c.is_zeros() {
+                let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+                if !bits_d.is_zeros() {
+                    let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+                    Some(base - idx1.min(idx2.min(idx3.min(idx4))))
                 } else {
-                    Some($base - idx1.min(idx2))
+                    Some(base - idx1.min(idx2.min(idx3)))
                 }
-            } else if !$bits_0_c.is_zeros() {
-                let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-                if !$bits_0_d.is_zeros() {
-                    let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                    Some($base - idx1.min(idx3.min(idx4)))
-                } else {
-                    Some($base - idx1.min(idx3))
-                }
-            } else if !$bits_0_d.is_zeros() {
-                let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                Some($base - idx1.min(idx4))
+            } else if !bits_d.is_zeros() {
+                let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+                Some(base - idx1.min(idx2.min(idx4)))
             } else {
-                Some($base - idx1)
+                Some(base - idx1.min(idx2))
             }
-        } else if !$bits_0_b.is_zeros() {
-            let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
-            if !$bits_0_c.is_zeros() {
-                let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-                if !$bits_0_d.is_zeros() {
-                    let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                    Some($base - idx2.min(idx3.min(idx4)))
-                } else {
-                    Some($base - idx2.min(idx3))
-                }
-            } else if !$bits_0_d.is_zeros() {
-                let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                Some($base - idx2.min(idx4))
+        } else if !bits_c.is_zeros() {
+            let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+            if !bits_d.is_zeros() {
+                let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+                Some(base - idx1.min(idx3.min(idx4)))
             } else {
-                Some($base - idx2)
+                Some(base - idx1.min(idx3))
             }
-        } else if !$bits_0_c.is_zeros() {
-            let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-            if !$bits_0_d.is_zeros() {
-                let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-                Some($base - idx3.min(idx4))
-            } else {
-                Some($base - idx3)
-            }
-        } else if !$bits_0_d.is_zeros() {
-            let idx4 = ($bits_0_d.trailing_zeros() / 8) as usize;
-            Some($base - idx4)
+        } else if !bits_d.is_zeros() {
+            let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx4))
         } else {
-            None
+            Some(base - idx1)
         }
-    }};
+    } else if !bits_b.is_zeros() {
+        let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+        if !bits_c.is_zeros() {
+            let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+            if !bits_d.is_zeros() {
+                let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+                Some(base - idx2.min(idx3.min(idx4)))
+            } else {
+                Some(base - idx2.min(idx3))
+            }
+        } else if !bits_d.is_zeros() {
+            let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+            Some(base - idx2.min(idx4))
+        } else {
+            Some(base - idx2)
+        }
+    } else if !bits_c.is_zeros() {
+        let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+        if !bits_d.is_zeros() {
+            let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+            Some(base - idx3.min(idx4))
+        } else {
+            Some(base - idx3)
+        }
+    } else if !bits_d.is_zeros() {
+        let idx4 = (bits_d.trailing_zeros() / 8) as usize;
+        Some(base - idx4)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -518,7 +521,7 @@ fn _rchr_qpl_c16_aa_x1(buf_ptr: *const u8, c16: B16Qpl, st_ptr: *const u8) -> Op
     let bits_0_d = PackedU128::new(v_0_d).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
-    _return_rchr_qpl!(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
+    _return_rchr_qpl(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
 }
 
 #[inline(always)]
@@ -578,7 +581,7 @@ fn _rchr_qpl_c8_aa_x1(buf_ptr: *const u8, c8: B8Qpl, st_ptr: *const u8) -> Optio
     let bits_0_d = PackedU64::new(v_0_d).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 8 - 1;
     //
-    _return_rchr_qpl!(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
+    _return_rchr_qpl(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
 }
 
 #[inline(always)]
@@ -638,7 +641,7 @@ fn _rchr_qpl_c4_aa_x1(buf_ptr: *const u8, c4: B4Qpl, st_ptr: *const u8) -> Optio
     let bits_0_d = PackedU32::new(v_0_d).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 4 - 1;
     //
-    _return_rchr_qpl!(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
+    _return_rchr_qpl(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
 }
 
 #[inline(always)]
@@ -693,7 +696,7 @@ fn _rchr_qpl_c2_aa_x1(buf_ptr: *const u8, c2: B2Qpl, st_ptr: *const u8) -> Optio
     let bits_0_d = PackedU16::new(v_0_d).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 2 - 1;
     //
-    _return_rchr_qpl!(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
+    _return_rchr_qpl(base, bits_0_a, bits_0_b, bits_0_c, bits_0_d)
 }
 
 #[inline(always)]

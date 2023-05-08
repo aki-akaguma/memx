@@ -53,8 +53,8 @@ fmt:
 doc:
 	cargo doc
 
-TARP_OPT = --offline --tests --engine llvm --line --out lcov --output-dir ./target
-#TARP_OPT = --offline --tests --engine ptrace --line --out lcov --output-dir ./target
+#TARP_OPT = --offline --tests --engine llvm --line --out lcov --output-dir ./target
+TARP_OPT = --offline --tests --engine ptrace --line --out lcov --output-dir ./target
 
 tarpaulin:
 	@#cargo tarpaulin --offline --engine llvm --out html --output-dir ./target
@@ -79,12 +79,13 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
-GRCOV_TEST=--test memchr
 GRCOV_TEST=
+GRCOV_TEST=--test memrchr_qpl
 
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
 	@rm -rf $(CURDIR)/target/coverage
+	$(COV_ENV1) cargo build
 	$(COV_ENV1) cargo test --offline $(GRCOV_TEST)
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_128 $(GRCOV_TEST)
 	$(COV_ENV1) cargo test --offline --features test_pointer_width_64 $(GRCOV_TEST)
@@ -122,10 +123,10 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
-bench_nms = bench-memchr_qpl bench-memrchr_qpl
+#bench_nms = bench-memchr_qpl bench-memrchr_qpl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memrchr_tpl
+bench_nms = bench-memrchr_qpl
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
