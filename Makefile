@@ -30,6 +30,7 @@ test-no-default-features:
 MIRI_TESTS=
 MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
 MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
+MIRI_TESTS=--test memchr_qpl --test memrchr_qpl
 
 MIRI=env MIRIFLAGS=-Zmiri-backtrace=full cargo +nightly miri test
 MIRI=cargo +nightly miri test
@@ -80,7 +81,7 @@ tarpaulin:
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
 GRCOV_TEST=
-GRCOV_TEST=--test memrchr_qpl
+GRCOV_TEST=--test memchr_tpl --test memrchr_tpl
 
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
@@ -123,10 +124,10 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
-#bench_nms = bench-memchr_qpl bench-memrchr_qpl
+bench_nms = bench-memchr_tpl bench-memrchr_tpl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-bench_nms = bench-memrchr_qpl
+#bench_nms = bench-memrchr_qpl
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
