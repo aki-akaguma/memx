@@ -311,39 +311,42 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
     basic::_memchr_tpl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
-macro_rules! _return_chr_tpl {
-    ($base:expr, $mask_0_a:expr, $mask_0_b:expr, $mask_0_c:expr) => {{
-        if $mask_0_a != 0 {
-            let idx1 = $mask_0_a.trailing_zeros() as usize;
-            if $mask_0_b != 0 {
-                let idx2 = $mask_0_b.trailing_zeros() as usize;
-                if $mask_0_c != 0 {
-                    let idx3 = $mask_0_c.trailing_zeros() as usize;
-                    Some($base + idx1.min(idx2.min(idx3)))
-                } else {
-                    Some($base + idx1.min(idx2))
-                }
-            } else if $mask_0_c != 0 {
-                let idx3 = $mask_0_c.trailing_zeros() as usize;
-                Some($base + idx1.min(idx3))
+#[inline(always)]
+fn _return_chr_tpl<T, PU>(base: T, mask_a: PU, mask_b: PU, mask_c: PU) -> Option<usize>
+where
+    T: core::ops::Add<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !mask_a.is_zeros() {
+        let idx1 = mask_a.trailing_zeros() as usize;
+        if !mask_b.is_zeros() {
+            let idx2 = mask_b.trailing_zeros() as usize;
+            if !mask_c.is_zeros() {
+                let idx3 = mask_c.trailing_zeros() as usize;
+                Some(base + idx1.min(idx2.min(idx3)))
             } else {
-                Some($base + idx1)
+                Some(base + idx1.min(idx2))
             }
-        } else if $mask_0_b != 0 {
-            let idx2 = $mask_0_b.trailing_zeros() as usize;
-            if $mask_0_c != 0 {
-                let idx3 = $mask_0_c.trailing_zeros() as usize;
-                Some($base + idx2.min(idx3))
-            } else {
-                Some($base + idx2)
-            }
-        } else if $mask_0_c != 0 {
-            let idx3 = $mask_0_c.trailing_zeros() as usize;
-            Some($base + idx3)
+        } else if !mask_c.is_zeros() {
+            let idx3 = mask_c.trailing_zeros() as usize;
+            Some(base + idx1.min(idx3))
         } else {
-            None
+            Some(base + idx1)
         }
-    }};
+    } else if !mask_b.is_zeros() {
+        let idx2 = mask_b.trailing_zeros() as usize;
+        if !mask_c.is_zeros() {
+            let idx3 = mask_c.trailing_zeros() as usize;
+            Some(base + idx2.min(idx3))
+        } else {
+            Some(base + idx2)
+        }
+    } else if !mask_c.is_zeros() {
+        let idx3 = mask_c.trailing_zeros() as usize;
+        Some(base + idx3)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -357,12 +360,12 @@ unsafe fn _chr_tpl_c16_uu_x1(
     let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
     let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
-    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
-    let mask_0_c = _mm_movemask_epi8(mm_0_eq_c);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b) as u32;
+    let mask_0_c = _mm_movemask_epi8(mm_0_eq_c) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    _return_chr_tpl!(base, mask_0_a, mask_0_b, mask_0_c)
+    _return_chr_tpl(base, mask_0_a, mask_0_b, mask_0_c)
 }
 
 #[inline(always)]
@@ -376,12 +379,12 @@ unsafe fn _chr_tpl_c16_aa_x1(
     let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
     let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
     let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
-    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b);
-    let mask_0_c = _mm_movemask_epi8(mm_0_eq_c);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm_movemask_epi8(mm_0_eq_b) as u32;
+    let mask_0_c = _mm_movemask_epi8(mm_0_eq_c) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    _return_chr_tpl!(base, mask_0_a, mask_0_b, mask_0_c)
+    _return_chr_tpl(base, mask_0_a, mask_0_b, mask_0_c)
 }
 
 #[inline(always)]
@@ -446,12 +449,12 @@ unsafe fn _chr_tpl_c32_uu_x1(
     let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
     let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
-    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
-    let mask_0_c = _mm256_movemask_epi8(mm_0_eq_c);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b) as u32;
+    let mask_0_c = _mm256_movemask_epi8(mm_0_eq_c) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    _return_chr_tpl!(base, mask_0_a, mask_0_b, mask_0_c)
+    _return_chr_tpl(base, mask_0_a, mask_0_b, mask_0_c)
 }
 
 #[inline(always)]
@@ -465,12 +468,12 @@ unsafe fn _chr_tpl_c32_aa_x1(
     let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
     let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
     let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
-    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a);
-    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b);
-    let mask_0_c = _mm256_movemask_epi8(mm_0_eq_c);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
+    let mask_0_b = _mm256_movemask_epi8(mm_0_eq_b) as u32;
+    let mask_0_c = _mm256_movemask_epi8(mm_0_eq_c) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    _return_chr_tpl!(base, mask_0_a, mask_0_b, mask_0_c)
+    _return_chr_tpl(base, mask_0_a, mask_0_b, mask_0_c)
 }
 
 #[inline(always)]

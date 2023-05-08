@@ -3,59 +3,82 @@
 #[test]
 fn test00() {
     let buf = vec![];
-    let r = test_memchr_tpl(&buf, b'G', b'g', b'X');
+    let r = test_memchr_tpl(&buf, b'g', b'Y', b'Z');
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let r = test_memchr_tpl(&buf, b'X', b'G', b'g');
-    assert_eq!(r, Some(1));
-    let r = test_memchr_tpl(&buf, b'G', b'g', b'X');
-    assert_eq!(r, Some(1));
-    let r = test_memchr_tpl(&buf, b'g', b'G', b'X');
-    assert_eq!(r, Some(1));
+    let mut vv = vec![b'g', b'Y', b'Z'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(1));
+    }
+    //
+    let buf = vec![b'a', b'B', b'C'];
+    let mut vv = vec![b'a', b'Y', b'Z'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(0));
+    }
+    //
+    let buf = vec![b'A', b'b', b'C'];
+    let mut vv = vec![b'b', b'Y', b'Z'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(1));
+    }
+    //
+    let buf = vec![b'A', b'B', b'c'];
+    let mut vv = vec![b'c', b'Y', b'Z'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(2));
+    }
     //
     let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr_tpl(&buf, b'A', b'a', b'X');
-    assert_eq!(r, Some(0));
-    let r = test_memchr_tpl(&buf, b'a', b'A', b'X');
-    assert_eq!(r, Some(0));
-    let r = test_memchr_tpl(&buf, b'X', b'a', b'A');
-    assert_eq!(r, Some(0));
-    //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr_tpl(&buf, b'B', b'b', b'X');
-    assert_eq!(r, Some(1));
-    let r = test_memchr_tpl(&buf, b'b', b'B', b'X');
-    assert_eq!(r, Some(1));
-    let r = test_memchr_tpl(&buf, b'X', b'b', b'B');
-    assert_eq!(r, Some(1));
-    //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr_tpl(&buf, b'C', b'c', b'X');
-    assert_eq!(r, Some(2));
-    let r = test_memchr_tpl(&buf, b'c', b'C', b'X');
-    assert_eq!(r, Some(2));
-    let r = test_memchr_tpl(&buf, b'X', b'c', b'C');
-    assert_eq!(r, Some(2));
-    //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr_tpl(&buf, b'a', b'b', b'X');
-    assert_eq!(r, None);
-    let r = test_memchr_tpl(&buf, b'b', b'a', b'X');
-    assert_eq!(r, None);
-    let r = test_memchr_tpl(&buf, b'X', b'b', b'a');
+    let r = test_memchr_tpl(&buf, b'a', b'b', b'c');
     assert_eq!(r, None);
 }
 #[test]
 fn test01() {
-    let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];
+    #[rustfmt::skip]
+    let buf = vec![
+        b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H',
+        b'I', b'j', b'k', b'l', b'M', b'N', b'O', b'P',
+        b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X',
+        b'Y', b'Z'
+    ];
     //
-    let r = test_memchr_tpl(&buf, b'G', b'g', b'X');
-    assert_eq!(r, Some(6));
-    let r = test_memchr_tpl(&buf, b'g', b'G', b'X');
-    assert_eq!(r, Some(6));
-    let r = test_memchr_tpl(&buf, b'X', b'g', b'G');
-    assert_eq!(r, Some(6));
+    let mut vv = vec![b'j', b'K', b'L'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(9));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'L'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(9));
+    }
+    //
+    let mut vv = vec![b'j', b'K', b'l'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(9));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'l'];
+    for _ in 0..3 {
+        vv.rotate_right(1);
+        let r = test_memchr_tpl(&buf, vv[0], vv[1], vv[2]);
+        assert_eq!(r, Some(9));
+    }
 }
 #[test]
 fn test02() {

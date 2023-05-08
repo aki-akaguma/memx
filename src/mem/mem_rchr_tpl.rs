@@ -433,36 +433,42 @@ pub(crate) fn _memrchr_tpl_remaining_3_bytes_impl(
     None
 }
 
-macro_rules! _return_rchr_tpl {
-    ($base:expr, $bits_0_a:expr, $bits_0_b:expr, $bits_0_c:expr) => {{
-        if !$bits_0_a.is_zeros() {
-            let idx1 = ($bits_0_a.trailing_zeros() / 8) as usize;
-            if !$bits_0_b.is_zeros() {
-                let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
-                if !$bits_0_c.is_zeros() {
-                    let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-                    Some($base - idx1.min(idx2.min(idx3)))
-                } else {
-                    Some($base - idx1.min(idx2))
-                }
+#[inline(always)]
+fn _return_rchr_tpl<T, PU>(base: T, bits_a: PU, bits_b: PU, bits_c: PU) -> Option<usize>
+where
+    T: core::ops::Sub<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !bits_a.is_zeros() {
+        let idx1 = (bits_a.trailing_zeros() / 8) as usize;
+        if !bits_b.is_zeros() {
+            let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+            if !bits_c.is_zeros() {
+                let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+                Some(base - idx1.min(idx2.min(idx3)))
             } else {
-                Some($base - idx1)
+                Some(base - idx1.min(idx2))
             }
-        } else if !$bits_0_b.is_zeros() {
-            let idx2 = ($bits_0_b.trailing_zeros() / 8) as usize;
-            if !$bits_0_c.is_zeros() {
-                let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-                Some($base - idx2.min(idx3))
-            } else {
-                Some($base - idx2)
-            }
-        } else if !$bits_0_c.is_zeros() {
-            let idx3 = ($bits_0_c.trailing_zeros() / 8) as usize;
-            Some($base - idx3)
+        } else if !bits_c.is_zeros() {
+            let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+            Some(base - idx1.min(idx3))
         } else {
-            None
+            Some(base - idx1)
         }
-    }};
+    } else if !bits_b.is_zeros() {
+        let idx2 = (bits_b.trailing_zeros() / 8) as usize;
+        if !bits_c.is_zeros() {
+            let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+            Some(base - idx2.min(idx3))
+        } else {
+            Some(base - idx2)
+        }
+    } else if !bits_c.is_zeros() {
+        let idx3 = (bits_c.trailing_zeros() / 8) as usize;
+        Some(base - idx3)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -482,7 +488,7 @@ fn _rchr_tpl_c16_aa_x1(buf_ptr: *const u8, c16: B16Tpl, st_ptr: *const u8) -> Op
     let bits_0_c = PackedU128::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 16 - 1;
     //
-    _return_rchr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
+    _return_rchr_tpl(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -541,7 +547,7 @@ fn _rchr_tpl_c8_aa_x1(buf_ptr: *const u8, c8: B8Tpl, st_ptr: *const u8) -> Optio
     let bits_0_c = PackedU64::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 8 - 1;
     //
-    _return_rchr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
+    _return_rchr_tpl(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -600,7 +606,7 @@ fn _rchr_tpl_c4_aa_x1(buf_ptr: *const u8, c4: B4Tpl, st_ptr: *const u8) -> Optio
     let bits_0_c = PackedU32::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 4 - 1;
     //
-    _return_rchr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
+    _return_rchr_tpl(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
@@ -654,7 +660,7 @@ fn _rchr_tpl_c2_aa_x1(buf_ptr: *const u8, c2: B2Tpl, st_ptr: *const u8) -> Optio
     let bits_0_c = PackedU16::new(v_0_c).may_have_zero_quick();
     let base = buf_ptr.usz_offset_from(st_ptr) + 2 - 1;
     //
-    _return_rchr_tpl!(base, bits_0_a, bits_0_b, bits_0_c)
+    _return_rchr_tpl(base, bits_0_a, bits_0_b, bits_0_c)
 }
 
 #[inline(always)]
