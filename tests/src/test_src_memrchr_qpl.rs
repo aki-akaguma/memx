@@ -7,42 +7,36 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let r = test_memrchr_qpl(&buf, b'Y', b'X', b'G', b'g');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'X', b'G', b'g', b'Y');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'G', b'g', b'Y', b'X');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'g', b'Y', b'X', b'G');
-    assert_eq!(r, Some(1));
+    let mut vv = vec![b'g', b'X', b'Y', b'Z'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(1));
+    }
     //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memrchr_qpl(&buf, b'A', b'a', b'X', b'Y');
-    assert_eq!(r, Some(0));
-    let r = test_memrchr_qpl(&buf, b'a', b'A', b'X', b'Y');
-    assert_eq!(r, Some(0));
-    let r = test_memrchr_qpl(&buf, b'Y', b'a', b'A', b'X');
-    assert_eq!(r, Some(0));
-    let r = test_memrchr_qpl(&buf, b'X', b'Y', b'a', b'A');
-    assert_eq!(r, Some(0));
+    let buf = vec![b'a', b'B', b'C'];
+    let mut vv = vec![b'a', b'X', b'Y', b'Z'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(0));
+    }
     //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memrchr_qpl(&buf, b'B', b'b', b'X', b'Y');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'Y', b'B', b'b', b'X');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'X', b'Y', b'B', b'b');
-    assert_eq!(r, Some(1));
-    let r = test_memrchr_qpl(&buf, b'b', b'X', b'Y', b'B');
-    assert_eq!(r, Some(1));
+    let buf = vec![b'A', b'b', b'C'];
+    let mut vv = vec![b'b', b'X', b'Y', b'Z'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(1));
+    }
     //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memrchr_qpl(&buf, b'Y', b'X', b'C', b'c');
-    assert_eq!(r, Some(2));
-    let r = test_memrchr_qpl(&buf, b'C', b'c', b'X', b'Y');
-    assert_eq!(r, Some(2));
-    let r = test_memrchr_qpl(&buf, b'c', b'C', b'X', b'Y');
-    assert_eq!(r, Some(2));
+    let buf = vec![b'A', b'B', b'c'];
+    let mut vv = vec![b'c', b'X', b'Y', b'Z'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(2));
+    }
     //
     let buf = vec![b'A', b'B', b'C'];
     let r = test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd');
@@ -50,14 +44,62 @@ fn test00() {
 }
 #[test]
 fn test01() {
-    let buf = vec![b'A', b'G', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];
+    #[rustfmt::skip]
+    let buf = vec![
+        b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H',
+        b'I', b'j', b'k', b'l', b'm', b'N', b'O', b'P',
+        b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X',
+        b'Y', b'Z'
+    ];
     //
-    let r = test_memrchr_qpl(&buf, b'G', b'g', b'X', b'Y');
-    assert_eq!(r, Some(6));
-    let r = test_memrchr_qpl(&buf, b'g', b'G', b'X', b'Y');
-    assert_eq!(r, Some(6));
-    let r = test_memrchr_qpl(&buf, b'Y', b'X', b'g', b'G');
-    assert_eq!(r, Some(6));
+    let mut vv = vec![b'j', b'K', b'L', b'M'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(9));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'L', b'M'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(10));
+    }
+    //
+    let mut vv = vec![b'j', b'K', b'l', b'M'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(11));
+    }
+    //
+    let mut vv = vec![b'j', b'K', b'L', b'm'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(12));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'l', b'M'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(11));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'L', b'm'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(12));
+    }
+    //
+    let mut vv = vec![b'j', b'k', b'l', b'm'];
+    for _ in 0..4 {
+        vv.rotate_right(1);
+        let r = test_memrchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
+        assert_eq!(r, Some(12));
+    }
 }
 #[test]
 fn test02() {

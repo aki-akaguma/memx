@@ -224,6 +224,56 @@ where
  *   you should have memcpy(), memcmp(), memset() on nostd environments
 */
 
+/// bitwidth operations
+pub(crate) trait BitOrt {
+    fn is_zeros(&self) -> bool;
+    fn is_highs(&self) -> bool;
+    fn leading_ones(&self) -> u32;
+    fn trailing_ones(&self) -> u32;
+    fn leading_zeros(&self) -> u32;
+    fn trailing_zeros(&self) -> u32;
+}
+impl BitOrt for u32 {
+    fn is_zeros(&self) -> bool {
+        *self == 0
+    }
+    fn is_highs(&self) -> bool {
+        *self == u32::MAX
+    }
+    fn leading_ones(&self) -> u32 {
+        u32::leading_ones(*self)
+    }
+    fn trailing_ones(&self) -> u32 {
+        u32::trailing_ones(*self)
+    }
+    fn leading_zeros(&self) -> u32 {
+        u32::leading_zeros(*self)
+    }
+    fn trailing_zeros(&self) -> u32 {
+        u32::trailing_zeros(*self)
+    }
+}
+impl BitOrt for u16 {
+    fn is_zeros(&self) -> bool {
+        *self == 0
+    }
+    fn is_highs(&self) -> bool {
+        *self == u16::MAX
+    }
+    fn leading_ones(&self) -> u32 {
+        u16::leading_ones(*self)
+    }
+    fn trailing_ones(&self) -> u32 {
+        u16::trailing_ones(*self)
+    }
+    fn leading_zeros(&self) -> u32 {
+        u16::leading_zeros(*self)
+    }
+    fn trailing_zeros(&self) -> u32 {
+        u16::trailing_zeros(*self)
+    }
+}
+
 macro_rules! packed_integers {
     ($($packed:ident: $ty:ident,)+) => {$(
         #[derive(Debug, Default)]
@@ -249,25 +299,27 @@ macro_rules! packed_integers {
                 let v = !((((x & Self::LOWS).wrapping_add(Self::LOWS)) | x) | Self::LOWS);
                 Self::new(v)
             }
-            pub fn is_zeros(&self) -> bool {
-                self.0 == 0
-            }
-            pub fn is_highs(&self) -> bool {
-                self.0 == Self::HIGHS
-            }
             pub fn propagate_a_high_bit(self) -> Self {
                 Self::new(propagate_a_high_bit(self.0))
             }
-            pub fn leading_ones(&self) -> u32 {
+        }
+        impl BitOrt for $packed {
+            fn is_zeros(&self) -> bool {
+                self.0 == 0
+            }
+            fn is_highs(&self) -> bool {
+                self.0 == Self::HIGHS
+            }
+            fn leading_ones(&self) -> u32 {
                 self.0.leading_ones()
             }
-            pub fn trailing_ones(&self) -> u32 {
+            fn trailing_ones(&self) -> u32 {
                 self.0.trailing_ones()
             }
-            pub fn leading_zeros(&self) -> u32 {
+            fn leading_zeros(&self) -> u32 {
                 self.0.leading_zeros()
             }
-            pub fn trailing_zeros(&self) -> u32 {
+            fn trailing_zeros(&self) -> u32 {
                 self.0.trailing_zeros()
             }
         }
