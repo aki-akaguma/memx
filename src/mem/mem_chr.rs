@@ -1,7 +1,7 @@
 use crate::utils::*;
 
 #[inline(never)]
-pub fn _memchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+pub fn _memchr_sgl_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     #[cfg(all(
         any(feature = "test", tarpaulin),
         any(
@@ -12,11 +12,11 @@ pub fn _memchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     ))]
     {
         #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_chr_128(buf, needle);
+        let r = _start_chr_sgl_128(buf, needle);
         #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_chr_64(buf, needle);
+        let r = _start_chr_sgl_64(buf, needle);
         #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_chr_32(buf, needle);
+        let r = _start_chr_sgl_32(buf, needle);
         //
         r
     }
@@ -30,22 +30,22 @@ pub fn _memchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     )))]
     {
         #[cfg(target_pointer_width = "128")]
-        let r = _start_chr_128(buf, needle);
+        let r = _start_chr_sgl_128(buf, needle);
         #[cfg(target_pointer_width = "64")]
-        let r = _start_chr_64(buf, needle);
+        let r = _start_chr_sgl_64(buf, needle);
         #[cfg(target_pointer_width = "32")]
-        let r = _start_chr_32(buf, needle);
+        let r = _start_chr_sgl_32(buf, needle);
         //
         r
     }
 }
 
-macro_rules! _unroll_one_chr_to_aligned_x1 {
+macro_rules! _unroll_one_chr_sgl_to_aligned_x1 {
     ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
         if $buf_ptr_2 >= $buf_ptr_end {
             break;
         }
-        let r = _chr_c1_aa_x1($buf_ptr_2, $c, $start_ptr);
+        let r = _chr_sgl_c1_aa_x1($buf_ptr_2, $c, $start_ptr);
         if r.is_some() {
             return (None, r);
         }
@@ -53,31 +53,31 @@ macro_rules! _unroll_one_chr_to_aligned_x1 {
     }};
 }
 
-macro_rules! _unroll_one_chr_to_aligned_x4 {
+macro_rules! _unroll_one_chr_sgl_to_aligned_x4 {
     ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_chr_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_chr_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_chr_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_chr_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
     }};
 }
 
-macro_rules! _unroll_one_chr_to_aligned_x8 {
+macro_rules! _unroll_one_chr_sgl_to_aligned_x8 {
     ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_chr_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_chr_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
     }};
 }
 
-macro_rules! _unroll_one_chr_to_aligned_x16 {
+macro_rules! _unroll_one_chr_sgl_to_aligned_x16 {
     ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_chr_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_chr_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
+        _unroll_one_chr_sgl_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
     }};
 }
 
 #[inline(always)]
-pub(crate) fn _chr_to_aligned_u256(
+pub(crate) fn _chr_sgl_to_aligned_u256(
     buf_ptr: *const u8,
     c: B1Sgl,
     st_ptr: *const u8,
@@ -86,14 +86,14 @@ pub(crate) fn _chr_to_aligned_u256(
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
     loop {
-        _unroll_one_chr_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
-        _unroll_one_chr_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
+        _unroll_one_chr_sgl_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
+        _unroll_one_chr_sgl_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
     }
     (Some(buf_ptr_end), None)
 }
 
 #[inline(always)]
-pub(crate) fn _chr_to_aligned_u128(
+pub(crate) fn _chr_sgl_to_aligned_u128(
     buf_ptr: *const u8,
     c: B1Sgl,
     st_ptr: *const u8,
@@ -102,13 +102,13 @@ pub(crate) fn _chr_to_aligned_u128(
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
     loop {
-        _unroll_one_chr_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
+        _unroll_one_chr_sgl_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c, st_ptr);
     }
     (Some(buf_ptr_end), None)
 }
 
 #[inline(always)]
-fn _chr_to_aligned_u64(
+fn _chr_sgl_to_aligned_u64(
     buf_ptr: *const u8,
     c: B1Sgl,
     st_ptr: *const u8,
@@ -117,13 +117,13 @@ fn _chr_to_aligned_u64(
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
     loop {
-        _unroll_one_chr_to_aligned_x8!(buf_ptr_2, buf_ptr_end, c, st_ptr);
+        _unroll_one_chr_sgl_to_aligned_x8!(buf_ptr_2, buf_ptr_end, c, st_ptr);
     }
     (Some(buf_ptr_end), None)
 }
 
 #[inline(always)]
-fn _chr_to_aligned_u32(
+fn _chr_sgl_to_aligned_u32(
     buf_ptr: *const u8,
     c: B1Sgl,
     st_ptr: *const u8,
@@ -132,14 +132,14 @@ fn _chr_to_aligned_u32(
     let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
     let mut buf_ptr_2 = buf_ptr;
     loop {
-        _unroll_one_chr_to_aligned_x4!(buf_ptr_2, buf_ptr_end, c, st_ptr);
+        _unroll_one_chr_sgl_to_aligned_x4!(buf_ptr_2, buf_ptr_end, c, st_ptr);
     }
     (Some(buf_ptr_end), None)
 }
 
 #[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+fn _start_chr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -153,7 +153,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             if !buf_ptr.is_aligned_u128() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let r = _chr_c16_uu_x1(buf_ptr, cc, start_ptr);
+                    let r = _chr_sgl_c16_uu_x1(buf_ptr, cc, start_ptr);
                     if r.is_some() {
                         return r;
                     }
@@ -162,7 +162,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let r = _chr_to_aligned_u128(buf_ptr, needle, start_ptr);
+                    let r = _chr_sgl_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -177,7 +177,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c16_aa_x8(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c16_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -190,7 +190,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c16_aa_x4(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c16_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -202,7 +202,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c16_aa_x2(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c16_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -215,7 +215,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c16_aa_x1(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c16_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -229,7 +229,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+fn _start_chr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -243,7 +243,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             if !buf_ptr.is_aligned_u64() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let r = _chr_c8_uu_x1(buf_ptr, cc, start_ptr);
+                    let r = _chr_sgl_c8_uu_x1(buf_ptr, cc, start_ptr);
                     if r.is_some() {
                         return r;
                     }
@@ -252,7 +252,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let r = _chr_to_aligned_u64(buf_ptr, needle, start_ptr);
+                    let r = _chr_sgl_to_aligned_u64(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -267,7 +267,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c8_aa_x8(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c8_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -280,7 +280,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c8_aa_x4(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -291,7 +291,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 2;
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _chr_c8_aa_x2(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c8_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -303,7 +303,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 1;
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _chr_c8_aa_x1(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c8_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -317,7 +317,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+fn _start_chr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -331,7 +331,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             if !buf_ptr.is_aligned_u32() {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let r = _chr_c4_uu_x1(buf_ptr, cc, start_ptr);
+                    let r = _chr_sgl_c4_uu_x1(buf_ptr, cc, start_ptr);
                     if r.is_some() {
                         return r;
                     }
@@ -340,7 +340,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let r = _chr_to_aligned_u32(buf_ptr, needle, start_ptr);
+                    let r = _chr_sgl_to_aligned_u32(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -355,7 +355,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 4;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
                 buf_ptr.prefetch_read_data();
-                let r = _chr_c4_aa_x8(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c4_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -367,7 +367,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 4;
             let loop_size = 4;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _chr_c4_aa_x4(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c4_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -378,7 +378,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 2;
             let loop_size = 4;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _chr_c4_aa_x2(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c4_aa_x2(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -390,7 +390,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 1;
             let loop_size = 4;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _chr_c4_aa_x1(buf_ptr, cc, start_ptr);
+                let r = _chr_sgl_c4_aa_x1(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
@@ -413,7 +413,7 @@ pub(crate) fn _memchr_remaining_15_bytes_impl(
     if buf_ptr.is_aligned_u64() {
         let loop_size = 8;
         if buf_ptr.is_not_over(end_ptr, loop_size) {
-            let r = _chr_c8_aa_x1(buf_ptr, cc, start_ptr);
+            let r = _chr_sgl_c8_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
             }
@@ -435,7 +435,7 @@ pub(crate) fn _memchr_remaining_7_bytes_impl(
     if buf_ptr.is_aligned_u32() {
         let loop_size = 4;
         if buf_ptr.is_not_over(end_ptr, loop_size) {
-            let r = _chr_c4_aa_x1(buf_ptr, cc, start_ptr);
+            let r = _chr_sgl_c4_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
             }
@@ -457,7 +457,7 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     if buf_ptr.is_aligned_u16() {
         let loop_size = 2;
         if buf_ptr.is_not_over(end_ptr, loop_size) {
-            let r = _chr_c2_aa_x1(buf_ptr, cc, start_ptr);
+            let r = _chr_sgl_c2_aa_x1(buf_ptr, cc, start_ptr);
             if r.is_some() {
                 return r;
             }
@@ -467,7 +467,7 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
     {
         let loop_size = 1;
         while buf_ptr.is_not_over(end_ptr, loop_size) {
-            let r = _chr_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
+            let r = _chr_sgl_c1_aa_x1(buf_ptr, cc.into(), start_ptr);
             if r.is_some() {
                 return r;
             }
@@ -478,208 +478,208 @@ pub(crate) fn _memchr_remaining_3_bytes_impl(
 }
 
 #[inline(always)]
-fn _chr_c16_uu_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) } ^ c16.v1;
-    let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
-    //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
+fn _return_chr_sgl<T, PU>(base: T, bits_a: PU) -> Option<usize>
+where
+    T: core::ops::Add<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !bits_a.is_zeros() {
+        let idx1 = (bits_a.trailing_zeros() / 8) as usize;
+        Some(base + idx1)
     } else {
         None
     }
 }
 
 #[inline(always)]
-fn _chr_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) } ^ c16.v1;
-    let bits_0 = PackedU128::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c16_uu_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
+    let v_0_a = v_0 ^ c16.v1;
+    let bits_0_a = PackedU128::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c16_aa_x2(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c16_aa_x1(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c16_aa_x4(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c16_aa_x2(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c16_aa_x8(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c16_aa_x4(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c8_uu_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.v1;
-    let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c16_aa_x1(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u128(buf_ptr) };
+    let v_0_a = v_0 ^ c16.v1;
+    let bits_0_a = PackedU128::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) } ^ c8.v1;
-    let bits_0 = PackedU64::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c16_aa_x2(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c16_aa_x1(buf_ptr, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c16_aa_x4(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c16_aa_x2(buf_ptr, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c16_aa_x8(buf_ptr: *const u8, c16: B16Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c16_aa_x4(buf_ptr, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c8_uu_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
+    let v_0_a = v_0 ^ c8.v1;
+    let bits_0_a = PackedU64::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c8_aa_x2(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c8_aa_x1(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c8_aa_x4(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c8_aa_x2(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c8_aa_x8(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c8_aa_x4(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c4_uu_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) } ^ c4.v1;
-    let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c8_aa_x1(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u64(buf_ptr) };
+    let v_0_a = v_0 ^ c8.v1;
+    let bits_0_a = PackedU64::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) } ^ c4.v1;
-    let bits_0 = PackedU32::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c8_aa_x2(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c8_aa_x1(buf_ptr, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c8_aa_x4(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c8_aa_x2(buf_ptr, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c8_aa_x8(buf_ptr: *const u8, c8: B8Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c8_aa_x4(buf_ptr, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c4_uu_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
+    let v_0_a = v_0 ^ c4.v1;
+    let bits_0_a = PackedU32::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c4_aa_x2(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c4_aa_x1(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c4_aa_x4(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c4_aa_x2(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c4_aa_x8(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
-    let r = _chr_c4_aa_x4(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _chr_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
-}
-
-#[inline(always)]
-fn _chr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<usize> {
-    let v_0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) } ^ c2.v1;
-    let bits_0 = PackedU16::new(v_0).may_have_zero_quick();
+fn _chr_sgl_c4_aa_x1(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u32(buf_ptr) };
+    let v_0_a = v_0 ^ c4.v1;
+    let bits_0_a = PackedU32::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if !bits_0.is_zeros() {
-        Some(buf_ptr.usz_offset_from(st_ptr) + (bits_0.trailing_zeros() / 8) as usize)
-    } else {
-        None
-    }
+    _return_chr_sgl(base, bits_0_a)
 }
 
 #[inline(always)]
-fn _chr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<usize> {
+fn _chr_sgl_c4_aa_x2(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c4_aa_x1(buf_ptr, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c4_aa_x4(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c4_aa_x2(buf_ptr, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c4_aa_x8(buf_ptr: *const u8, c4: B4Sgl, st_ptr: *const u8) -> Option<usize> {
+    let r = _chr_sgl_c4_aa_x4(buf_ptr, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    let r = _chr_sgl_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
+}
+
+#[inline(always)]
+fn _chr_sgl_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<usize> {
+    let v_0 = unsafe { _read_a_little_endian_from_ptr_u16(buf_ptr) };
+    let v_0_a = v_0 ^ c2.v1;
+    let bits_0_a = PackedU16::new(v_0_a).may_have_zero_quick();
+    let base = buf_ptr.usz_offset_from(st_ptr);
+    //
+    _return_chr_sgl(base, bits_0_a)
+}
+
+#[inline(always)]
+fn _chr_sgl_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<usize> {
     let aa_ptr = buf_ptr as *const u8;
     let aac = unsafe { *aa_ptr };
     if aac == c1.v1 {

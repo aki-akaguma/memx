@@ -1,8 +1,8 @@
 mod x86_chr;
-pub(crate) use x86_chr::_memchr_impl;
+pub(crate) use x86_chr::_memchr_sgl_impl;
 
 mod x86_rchr;
-pub(crate) use x86_rchr::_memrchr_impl;
+pub(crate) use x86_rchr::_memrchr_sgl_impl;
 
 mod x86_chr_dbl;
 pub(crate) use x86_chr_dbl::_memchr_dbl_impl;
@@ -50,12 +50,12 @@ mod x86_set;
 pub(crate) use x86_set::_memset_impl;
 
 #[allow(unused_imports)]
-pub use x86_chr::_memchr_avx2;
+pub use x86_chr::_memchr_sgl_avx2;
 #[allow(unused_imports)]
-pub use x86_chr::_memchr_sse2;
+pub use x86_chr::_memchr_sgl_sse2;
 
-pub use x86_rchr::_memrchr_avx2;
-pub use x86_rchr::_memrchr_sse2;
+pub use x86_rchr::_memrchr_sgl_avx2;
+pub use x86_rchr::_memrchr_sgl_sse2;
 
 pub use x86_nechr::_memnechr_avx2;
 pub use x86_nechr::_memnechr_sse2;

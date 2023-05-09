@@ -3,24 +3,24 @@
 use crate::utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
 
 mod mem_chr;
-pub(crate) use mem_chr::_memchr_impl;
+pub(crate) use mem_chr::_memchr_sgl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_chr::_chr_to_aligned_u128;
+pub(crate) use mem_chr::_chr_sgl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_chr::_chr_to_aligned_u256;
+pub(crate) use mem_chr::_chr_sgl_to_aligned_u256;
 #[allow(unused_imports)]
 pub(crate) use mem_chr::_memchr_remaining_15_bytes_impl;
 
 mod mem_rchr;
-pub(crate) use mem_rchr::_memrchr_impl;
+pub(crate) use mem_rchr::_memrchr_sgl_impl;
 
 #[allow(unused_imports)]
 pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
 #[allow(unused_imports)]
-pub(crate) use mem_rchr::_rchr_to_aligned_u128;
+pub(crate) use mem_rchr::_rchr_sgl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_rchr::_rchr_to_aligned_u256;
+pub(crate) use mem_rchr::_rchr_sgl_to_aligned_u256;
 
 mod mem_nechr;
 pub(crate) use mem_nechr::_memnechr_impl;
@@ -165,12 +165,12 @@ use core::cmp::Ordering;
 
 pub fn memchr_basic(buf: &[u8], c1: u8) -> Option<usize> {
     let needle = B1Sgl::new(c1);
-    crate::mem::_memchr_impl(buf, needle)
+    crate::mem::_memchr_sgl_impl(buf, needle)
 }
 
 pub fn memrchr_basic(buf: &[u8], c1: u8) -> Option<usize> {
     let needle = B1Sgl::new(c1);
-    crate::mem::_memrchr_impl(buf, needle)
+    crate::mem::_memrchr_sgl_impl(buf, needle)
 }
 
 pub fn memchr_dbl_basic(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {

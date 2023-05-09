@@ -94,7 +94,7 @@ fn _memmem_sse2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = 0;
     while curr_idx < hay_len {
-        let r = unsafe { super::_memchr_sse2(&haystack[curr_idx..], B1Sgl::new(nee_1st_byte)) };
+        let r = unsafe { super::_memchr_sgl_sse2(&haystack[curr_idx..], B1Sgl::new(nee_1st_byte)) };
         if let Some(pos) = r {
             let r_idx = curr_idx + pos;
             if r_idx + nee_len > hay_len {
@@ -119,7 +119,8 @@ fn _memmem_sse2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = nee_last_idx;
     while curr_idx < hay_len {
-        let r = unsafe { super::_memchr_sse2(&haystack[curr_idx..], B1Sgl::new(nee_last_byte)) };
+        let r =
+            unsafe { super::_memchr_sgl_sse2(&haystack[curr_idx..], B1Sgl::new(nee_last_byte)) };
         if let Some(pos) = r {
             let r_idx = curr_idx + pos - nee_last_idx;
             if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
@@ -168,7 +169,7 @@ fn _memmem_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_1st_byte = needle[0];
     let mut curr_idx = 0;
     while curr_idx < hay_len {
-        let r = unsafe { super::_memchr_avx2(&haystack[curr_idx..], B1Sgl::new(nee_1st_byte)) };
+        let r = unsafe { super::_memchr_sgl_avx2(&haystack[curr_idx..], B1Sgl::new(nee_1st_byte)) };
         if let Some(pos) = r {
             let r_idx = curr_idx + pos;
             if r_idx + nee_len > hay_len {
@@ -193,7 +194,8 @@ fn _memmem_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let nee_last_byte = needle[nee_last_idx];
     let mut curr_idx = nee_last_idx;
     while curr_idx < hay_len {
-        let r = unsafe { super::_memchr_avx2(&haystack[curr_idx..], B1Sgl::new(nee_last_byte)) };
+        let r =
+            unsafe { super::_memchr_sgl_avx2(&haystack[curr_idx..], B1Sgl::new(nee_last_byte)) };
         if let Some(pos) = r {
             let r_idx = curr_idx + pos - nee_last_idx;
             if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
