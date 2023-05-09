@@ -53,12 +53,12 @@ pub fn memchr(buf: &[u8], c1: u8) -> Option<usize> {
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memchr_impl(buf, needle) }
+        { arch::x86::_memchr_sgl_impl(buf, needle) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memchr_impl(buf, needle) }
+        { mem::_memchr_sgl_impl(buf, needle) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memchr_impl(buf, needle);
+    let r = mem::_memchr_sgl_impl(buf, needle);
     //
     r
 }
@@ -70,12 +70,12 @@ pub fn memrchr(buf: &[u8], c1: u8) -> Option<usize> {
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memrchr_impl(buf, needle) }
+        { arch::x86::_memrchr_sgl_impl(buf, needle) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memrchr_impl(buf, needle) }
+        { mem::_memrchr_sgl_impl(buf, needle) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memrchr_impl(buf, needle);
+    let r = mem::_memrchr_sgl_impl(buf, needle);
     //
     r
 }

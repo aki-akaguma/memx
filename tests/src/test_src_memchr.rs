@@ -3,23 +3,27 @@
 #[test]
 fn test00() {
     let buf = vec![];
-    let r = test_memchr(&buf, b'G');
+    let r = test_memchr(&buf, b'g');
     assert_eq!(r, None);
     //
-    let buf = vec![b'G'];
-    let r = test_memchr(&buf, b'G');
-    assert_eq!(r, Some(0));
-    //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr(&buf, b'A');
-    assert_eq!(r, Some(0));
-    //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr(&buf, b'B');
+    let buf = vec![b'A', b'g'];
+    let vv = vec![b'g'];
+    let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(1));
     //
-    let buf = vec![b'A', b'B', b'C'];
-    let r = test_memchr(&buf, b'C');
+    let buf = vec![b'a', b'B', b'C'];
+    let vv = vec![b'a'];
+    let r = test_memchr(&buf, vv[0]);
+    assert_eq!(r, Some(0));
+    //
+    let buf = vec![b'A', b'b', b'C'];
+    let vv = vec![b'b'];
+    let r = test_memchr(&buf, vv[0]);
+    assert_eq!(r, Some(1));
+    //
+    let buf = vec![b'A', b'B', b'c'];
+    let vv = vec![b'c'];
+    let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(2));
     //
     let buf = vec![b'A', b'B', b'C'];
@@ -28,10 +32,17 @@ fn test00() {
 }
 #[test]
 fn test01() {
-    let buf = vec![b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'J', b'K'];
+    #[rustfmt::skip]
+    let buf = vec![
+        b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H',
+        b'I', b'j', b'k', b'L', b'M', b'N', b'O', b'P',
+        b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X',
+        b'Y', b'Z'
+    ];
     //
-    let r = test_memchr(&buf, b'G');
-    assert_eq!(r, Some(6));
+    let vv = vec![b'j'];
+    let r = test_memchr(&buf, vv[0]);
+    assert_eq!(r, Some(9));
 }
 #[test]
 fn test02() {

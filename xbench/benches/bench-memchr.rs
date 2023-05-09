@@ -204,7 +204,7 @@ fn process_memx_memchr_sse2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
         let needle = memx::B1Sgl::new(by1);
-        unsafe { memx::arch::x86::_memchr_sse2(buf, needle) }
+        unsafe { memx::arch::x86::_memchr_sgl_sse2(buf, needle) }
     }
     //
     let mut found: usize = 0;
@@ -234,7 +234,7 @@ fn process_memx_memchr_avx2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
         let needle = memx::B1Sgl::new(by1);
-        unsafe { memx::arch::x86::_memchr_avx2(buf, needle) }
+        unsafe { memx::arch::x86::_memchr_sgl_avx2(buf, needle) }
     }
     //
     let mut found: usize = 0;
