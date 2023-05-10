@@ -160,7 +160,7 @@ fn process_memx_memcpy_basic(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
 fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     #[inline(never)]
     fn _t_(dst: &mut [u8], src: &[u8]) -> Result<(), memx::RangeError> {
-        unsafe { memx::arch::x86::_memcpy_sse2(dst, src) }
+        memx::arch::x86::memcpy_sse2(dst, src)
     }
     //
     let pat_len = pat_bytes.len();
@@ -183,7 +183,7 @@ fn process_memx_memcpy_sse2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
 fn process_memx_memcpy_avx2(texts: &mut [Vec<u8>], pat_bytes: &[u8]) {
     #[inline(never)]
     fn _t_(dst: &mut [u8], src: &[u8]) -> Result<(), memx::RangeError> {
-        unsafe { memx::arch::x86::_memcpy_avx2(dst, src) }
+        memx::arch::x86::memcpy_avx2(dst, src)
     }
     //
     let pat_len = pat_bytes.len();

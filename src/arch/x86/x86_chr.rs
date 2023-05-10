@@ -161,7 +161,7 @@ fn _memchr_sgl_sse2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     }
     //
     let cc: B8Sgl = needle.into();
-    basic::_memchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+    basic::_memchr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
 #[allow(clippy::missing_safety_doc)]
@@ -309,7 +309,7 @@ pub fn _memchr_sgl_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     }
     //
     let cc: B8Sgl = needle.into();
-    basic::_memchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+    basic::_memchr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
 #[inline(always)]

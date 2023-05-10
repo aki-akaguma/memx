@@ -172,6 +172,7 @@ fn _memrchr_qpl_avx2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 2;
             let loop_size = 32;
@@ -183,6 +184,7 @@ fn _memrchr_qpl_avx2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
                 }
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 32;

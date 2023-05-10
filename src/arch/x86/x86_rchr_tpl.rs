@@ -172,6 +172,7 @@ fn _memrchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 2;
             let loop_size = 32;
@@ -183,6 +184,7 @@ fn _memrchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
                 }
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 32;

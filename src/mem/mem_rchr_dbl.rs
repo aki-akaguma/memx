@@ -236,6 +236,7 @@ fn _start_rchr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 8;
@@ -247,7 +248,7 @@ fn _start_rchr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 8;
@@ -259,6 +260,7 @@ fn _start_rchr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 8;
@@ -308,6 +310,7 @@ fn _start_rchr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 4;
@@ -320,7 +323,7 @@ fn _start_rchr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 4;
@@ -332,6 +335,7 @@ fn _start_rchr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 4;
@@ -403,7 +407,7 @@ pub(crate) fn _memrchr_dbl_remaining_7_bytes_impl(
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_dbl_remaining_3_bytes_impl(
+fn _memrchr_dbl_remaining_3_bytes_impl(
     buf_ptr: *const u8,
     cc: B2Dbl,
     start_ptr: *const u8,
@@ -647,22 +651,21 @@ fn _rchr_dbl_c1_aa_x1(buf_ptr: *const u8, c1: B1Dbl, st_ptr: *const u8) -> Optio
 }
 
 /*
- * Reference.
- * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
- * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
-*/
-
-/*
  * The simple implement:
 
 #[inline(always)]
-pub fn _memrchr_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn _memrchr_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     for i in 0..buf.len() {
-        let j = buf.len()-i-1;
-        if buf[j] == c1 || buf[j] == c2 {
+        let j = buf.len() - i - 1;
+        if buf[j] == needle.v1 || buf[j] == needle.v2 {
             return Some(j);
         }
     }
     None
 }
+*/
+/*
+ * Reference.
+ * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
+ * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */

@@ -166,8 +166,7 @@ fn process_memx_memchr_tpl_basic(texts: &[&str], pat: (u8, u8, u8)) -> usize {
 fn process_memx_memchr_tpl_sse2(texts: &[&str], pat: (u8, u8, u8)) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
-        let needle = memx::B1Tpl::new(by1, by2, by3);
-        unsafe { memx::arch::x86::_memchr_tpl_sse2(buf, needle) }
+        memx::arch::x86::memchr_tpl_sse2(buf, by1, by2, by3)
     }
     //
     let mut found: usize = 0;
@@ -196,8 +195,7 @@ fn process_memx_memchr_tpl_sse2(texts: &[&str], pat: (u8, u8, u8)) -> usize {
 fn process_memx_memchr_tpl_avx2(texts: &[&str], pat: (u8, u8, u8)) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
-        let needle = memx::B1Tpl::new(by1, by2, by3);
-        unsafe { memx::arch::x86::_memchr_tpl_avx2(buf, needle) }
+        memx::arch::x86::memchr_tpl_avx2(buf, by1, by2, by3)
     }
     //
     let mut found: usize = 0;

@@ -142,8 +142,7 @@ fn process_memx_memchr_qpl_basic(texts: &[&str], pat: (u8, u8, u8, u8)) -> usize
 fn process_memx_memchr_qpl_sse2(texts: &[&str], pat: (u8, u8, u8, u8)) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
-        let needle = memx::B1Qpl::new(by1, by2, by3, by4);
-        unsafe { memx::arch::x86::_memchr_qpl_sse2(buf, needle) }
+        memx::arch::x86::memchr_qpl_sse2(buf, by1, by2, by3, by4)
     }
     //
     let mut found: usize = 0;
@@ -172,8 +171,7 @@ fn process_memx_memchr_qpl_sse2(texts: &[&str], pat: (u8, u8, u8, u8)) -> usize 
 fn process_memx_memchr_qpl_avx2(texts: &[&str], pat: (u8, u8, u8, u8)) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
-        let needle = memx::B1Qpl::new(by1, by2, by3, by4);
-        unsafe { memx::arch::x86::_memchr_qpl_avx2(buf, needle) }
+        memx::arch::x86::memchr_qpl_avx2(buf, by1, by2, by3, by4)
     }
     //
     let mut found: usize = 0;

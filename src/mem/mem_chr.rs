@@ -172,6 +172,7 @@ fn _start_chr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 16;
@@ -184,7 +185,7 @@ fn _start_chr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 16;
@@ -197,6 +198,7 @@ fn _start_chr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 16;
@@ -224,7 +226,7 @@ fn _start_chr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 15 bytes.
-    _memchr_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_sgl_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
@@ -266,7 +268,7 @@ fn _start_chr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 8;
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = _chr_sgl_c8_aa_x8(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -279,7 +281,7 @@ fn _start_chr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let unroll = 4;
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = _chr_sgl_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -287,6 +289,8 @@ fn _start_chr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
+        /*
         {
             let unroll = 2;
             let loop_size = 8;
@@ -312,7 +316,7 @@ fn _start_chr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memchr_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_sgl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
@@ -350,6 +354,7 @@ fn _start_chr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 4;
@@ -362,7 +367,7 @@ fn _start_chr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 4;
@@ -374,6 +379,7 @@ fn _start_chr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 4;
@@ -399,11 +405,11 @@ fn _start_chr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memchr_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_sgl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_remaining_15_bytes_impl(
+pub(crate) fn _memchr_sgl_remaining_15_bytes_impl(
     buf_ptr: *const u8,
     cc: B8Sgl,
     start_ptr: *const u8,
@@ -421,11 +427,11 @@ pub(crate) fn _memchr_remaining_15_bytes_impl(
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memchr_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_sgl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_remaining_7_bytes_impl(
+pub(crate) fn _memchr_sgl_remaining_7_bytes_impl(
     buf_ptr: *const u8,
     cc: B4Sgl,
     start_ptr: *const u8,
@@ -443,11 +449,11 @@ pub(crate) fn _memchr_remaining_7_bytes_impl(
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memchr_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
+    _memchr_sgl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr, end_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_remaining_3_bytes_impl(
+fn _memchr_sgl_remaining_3_bytes_impl(
     buf_ptr: *const u8,
     cc: B2Sgl,
     start_ptr: *const u8,
@@ -693,12 +699,17 @@ fn _chr_sgl_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option
  * The simple implement:
 
 #[inline(always)]
-pub fn _memchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub fn _memchr_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     for i in 0..buf.len() {
-        if buf[i] == c {
+        if buf[i] == needle.v1 {
             return Some(i);
         }
     }
     None
 }
+*/
+/*
+ * Reference.
+ * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
+ * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */

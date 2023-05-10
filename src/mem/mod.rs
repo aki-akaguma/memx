@@ -10,13 +10,13 @@ pub(crate) use mem_chr::_chr_sgl_to_aligned_u128;
 #[allow(unused_imports)]
 pub(crate) use mem_chr::_chr_sgl_to_aligned_u256;
 #[allow(unused_imports)]
-pub(crate) use mem_chr::_memchr_remaining_15_bytes_impl;
+pub(crate) use mem_chr::_memchr_sgl_remaining_15_bytes_impl;
 
 mod mem_rchr;
 pub(crate) use mem_rchr::_memrchr_sgl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_rchr::_memrchr_remaining_15_bytes_impl;
+pub(crate) use mem_rchr::_memrchr_sgl_remaining_15_bytes_impl;
 #[allow(unused_imports)]
 pub(crate) use mem_rchr::_rchr_sgl_to_aligned_u128;
 #[allow(unused_imports)]

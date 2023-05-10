@@ -123,11 +123,11 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
-bench_nms = bench-memchr bench-memrchr
+bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
+#bench_nms = bench-memchr bench-memrchr
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memrchr_qpl
+#bench_nms = bench-memrchr
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux

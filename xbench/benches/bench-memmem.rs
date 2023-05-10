@@ -221,7 +221,7 @@ fn process_memx_memmem_basic(texts: &[&str], pattern: &str) -> usize {
 fn process_memx_memmem_sse2(texts: &[&str], pattern: &str) -> usize {
     #[inline(never)]
     fn _t_(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-        unsafe { memx::arch::x86::_memmem_sse2(haystack, needle) }
+        memx::arch::x86::memmem_sse2(haystack, needle)
     }
     //
     let pat_bytes = pattern.as_bytes();
@@ -252,7 +252,7 @@ fn process_memx_memmem_sse2(texts: &[&str], pattern: &str) -> usize {
 fn process_memx_memmem_avx2(texts: &[&str], pattern: &str) -> usize {
     #[inline(never)]
     fn _t_(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-        unsafe { memx::arch::x86::_memmem_avx2(haystack, needle) }
+        memx::arch::x86::memmem_avx2(haystack, needle)
     }
     //
     let pat_bytes = pattern.as_bytes();

@@ -110,6 +110,7 @@ fn _memchr_qpl_sse2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 16;
@@ -122,12 +123,12 @@ fn _memchr_qpl_sse2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = unsafe { _chr_qpl_c16_aa_x4(buf_ptr, cc, start_ptr) };
                 if r.is_some() {
                     return r;
@@ -135,6 +136,7 @@ fn _memchr_qpl_sse2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 16;
@@ -223,11 +225,12 @@ fn _memchr_qpl_avx2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         {
             let unroll = 2;
             let loop_size = 32;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = unsafe { _chr_qpl_c32_aa_x2(buf_ptr, cc, start_ptr) };
                 if r.is_some() {
                     return r;
@@ -235,7 +238,6 @@ fn _memchr_qpl_avx2_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        */
         {
             let unroll = 1;
             let loop_size = 32;
