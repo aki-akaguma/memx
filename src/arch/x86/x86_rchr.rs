@@ -115,6 +115,7 @@ fn _memrchr_sgl_sse2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             let loop_size = 16;
             while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
                 buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
+                buf_ptr.prefetch_read_data();
                 let r = unsafe { _rchr_sgl_c16_aa_x4(buf_ptr, cc, start_ptr) };
                 if r.is_some() {
                     return r;
@@ -135,7 +136,7 @@ fn _memrchr_sgl_sse2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     }
     //
     let cc: B8Sgl = needle.into();
-    basic::_memrchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
+    basic::_memrchr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 
 #[allow(clippy::missing_safety_doc)]
@@ -173,6 +174,7 @@ fn _memrchr_sgl_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 2;
             let loop_size = 32;
@@ -184,6 +186,7 @@ fn _memrchr_sgl_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
             }
         }
+        */
         {
             let unroll = 1;
             let loop_size = 32;
@@ -256,7 +259,7 @@ fn _memrchr_sgl_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     }
     //
     let cc: B8Sgl = needle.into();
-    basic::_memrchr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
+    basic::_memrchr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr)
 }
 
 #[inline(always)]

@@ -188,7 +188,7 @@ fn process_memx_memeq_basic(texts: &[&str], pattern: &str) -> usize {
 fn process_memx_memeq_sse2(texts: &[&str], pattern: &str) -> usize {
     #[inline(never)]
     fn _t_(a: &[u8], b: &[u8]) -> bool {
-        unsafe { memx::arch::x86::_memeq_sse2(a, b) }
+        memx::arch::x86::memeq_sse2(a, b)
     }
     //
     let pat_bytes = pattern.as_bytes();
@@ -218,7 +218,7 @@ fn process_memx_memeq_sse2(texts: &[&str], pattern: &str) -> usize {
 fn process_memx_memeq_avx2(texts: &[&str], pattern: &str) -> usize {
     #[inline(never)]
     fn _t_(a: &[u8], b: &[u8]) -> bool {
-        unsafe { memx::arch::x86::_memeq_avx2(a, b) }
+        memx::arch::x86::memeq_avx2(a, b)
     }
     //
     let pat_bytes = pattern.as_bytes();

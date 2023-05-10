@@ -1,3 +1,5 @@
+#![doc(hidden)]
+
 mod x86_chr;
 pub(crate) use x86_chr::_memchr_sgl_impl;
 
@@ -49,55 +51,14 @@ pub(crate) use x86_cpy::_memcpy_impl;
 mod x86_set;
 pub(crate) use x86_set::_memset_impl;
 
-#[allow(unused_imports)]
-pub use x86_chr::_memchr_sgl_avx2;
-#[allow(unused_imports)]
-pub use x86_chr::_memchr_sgl_sse2;
+pub(crate) use x86_chr::_memchr_sgl_avx2;
+pub(crate) use x86_chr::_memchr_sgl_sse2;
 
-pub use x86_rchr::_memrchr_sgl_avx2;
-pub use x86_rchr::_memrchr_sgl_sse2;
+pub(crate) use x86_rchr::_memrchr_sgl_avx2;
+pub(crate) use x86_rchr::_memrchr_sgl_sse2;
 
-pub use x86_nechr::_memnechr_avx2;
-pub use x86_nechr::_memnechr_sse2;
-
-pub use x86_rnechr::_memrnechr_avx2;
-pub use x86_rnechr::_memrnechr_sse2;
-
-pub use x86_chr_dbl::_memchr_dbl_avx2;
-pub use x86_chr_dbl::_memchr_dbl_sse2;
-
-pub use x86_rchr_dbl::_memrchr_dbl_avx2;
-pub use x86_rchr_dbl::_memrchr_dbl_sse2;
-
-pub use x86_chr_tpl::_memchr_tpl_avx2;
-pub use x86_chr_tpl::_memchr_tpl_sse2;
-
-pub use x86_rchr_tpl::_memrchr_tpl_avx2;
-pub use x86_rchr_tpl::_memrchr_tpl_sse2;
-
-pub use x86_chr_qpl::_memchr_qpl_avx2;
-pub use x86_chr_qpl::_memchr_qpl_sse2;
-
-pub use x86_rchr_qpl::_memrchr_qpl_avx2;
-pub use x86_rchr_qpl::_memrchr_qpl_sse2;
-
-pub use x86_mem::_memmem_avx2;
-pub use x86_mem::_memmem_sse2;
-
-pub use x86_rmem::_memrmem_avx2;
-pub use x86_rmem::_memrmem_sse2;
-
-pub use x86_cmp::_memcmp_avx2;
-pub use x86_cmp::_memcmp_sse2;
-
-pub use x86_eq::_memeq_avx2;
-pub use x86_eq::_memeq_sse2;
-
-pub use x86_cpy::_memcpy_avx2;
-pub use x86_cpy::_memcpy_sse2;
-
-pub use x86_set::_memset_avx2;
-pub use x86_set::_memset_sse2;
+pub(crate) use x86_eq::_memeq_avx2;
+pub(crate) use x86_eq::_memeq_sse2;
 
 mod cpuid {
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
@@ -177,3 +138,143 @@ pub(crate) use needle::dbl::{MMB16Dbl, MMB32Dbl};
 pub(crate) use needle::qpl::{MMB16Qpl, MMB32Qpl};
 pub(crate) use needle::sgl::{MMB16Sgl, MMB32Sgl};
 pub(crate) use needle::tpl::{MMB16Tpl, MMB32Tpl};
+
+use crate::utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
+use crate::RangeError;
+use core::cmp::Ordering;
+
+pub fn memchr_sse2(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    unsafe { x86_chr::_memchr_sgl_sse2(buf, needle) }
+}
+pub fn memchr_avx2(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    unsafe { x86_chr::_memchr_sgl_avx2(buf, needle) }
+}
+
+pub fn memrchr_sse2(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    unsafe { x86_rchr::_memrchr_sgl_sse2(buf, needle) }
+}
+pub fn memrchr_avx2(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    unsafe { x86_rchr::_memrchr_sgl_avx2(buf, needle) }
+}
+
+pub fn memchr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_chr_dbl::_memchr_dbl_sse2(buf, needle) }
+}
+pub fn memchr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_chr_dbl::_memchr_dbl_avx2(buf, needle) }
+}
+
+pub fn memrchr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_rchr_dbl::_memrchr_dbl_sse2(buf, needle) }
+}
+pub fn memrchr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_rchr_dbl::_memrchr_dbl_avx2(buf, needle) }
+}
+
+pub fn memchr_tpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_chr_tpl::_memchr_tpl_sse2(buf, needle) }
+}
+pub fn memchr_tpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_chr_tpl::_memchr_tpl_avx2(buf, needle) }
+}
+
+pub fn memrchr_tpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_rchr_tpl::_memrchr_tpl_sse2(buf, needle) }
+}
+pub fn memrchr_tpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_rchr_tpl::_memrchr_tpl_avx2(buf, needle) }
+}
+
+pub fn memchr_qpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_chr_qpl::_memchr_qpl_sse2(buf, needle) }
+}
+pub fn memchr_qpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_chr_qpl::_memchr_qpl_avx2(buf, needle) }
+}
+
+pub fn memrchr_qpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_rchr_qpl::_memrchr_qpl_sse2(buf, needle) }
+}
+pub fn memrchr_qpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_rchr_qpl::_memrchr_qpl_avx2(buf, needle) }
+}
+
+pub fn memnechr_sse2(buf: &[u8], c1: u8) -> Option<usize> {
+    unsafe { x86_nechr::_memnechr_sse2(buf, c1) }
+    //let needle = B1Sgl::new(c1);
+    //unsafe { x86_nechr::_memnechr_sgl_sse2(buf, needle) }
+}
+pub fn memnechr_avx2(buf: &[u8], c1: u8) -> Option<usize> {
+    unsafe { x86_nechr::_memnechr_avx2(buf, c1) }
+    //let needle = B1Sgl::new(c1);
+    //unsafe { x86_nechr::_memnechr_sgl_avx2(buf, needle) }
+}
+
+pub fn memrnechr_sse2(buf: &[u8], c1: u8) -> Option<usize> {
+    unsafe { x86_rnechr::_memrnechr_sse2(buf, c1) }
+    //let needle = B1Sgl::new(c1);
+    //unsafe { x86_rnechr::_memrnechr_sgl_sse2(buf, needle) }
+}
+pub fn memrnechr_avx2(buf: &[u8], c1: u8) -> Option<usize> {
+    unsafe { x86_rnechr::_memrnechr_avx2(buf, c1) }
+    //let needle = B1Sgl::new(c1);
+    //unsafe { x86_rnechr::_memrnechr_sgl_avx2(buf, needle) }
+}
+
+pub fn memmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    unsafe { x86_mem::_memmem_sse2(haystack, needle) }
+}
+pub fn memmem_avx2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    unsafe { x86_mem::_memmem_avx2(haystack, needle) }
+}
+
+pub fn memrmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    unsafe { x86_rmem::_memrmem_sse2(haystack, needle) }
+}
+pub fn memrmem_avx2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    unsafe { x86_rmem::_memrmem_avx2(haystack, needle) }
+}
+
+pub fn memcmp_sse2(a: &[u8], b: &[u8]) -> Ordering {
+    unsafe { x86_cmp::_memcmp_sse2(a, b) }
+}
+pub fn memcmp_avx2(a: &[u8], b: &[u8]) -> Ordering {
+    unsafe { x86_cmp::_memcmp_avx2(a, b) }
+}
+
+pub fn memeq_sse2(a: &[u8], b: &[u8]) -> bool {
+    unsafe { x86_eq::_memeq_sse2(a, b) }
+}
+pub fn memeq_avx2(a: &[u8], b: &[u8]) -> bool {
+    unsafe { x86_eq::_memeq_avx2(a, b) }
+}
+
+pub fn memcpy_sse2(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    unsafe { x86_cpy::_memcpy_sse2(dst, src) }
+}
+pub fn memcpy_avx2(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
+    unsafe { x86_cpy::_memcpy_avx2(dst, src) }
+}
+
+pub fn memset_sse2(buf: &mut [u8], c: u8) {
+    unsafe { x86_set::_memset_sse2(buf, c) }
+}
+pub fn memset_avx2(buf: &mut [u8], c: u8) {
+    unsafe { x86_set::_memset_avx2(buf, c) }
+}

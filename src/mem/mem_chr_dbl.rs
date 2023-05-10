@@ -163,8 +163,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Dbl::new(c_1, c_2);
-                    let r = _chr_dbl_to_aligned_u128(buf_ptr, c, start_ptr);
+                    let r = _chr_dbl_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -181,6 +180,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 16;
@@ -193,7 +193,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 16;
@@ -206,6 +206,7 @@ fn _start_chr_128(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 16;
@@ -262,8 +263,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Dbl::new(c_1, c_2);
-                    let r = _chr_dbl_to_aligned_u64(buf_ptr, c, start_ptr);
+                    let r = _chr_dbl_to_aligned_u64(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -280,6 +280,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 8;
@@ -292,12 +293,12 @@ fn _start_chr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 8;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = _chr_dbl_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
@@ -305,6 +306,7 @@ fn _start_chr_64(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 8;
@@ -359,8 +361,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Dbl::new(c_1, c_2);
-                    let r = _chr_dbl_to_aligned_u32(buf_ptr, c, start_ptr);
+                    let r = _chr_dbl_to_aligned_u32(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -377,6 +378,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 4;
@@ -389,7 +391,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 4;
@@ -401,6 +403,7 @@ fn _start_chr_32(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 4;
@@ -474,7 +477,7 @@ pub(crate) fn _memchr_dbl_remaining_7_bytes_impl(
 }
 
 #[inline(always)]
-pub(crate) fn _memchr_dbl_remaining_3_bytes_impl(
+fn _memchr_dbl_remaining_3_bytes_impl(
     buf_ptr: *const u8,
     cc: B2Dbl,
     start_ptr: *const u8,
@@ -721,9 +724,9 @@ fn _chr_dbl_c1_aa_x1(buf_ptr: *const u8, c1: B1Dbl, st_ptr: *const u8) -> Option
  * The simple implement:
 
 #[inline(always)]
-pub fn _memchr_impl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+pub fn _memchr_dbl_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     for i in 0..buf.len() {
-        if buf[i] == c1 || buf[i] == c2 {
+        if buf[i] == needle.v1 || buf[i] == needle.v2 {
             return Some(i);
         }
     }

@@ -212,7 +212,7 @@ fn _start_rchr_sgl_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 15 bytes.
-    _memrchr_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr)
+    _memrchr_sgl_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
@@ -236,6 +236,7 @@ fn _start_rchr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 8;
@@ -247,19 +248,19 @@ fn _start_rchr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 8;
             while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
                 buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                buf_ptr.prefetch_read_data();
                 let r = _rchr_sgl_c8_aa_x4(buf_ptr, cc, start_ptr);
                 if r.is_some() {
                     return r;
                 }
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 8;
@@ -286,7 +287,7 @@ fn _start_rchr_sgl_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memrchr_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr)
+    _memrchr_sgl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
@@ -310,6 +311,7 @@ fn _start_rchr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 4;
@@ -321,7 +323,7 @@ fn _start_rchr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 4;
@@ -333,6 +335,7 @@ fn _start_rchr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
                 }
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 4;
@@ -358,11 +361,11 @@ fn _start_rchr_sgl_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memrchr_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr)
+    _memrchr_sgl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_remaining_15_bytes_impl(
+pub(crate) fn _memrchr_sgl_remaining_15_bytes_impl(
     buf_ptr: *const u8,
     cc: B8Sgl,
     start_ptr: *const u8,
@@ -379,11 +382,11 @@ pub(crate) fn _memrchr_remaining_15_bytes_impl(
         }
     }
     // the remaining data is the max: 7 bytes.
-    _memrchr_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr)
+    _memrchr_sgl_remaining_7_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_remaining_7_bytes_impl(
+pub(crate) fn _memrchr_sgl_remaining_7_bytes_impl(
     buf_ptr: *const u8,
     cc: B4Sgl,
     start_ptr: *const u8,
@@ -400,11 +403,11 @@ pub(crate) fn _memrchr_remaining_7_bytes_impl(
         }
     }
     // the remaining data is the max: 3 bytes.
-    _memrchr_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr)
+    _memrchr_sgl_remaining_3_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[inline(always)]
-pub(crate) fn _memrchr_remaining_3_bytes_impl(
+fn _memrchr_sgl_remaining_3_bytes_impl(
     buf_ptr: *const u8,
     cc: B2Sgl,
     start_ptr: *const u8,
@@ -642,10 +645,10 @@ fn _rchr_sgl_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Optio
  * The simple implement:
 
 #[inline(always)]
-pub fn _memrchr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub fn _memrchr_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     for i in 0..buf.len() {
         let j = buf.len() - i - 1;
-        if buf[j] == c {
+        if buf[j] == needle.v1 {
             return Some(j);
         }
     }

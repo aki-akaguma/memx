@@ -141,7 +141,7 @@ fn process_memx_memnechr_basic(texts: &[&str], pat_byte: u8) -> usize {
 fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memnechr_sse2(buf, by1) }
+        memx::arch::x86::memnechr_sse2(buf, by1)
     }
     //
     let mut found: usize = 0;
@@ -170,7 +170,7 @@ fn process_memx_memnechr_sse2(texts: &[&str], pat_byte: u8) -> usize {
 fn process_memx_memnechr_avx2(texts: &[&str], pat_byte: u8) -> usize {
     #[inline(never)]
     fn _t_(buf: &[u8], by1: u8) -> Option<usize> {
-        unsafe { memx::arch::x86::_memnechr_avx2(buf, by1) }
+        memx::arch::x86::memnechr_avx2(buf, by1)
     }
     //
     let mut found: usize = 0;

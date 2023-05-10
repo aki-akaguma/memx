@@ -205,7 +205,7 @@ fn process_memx_memcmp_basic(texts: &[&str], pattern: &str) -> (usize, usize, us
 fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     #[inline(never)]
     fn _t_(a: &[u8], b: &[u8]) -> Ordering {
-        unsafe { memx::arch::x86::_memcmp_sse2(a, b) }
+        memx::arch::x86::memcmp_sse2(a, b)
     }
     //
     let pat_bytes = pattern.as_bytes();
@@ -239,7 +239,7 @@ fn process_memx_memcmp_sse2(texts: &[&str], pattern: &str) -> (usize, usize, usi
 fn process_memx_memcmp_avx2(texts: &[&str], pattern: &str) -> (usize, usize, usize) {
     #[inline(never)]
     fn _t_(a: &[u8], b: &[u8]) -> Ordering {
-        unsafe { memx::arch::x86::_memcmp_avx2(a, b) }
+        memx::arch::x86::memcmp_avx2(a, b)
     }
     //
     let pat_bytes = pattern.as_bytes();

@@ -158,7 +158,7 @@ fn process_memx_memset_basic(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 fn process_memx_memset_sse2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
     fn _t_(buf: &mut [u8], by1: u8) {
-        unsafe { memx::arch::x86::_memset_sse2(buf, by1) }
+        memx::arch::x86::memset_sse2(buf, by1)
     }
     //
     for line in texts {
@@ -183,7 +183,7 @@ fn process_memx_memset_sse2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
 fn process_memx_memset_avx2(texts: &mut [Vec<u8>], pat_u8: u8, len: usize) {
     #[inline(never)]
     fn _t_(buf: &mut [u8], by1: u8) {
-        unsafe { memx::arch::x86::_memset_avx2(buf, by1) }
+        memx::arch::x86::memset_avx2(buf, by1)
     }
     //
     for line in texts {

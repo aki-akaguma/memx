@@ -6,12 +6,12 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr_tpl         |   11.972 µs |   23.075 µs |   11.653 µs |   23.481 µs |
-| memchr_memrchr_tpl      |    8.551 µs |    8.990 µs |    8.534 µs |    9.022 µs |
-| memx_memrchr_tpl        |    7.052 µs |    7.321 µs |    7.117 µs |    7.576 µs |
-| memx_memrchr_t_basic    |   11.413 µs |   15.821 µs |   11.561 µs |   15.897 µs |
-| memx_memrchr_t_sse2     |    6.761 µs |    8.281 µs |    7.010 µs |    8.439 µs |
-| memx_memrchr_t_avx2     |    7.035 µs |    7.314 µs |    6.962 µs |    7.469 µs |
+| std_memrchr_tpl         |   11.781 µs |   23.026 µs |   11.581 µs |   23.507 µs |
+| memchr_memrchr_tpl      |    8.542 µs |    9.075 µs |    8.556 µs |    9.043 µs |
+| memx_memrchr_tpl        |    6.904 µs |    7.579 µs |    6.822 µs |    7.574 µs |
+| memx_memrchr_t_basic    |   11.527 µs |   15.967 µs |   12.160 µs |   16.532 µs |
+| memx_memrchr_t_sse2     |    7.501 µs |    8.866 µs |    7.492 µs |    8.871 µs |
+| memx_memrchr_t_avx2     |    6.885 µs |    7.473 µs |    6.809 µs |    7.629 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
