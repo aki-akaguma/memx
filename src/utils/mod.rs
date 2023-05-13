@@ -199,7 +199,7 @@ read_big_integer_impl! {
 }
 
 #[inline(always)]
-fn propagate_a_high_bit<T>(bits: T) -> T
+pub(crate) fn propagate_a_high_bit<T>(bits: T) -> T
 where
     T: core::ops::Div<Output = T> + core::ops::Mul<Output = T> + From<u8>,
 {
@@ -274,6 +274,11 @@ impl BitOrt for u16 {
     }
 }
 
+/// a high bit propagations
+pub(crate) trait HighBitProp {
+    fn propagate_a_high_bit(self) -> Self;
+}
+
 macro_rules! packed_integers {
     ($($packed:ident: $ty:ident,)+) => {$(
         #[derive(Debug, Default)]
@@ -299,9 +304,6 @@ macro_rules! packed_integers {
                 let v = !((((x & Self::LOWS).wrapping_add(Self::LOWS)) | x) | Self::LOWS);
                 Self::new(v)
             }
-            pub fn propagate_a_high_bit(self) -> Self {
-                Self::new(propagate_a_high_bit(self.0))
-            }
         }
         impl BitOrt for $packed {
             fn is_zeros(&self) -> bool {
@@ -321,6 +323,11 @@ macro_rules! packed_integers {
             }
             fn trailing_zeros(&self) -> u32 {
                 self.0.trailing_zeros()
+            }
+        }
+        impl HighBitProp for $packed {
+            fn propagate_a_high_bit(self) -> $packed {
+                Self::new(propagate_a_high_bit(self.0))
             }
         }
     )+}

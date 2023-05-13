@@ -23,24 +23,24 @@ pub(crate) use mem_rchr::_rchr_sgl_to_aligned_u128;
 pub(crate) use mem_rchr::_rchr_sgl_to_aligned_u256;
 
 mod mem_nechr;
-pub(crate) use mem_nechr::_memnechr_impl;
+pub(crate) use mem_nechr::_memnechr_sgl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_nechr::_memnechr_remaining_15_bytes_impl;
+pub(crate) use mem_nechr::_memnechr_sgl_remaining_15_bytes_impl;
 #[allow(unused_imports)]
-pub(crate) use mem_nechr::_nechr_to_aligned_u128;
+pub(crate) use mem_nechr::_nechr_sgl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_nechr::_nechr_to_aligned_u256;
+pub(crate) use mem_nechr::_nechr_sgl_to_aligned_u256;
 
 mod mem_rnechr;
-pub(crate) use mem_rnechr::_memrnechr_impl;
+pub(crate) use mem_rnechr::_memrnechr_sgl_impl;
 
 #[allow(unused_imports)]
-pub(crate) use mem_rnechr::_memrnechr_remaining_15_bytes_impl;
+pub(crate) use mem_rnechr::_memrnechr_sgl_remaining_15_bytes_impl;
 #[allow(unused_imports)]
-pub(crate) use mem_rnechr::_rnechr_to_aligned_u128;
+pub(crate) use mem_rnechr::_rnechr_sgl_to_aligned_u128;
 #[allow(unused_imports)]
-pub(crate) use mem_rnechr::_rnechr_to_aligned_u256;
+pub(crate) use mem_rnechr::_rnechr_sgl_to_aligned_u256;
 
 mod mem_chr_dbl;
 pub(crate) use mem_chr_dbl::_memchr_dbl_impl;
@@ -203,12 +203,14 @@ pub fn memrchr_qpl_basic(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<u
     crate::mem::_memrchr_qpl_impl(buf, needle)
 }
 
-pub fn memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    crate::mem::_memnechr_impl(buf, c)
+pub fn memnechr_basic(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    crate::mem::_memnechr_sgl_impl(buf, needle)
 }
 
-pub fn memrnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    crate::mem::_memrnechr_impl(buf, c)
+pub fn memrnechr_basic(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    crate::mem::_memrnechr_sgl_impl(buf, needle)
 }
 
 pub fn memmem_basic(haystack: &[u8], needle: &[u8]) -> Option<usize> {

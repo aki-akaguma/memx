@@ -81,33 +81,35 @@ pub fn memrchr(buf: &[u8], c1: u8) -> Option<usize> {
 }
 
 /// This is same as `buf.iter().position(|&x| x != c)`, not included libc.
-pub fn memnechr(buf: &[u8], c: u8) -> Option<usize> {
+pub fn memnechr(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memnechr_impl(buf, c) }
+        { arch::x86::_memnechr_sgl_impl(buf, needle) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memnechr_impl(buf, c) }
+        { mem::_memnechr_sgl_impl(buf, needle) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memnechr_impl(buf, c);
+    let r = mem::_memnechr_sgl_impl(buf, needle);
     //
     r
 }
 
 /// This is same as `buf.iter().rposition(|&x| x != c)`, not included libc.
-pub fn memrnechr(buf: &[u8], c: u8) -> Option<usize> {
+pub fn memrnechr(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
         #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memrnechr_impl(buf, c) }
+        { arch::x86::_memrnechr_sgl_impl(buf, needle) }
         #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memrnechr_impl(buf, c) }
+        { mem::_memrnechr_sgl_impl(buf, needle) }
     };
     #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memrnechr_impl(buf, c);
+    let r = mem::_memrnechr_sgl_impl(buf, needle);
     //
     r
 }

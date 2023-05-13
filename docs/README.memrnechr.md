@@ -6,11 +6,11 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |   11.845 µs |   21.514 µs |   11.590 µs |   22.383 µs |
-| memx_memrnechr          |    5.454 µs |    6.121 µs |    5.477 µs |    6.028 µs |
-| memx_memrnechr_basic    |    7.265 µs |    9.337 µs |    7.279 µs |    9.237 µs |
-| memx_memrnechr_sse2     |    5.156 µs |    6.062 µs |    5.175 µs |    5.960 µs |
-| memx_memnechr_avx2      |    5.457 µs |    6.148 µs |    5.373 µs |    5.974 µs |
+| std_memrnechr           |   11.736 µs |   20.988 µs |   12.079 µs |   20.984 µs |
+| memx_memrnechr          |    5.470 µs |    6.133 µs |    5.384 µs |    6.019 µs |
+| memx_memrnechr_basic    |    7.273 µs |    9.294 µs |    7.279 µs |    9.235 µs |
+| memx_memrnechr_sse2     |    5.136 µs |    6.156 µs |    5.164 µs |    5.955 µs |
+| memx_memnechr_avx2      |    5.465 µs |    6.092 µs |    5.364 µs |    5.948 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 

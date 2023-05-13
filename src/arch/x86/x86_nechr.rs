@@ -24,60 +24,60 @@ use super::cpuid;
 
 use core::sync::atomic::AtomicPtr;
 use core::sync::atomic::Ordering;
-type FuncType = fn(&[u8], u8) -> Option<usize>;
+type FuncType = fn(&[u8], B1Sgl) -> Option<usize>;
 
 const FUNC: FuncType = fnptr_setup_func;
 static FUNC_PTR_ATOM: AtomicPtr<FuncType> = AtomicPtr::new(FUNC as *mut FuncType);
 
 #[inline(never)]
-fn fnptr_setup_func(buf: &[u8], c: u8) -> Option<usize> {
+fn fnptr_setup_func(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     #[cfg(target_arch = "x86_64")]
     let func = if cpuid::has_avx2() {
-        _memnechr_avx2
+        _memnechr_sgl_avx2
     } else {
-        _memnechr_sse2
+        _memnechr_sgl_sse2
     };
     #[cfg(target_arch = "x86")]
     let func = if cpuid::has_avx2() {
-        _memnechr_avx2
+        _memnechr_sgl_avx2
     } else if cpuid::has_sse2() {
-        _memnechr_sse2
+        _memnechr_sgl_sse2
     } else {
-        _memnechr_basic
+        _memnechr_sgl_basic
     };
     //
     FUNC_PTR_ATOM.store(func as *mut FuncType, Ordering::Relaxed);
-    unsafe { func(buf, c) }
+    unsafe { func(buf, needle) }
 }
 
 #[inline(always)]
-pub(crate) fn _memnechr_impl(buf: &[u8], c: u8) -> Option<usize> {
+pub(crate) fn _memnechr_sgl_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let func_u = FUNC_PTR_ATOM.load(Ordering::Relaxed);
     #[allow(clippy::crosspointer_transmute)]
     let func: FuncType = unsafe { core::mem::transmute(func_u) };
-    func(buf, c)
+    func(buf, needle)
 }
 
-unsafe fn _memnechr_basic(buf: &[u8], c: u8) -> Option<usize> {
-    basic::_memnechr_impl(buf, c)
+unsafe fn _memnechr_sgl_basic(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    basic::_memnechr_sgl_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "sse2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memnechr_sse2(buf: &[u8], c: u8) -> Option<usize> {
-    _memnechr_sse2_impl(buf, c)
+pub unsafe fn _memnechr_sgl_sse2(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    _memnechr_sgl_sse2_impl(buf, needle)
 }
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 #[target_feature(enable = "avx2")]
 #[allow(clippy::missing_safety_doc)]
-pub unsafe fn _memnechr_avx2(buf: &[u8], c: u8) -> Option<usize> {
-    _memnechr_avx2_impl(buf, c)
+pub unsafe fn _memnechr_sgl_avx2(buf: &[u8], needle: B1Sgl) -> Option<usize> {
+    _memnechr_sgl_avx2_impl(buf, needle)
 }
 
 #[inline(always)]
-fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
+fn _memnechr_sgl_sse2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -85,7 +85,7 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 16 {
-        let cc = MMB16Sgl::new(c1);
+        let cc: MMB16Sgl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u128() {
@@ -100,8 +100,7 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c1);
-                    let r = basic::_nechr_to_aligned_u128(buf_ptr, c, start_ptr);
+                    let r = basic::_nechr_sgl_to_aligned_u128(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -111,6 +110,7 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 16;
@@ -123,12 +123,12 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
-        /*
+        */
         {
             let unroll = 4;
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = unsafe { _nechr_c16_aa_x4(buf_ptr, cc, start_ptr) };
                 if r.is_some() {
                     return r;
@@ -136,6 +136,7 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        /*
         {
             let unroll = 2;
             let loop_size = 16;
@@ -161,12 +162,12 @@ fn _memnechr_sse2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Sgl::new(c1);
-    basic::_memnechr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+    let cc: B8Sgl = needle.into();
+    basic::_memnechr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
 }
 
 #[inline(always)]
-fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
+fn _memnechr_sgl_avx2_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -174,7 +175,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
     buf_ptr.prefetch_read_data();
     //
     if buf_len >= 32 {
-        let cc = MMB32Sgl::new(c1);
+        let cc: MMB32Sgl = needle.into();
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u256() {
@@ -189,8 +190,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 }
                 #[cfg(feature = "test_alignment_check")]
                 {
-                    let c = B1Sgl::new(c1);
-                    let r = basic::_nechr_to_aligned_u256(buf_ptr, c, start_ptr);
+                    let r = basic::_nechr_sgl_to_aligned_u256(buf_ptr, needle, start_ptr);
                     if let Some(p) = r.0 {
                         buf_ptr = p;
                     } else if let Some(v) = r.1 {
@@ -200,6 +200,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             }
         }
         // the loop
+        /*
         {
             let unroll = 8;
             let loop_size = 32;
@@ -212,12 +213,13 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                 buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
             }
         }
+        */
         /*
         {
             let unroll = 4;
             let loop_size = 32;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
+                //buf_ptr.prefetch_read_data();
                 let r = unsafe { _nechr_c32_aa_x4(buf_ptr, cc, start_ptr) };
                 if r.is_some() {
                     return r;
@@ -250,7 +252,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
             }
         }
         {
-            let cc = MMB16Sgl::new(c1);
+            let cc: MMB16Sgl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -263,7 +265,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     } else if buf_len >= 16 {
         {
-            let cc = MMB16Sgl::new(c1);
+            let cc: MMB16Sgl = needle.into();
             let unroll = 1;
             let loop_size = 16;
             if buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
@@ -290,8 +292,7 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
                     }
                     #[cfg(feature = "test_alignment_check")]
                     {
-                        let c = B1Sgl::new(c1);
-                        let r = basic::_nechr_to_aligned_u128(buf_ptr, c, start_ptr);
+                        let r = basic::_nechr_sgl_to_aligned_u128(buf_ptr, needle, start_ptr);
                         if let Some(p) = r.0 {
                             buf_ptr = p;
                         } else if let Some(v) = r.1 {
@@ -310,8 +311,22 @@ fn _memnechr_avx2_impl(buf: &[u8], c1: u8) -> Option<usize> {
         }
     }
     //
-    let cc = B8Sgl::new(c1);
-    basic::_memnechr_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+    let cc: B8Sgl = needle.into();
+    basic::_memnechr_sgl_remaining_15_bytes_impl(buf_ptr, cc, start_ptr, end_ptr)
+}
+
+#[inline(always)]
+fn _return_nechr_sgl<T, PU>(base: T, mask_a: PU) -> Option<usize>
+where
+    T: core::ops::Add<usize, Output = usize>,
+    PU: BitOrt,
+{
+    if !mask_a.is_highs() {
+        let idx1 = mask_a.trailing_ones() as usize;
+        Some(base + idx1)
+    } else {
+        None
+    }
 }
 
 #[inline(always)]
@@ -320,17 +335,12 @@ unsafe fn _nechr_c16_uu_x1(
     mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
     let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
+    let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u16;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0 != 0xFFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else {
-        None
-    }
+    _return_nechr_sgl(base, mask_0_a)
 }
 
 #[inline(always)]
@@ -339,17 +349,12 @@ unsafe fn _nechr_c16_aa_x1(
     mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
     let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
+    let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
+    let mask_0_a = _mm_movemask_epi8(mm_0_eq_a) as u16;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0 != 0xFFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else {
-        None
-    }
+    _return_nechr_sgl(base, mask_0_a)
 }
 
 #[inline(always)]
@@ -358,22 +363,15 @@ unsafe fn _nechr_c16_aa_x2(
     mm_c16: MMB16Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
-    let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_1 = _mm_load_si128(buf_ptr.add(16) as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mm_1_eq = _mm_cmpeq_epi8(mm_1, mm_c16.v1);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u32 & 0xFFFF_u32;
-    let mask_1 = _mm_movemask_epi8(mm_1_eq) as u32 & 0xFFFF_u32;
-    let base = buf_ptr.usz_offset_from(st_ptr);
-    //
-    if mask_0 != 0xFFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else if mask_1 != 0xFFFF_u32 {
-        Some(base + mask_1.trailing_ones() as usize + 16)
-    } else {
-        None
+    let r = _nechr_c16_aa_x1(buf_ptr, mm_c16, st_ptr);
+    if r.is_some() {
+        return r;
     }
+    let r = _nechr_c16_aa_x1(buf_ptr.add(16), mm_c16, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
 }
 
 #[inline(always)]
@@ -416,17 +414,12 @@ unsafe fn _nechr_c32_uu_x1(
     mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
     let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
+    let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else {
-        None
-    }
+    _return_nechr_sgl(base, mask_0_a)
 }
 
 #[inline(always)]
@@ -435,17 +428,12 @@ unsafe fn _nechr_c32_aa_x1(
     mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
     let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
+    let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
+    let mask_0_a = _mm256_movemask_epi8(mm_0_eq_a) as u32;
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
-    if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else {
-        None
-    }
+    _return_nechr_sgl(base, mask_0_a)
 }
 
 #[inline(always)]
@@ -454,22 +442,15 @@ unsafe fn _nechr_c32_aa_x2(
     mm_c32: MMB32Sgl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    //
-    let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_1 = _mm256_load_si256(buf_ptr.add(32) as *const __m256i);
-    let mm_0_eq = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mm_1_eq = _mm256_cmpeq_epi8(mm_1, mm_c32.v1);
-    let mask_0 = _mm256_movemask_epi8(mm_0_eq) as u32;
-    let mask_1 = _mm256_movemask_epi8(mm_1_eq) as u32;
-    let base = buf_ptr.usz_offset_from(st_ptr);
-    //
-    if mask_0 != 0xFFFF_FFFF_u32 {
-        Some(base + mask_0.trailing_ones() as usize)
-    } else if mask_1 != 0xFFFF_FFFF_u32 {
-        Some(base + mask_1.trailing_ones() as usize + 32)
-    } else {
-        None
+    let r = _nechr_c32_aa_x1(buf_ptr, mm_c32, st_ptr);
+    if r.is_some() {
+        return r;
     }
+    let r = _nechr_c32_aa_x1(buf_ptr.add(32), mm_c32, st_ptr);
+    if r.is_some() {
+        return r;
+    }
+    None
 }
 
 #[inline(always)]
