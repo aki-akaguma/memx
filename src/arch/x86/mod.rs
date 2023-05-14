@@ -30,6 +30,24 @@ pub(crate) use x86_nechr::_memnechr_sgl_impl;
 mod x86_rnechr;
 pub(crate) use x86_rnechr::_memrnechr_sgl_impl;
 
+mod x86_nechr_dbl;
+pub(crate) use x86_nechr_dbl::_memnechr_dbl_impl;
+
+mod x86_rnechr_dbl;
+pub(crate) use x86_rnechr_dbl::_memrnechr_dbl_impl;
+
+mod x86_nechr_tpl;
+pub(crate) use x86_nechr_tpl::_memnechr_tpl_impl;
+
+mod x86_rnechr_tpl;
+pub(crate) use x86_rnechr_tpl::_memrnechr_tpl_impl;
+
+mod x86_nechr_qpl;
+pub(crate) use x86_nechr_qpl::_memnechr_qpl_impl;
+
+mod x86_rnechr_qpl;
+pub(crate) use x86_rnechr_qpl::_memrnechr_qpl_impl;
+
 mod x86_mem;
 pub(crate) use x86_mem::_memmem_impl;
 
@@ -231,6 +249,60 @@ pub fn memrnechr_sse2(buf: &[u8], c1: u8) -> Option<usize> {
 pub fn memrnechr_avx2(buf: &[u8], c1: u8) -> Option<usize> {
     let needle = B1Sgl::new(c1);
     unsafe { x86_rnechr::_memrnechr_sgl_avx2(buf, needle) }
+}
+
+pub fn memnechr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_nechr_dbl::_memnechr_dbl_sse2(buf, needle) }
+}
+pub fn memnechr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_nechr_dbl::_memnechr_dbl_avx2(buf, needle) }
+}
+
+pub fn memrnechr_dbl_sse2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_rnechr_dbl::_memrnechr_dbl_sse2(buf, needle) }
+}
+pub fn memrnechr_dbl_avx2(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    unsafe { x86_rnechr_dbl::_memrnechr_dbl_avx2(buf, needle) }
+}
+
+pub fn memnechr_tpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_nechr_tpl::_memnechr_tpl_sse2(buf, needle) }
+}
+pub fn memnechr_tpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_nechr_tpl::_memnechr_tpl_avx2(buf, needle) }
+}
+
+pub fn memrnechr_tpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_rnechr_tpl::_memrnechr_tpl_sse2(buf, needle) }
+}
+pub fn memrnechr_tpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    unsafe { x86_rnechr_tpl::_memrnechr_tpl_avx2(buf, needle) }
+}
+
+pub fn memnechr_qpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_nechr_qpl::_memnechr_qpl_sse2(buf, needle) }
+}
+pub fn memnechr_qpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_nechr_qpl::_memnechr_qpl_avx2(buf, needle) }
+}
+
+pub fn memrnechr_qpl_sse2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_rnechr_qpl::_memrnechr_qpl_sse2(buf, needle) }
+}
+pub fn memrnechr_qpl_avx2(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    unsafe { x86_rnechr_qpl::_memrnechr_qpl_avx2(buf, needle) }
 }
 
 pub fn memmem_sse2(haystack: &[u8], needle: &[u8]) -> Option<usize> {
