@@ -95,3 +95,33 @@ harness = false
 name = "bench-memrchr_qpl"
 path = "benches/bench-memrchr_qpl.rs"
 harness = false
+
+[[bench]]
+name = "bench-memnechr_dbl"
+path = "benches/bench-memnechr_dbl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrnechr_dbl"
+path = "benches/bench-memrnechr_dbl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memnechr_tpl"
+path = "benches/bench-memnechr_tpl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrnechr_tpl"
+path = "benches/bench-memrnechr_tpl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memnechr_qpl"
+path = "benches/bench-memnechr_qpl.rs"
+harness = false
+
+[[bench]]
+name = "bench-memrnechr_qpl"
+path = "benches/bench-memrnechr_qpl.rs"
+harness = false

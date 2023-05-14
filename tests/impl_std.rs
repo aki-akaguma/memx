@@ -91,6 +91,32 @@ pub fn _std_memrchr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Optio
         .rposition(|&x| x == by1 || x == by2 || x == by3 || x == by4)
 }
 
+pub fn _std_memnechr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    buf.iter().position(|&x| x != by1 && x != by2)
+}
+
+pub fn _std_memrnechr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x != by1 && x != by2)
+}
+
+pub fn _std_memnechr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    buf.iter().position(|&x| x != by1 && x != by2 && x != by3)
+}
+
+pub fn _std_memrnechr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    buf.iter().rposition(|&x| x != by1 && x != by2 && x != by3)
+}
+
+pub fn _std_memnechr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    buf.iter()
+        .position(|&x| x != by1 && x != by2 && x != by3 && x != by4)
+}
+
+pub fn _std_memrnechr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    buf.iter()
+        .rposition(|&x| x != by1 && x != by2 && x != by3 && x != by4)
+}
+
 pub fn _std_memchr_iter(buf: &[u8], by1: u8) -> StdMemchrSglIter {
     StdMemchrSglIter::new(buf, by1)
 }

@@ -8,14 +8,6 @@ pub fn create_data_chr() -> (Vec<String>, u8, usize) {
     }
 }
 
-pub fn create_data_nechr() -> (Vec<String>, u8, usize) {
-    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
-    match sw.as_str() {
-        "ja.1" => create_data_nechr_ja_1(),
-        _ => create_data_nechr_en_1(),
-    }
-}
-
 pub fn create_data_chr_dbl() -> (Vec<String>, (u8, u8), usize) {
     let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
     match sw.as_str() {
@@ -37,6 +29,38 @@ pub fn create_data_chr_qpl() -> (Vec<String>, (u8, u8, u8, u8), usize) {
     match sw.as_str() {
         "ja.1" => create_data_chr_qpl_ja_1(),
         _ => create_data_chr_qpl_en_1(),
+    }
+}
+
+pub fn create_data_nechr() -> (Vec<String>, u8, usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_nechr_ja_1(),
+        _ => create_data_nechr_en_1(),
+    }
+}
+
+pub fn create_data_nechr_dbl() -> (Vec<String>, (u8, u8), usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_nechr_dbl_ja_1(),
+        _ => create_data_nechr_dbl_en_1(),
+    }
+}
+
+pub fn create_data_nechr_tpl() -> (Vec<String>, (u8, u8, u8), usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_nechr_tpl_ja_1(),
+        _ => create_data_nechr_tpl_en_1(),
+    }
+}
+
+pub fn create_data_nechr_qpl() -> (Vec<String>, (u8, u8, u8, u8), usize) {
+    let sw = std::env::var("AKI_TEST_DAT").unwrap_or("en.1".to_string());
+    match sw.as_str() {
+        "ja.1" => create_data_nechr_qpl_ja_1(),
+        _ => create_data_nechr_qpl_en_1(),
     }
 }
 
@@ -72,6 +96,7 @@ pub fn create_data_set() -> (Vec<Vec<u8>>, usize) {
     }
 }
 
+//{{{ chr
 pub fn create_data_chr_en_1() -> (Vec<String>, u8, usize) {
     let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();
@@ -117,70 +142,6 @@ pub fn create_data_chr_ja_1() -> (Vec<String>, u8, usize) {
     (v, by1, match_cnt)
 }
 
-pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
-    let by1 = b'r';
-    let cc = 'r';
-    let s1: String = EN_DAT_S1
-        .to_string()
-        .chars()
-        .map(|c| if c == cc { '.' } else { cc })
-        .collect();
-    let s2: String = EN_DAT_S2
-        .to_string()
-        .chars()
-        .map(|c| if c == cc { '.' } else { cc })
-        .collect();
-    let mut v: Vec<String> = Vec::new();
-    let mut i = 0;
-    loop {
-        i += 1;
-        if i > 21 {
-            break;
-        }
-        if i % 2 == 0 {
-            v.push(s1.clone());
-        } else {
-            v.push(s2.clone());
-        }
-    }
-    let match_cnt = 768;
-    (v, by1, match_cnt)
-}
-
-pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
-    let by1 = b'r';
-    let bbb = {
-        let bytes = r"る".as_bytes();
-        bytes[bytes.len() - 1]
-    };
-    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
-        .bytes()
-        .map(|c| if c == bbb { b'.' } else { by1 })
-        .collect();
-    let v2: Vec<u8> = JA_DAT_S2
-        .to_string()
-        .bytes()
-        .map(|c| if c == bbb { b'.' } else { by1 })
-        .collect();
-    let s1: String = String::from_utf8_lossy(&v1).to_string();
-    let s2: String = String::from_utf8_lossy(&v2).to_string();
-    let mut v: Vec<String> = Vec::new();
-    let mut i = 0;
-    loop {
-        i += 1;
-        if i > 21 {
-            break;
-        }
-        if i % 2 == 0 {
-            v.push(s1.clone());
-        } else {
-            v.push(s2.clone());
-        }
-    }
-    let match_cnt = 834;
-    (v, by1, match_cnt)
-}
-
 pub fn create_data_chr_dbl_en_1() -> (Vec<String>, (u8, u8), usize) {
     let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();
@@ -197,8 +158,8 @@ pub fn create_data_chr_dbl_en_1() -> (Vec<String>, (u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 768 + 162;
-    (v, (b'r', b'.'), match_cnt)
+    let match_cnt = 144 + 768;
+    (v, (b'v', b'r'), match_cnt)
 }
 
 pub fn create_data_chr_dbl_ja_1() -> (Vec<String>, (u8, u8), usize) {
@@ -218,13 +179,13 @@ pub fn create_data_chr_dbl_ja_1() -> (Vec<String>, (u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 834 + 134;
+    let match_cnt = 134 + 834;
     let by1 = {
-        let bytes = r"る".as_bytes();
+        let bytes = r"じ".as_bytes();
         bytes[bytes.len() - 1]
     };
     let by2 = {
-        let bytes = r"じ".as_bytes();
+        let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
     (v, (by1, by2), match_cnt)
@@ -246,8 +207,8 @@ pub fn create_data_chr_tpl_en_1() -> (Vec<String>, (u8, u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 63 + 768 + 162;
-    (v, (b'x', b'r', b'.'), match_cnt)
+    let match_cnt = 63 + 144 + 768;
+    (v, (b'x', b'v', b'r'), match_cnt)
 }
 
 pub fn create_data_chr_tpl_ja_1() -> (Vec<String>, (u8, u8, u8), usize) {
@@ -267,9 +228,9 @@ pub fn create_data_chr_tpl_ja_1() -> (Vec<String>, (u8, u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 834 + 134 + 30;
+    let match_cnt = 123 + 134 + 834;
     let by1 = {
-        let bytes = r"る".as_bytes();
+        let bytes = r"ど".as_bytes();
         bytes[bytes.len() - 1]
     };
     let by2 = {
@@ -277,7 +238,7 @@ pub fn create_data_chr_tpl_ja_1() -> (Vec<String>, (u8, u8, u8), usize) {
         bytes[bytes.len() - 1]
     };
     let by3 = {
-        let bytes = r"ぷ".as_bytes();
+        let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
     (v, (by1, by2, by3), match_cnt)
@@ -299,8 +260,8 @@ pub fn create_data_chr_qpl_en_1() -> (Vec<String>, (u8, u8, u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 10 + 63 + 768 + 162;
-    (v, (b'z', b'x', b'r', b'.'), match_cnt)
+    let match_cnt = 10 + 63 + 144 + 768;
+    (v, (b'z', b'x', b'v', b'r'), match_cnt)
 }
 
 pub fn create_data_chr_qpl_ja_1() -> (Vec<String>, (u8, u8, u8, u8), usize) {
@@ -320,26 +281,424 @@ pub fn create_data_chr_qpl_ja_1() -> (Vec<String>, (u8, u8, u8, u8), usize) {
             v.push(s2.clone());
         }
     }
-    let match_cnt = 834 + 134 + 30 + 123;
+    let match_cnt = 30 + 123 + 134 + 834;
     let by1 = {
-        let bytes = r"る".as_bytes();
-        bytes[bytes.len() - 1]
-    };
-    let by2 = {
-        let bytes = r"じ".as_bytes();
-        bytes[bytes.len() - 1]
-    };
-    let by3 = {
         let bytes = r"ぷ".as_bytes();
         bytes[bytes.len() - 1]
     };
-    let by4 = {
+    let by2 = {
         let bytes = r"ど".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let by3 = {
+        let bytes = r"じ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let by4 = {
+        let bytes = r"る".as_bytes();
         bytes[bytes.len() - 1]
     };
     (v, (by1, by2, by3, by4), match_cnt)
 }
+//}}}
+//{{{ nechr
+pub fn create_data_nechr_en_1() -> (Vec<String>, u8, usize) {
+    let by0 = b' ';
+    let by1 = b'r';
+    let v0 = vec![by1];
+    let v1: Vec<u8> = EN_DAT_S1
+        .to_string()
+        .bytes()
+        .map(|c| if c == by1 { by0 } else { v0[0] })
+        .collect();
+    let v2: Vec<u8> = EN_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| if c == by1 { by0 } else { v0[0] })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 768;
+    (v, by1, match_cnt)
+}
 
+pub fn create_data_nechr_ja_1() -> (Vec<String>, u8, usize) {
+    let by0 = b' ';
+    let by1 = b'r';
+    let bbb1 = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let v0 = vec![by1];
+    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
+        .bytes()
+        .map(|c| if c == bbb1 { by0 } else { v0[0] })
+        .collect();
+    let v2: Vec<u8> = JA_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| if c == bbb1 { by0 } else { v0[0] })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 834;
+    (v, by1, match_cnt)
+}
+
+pub fn create_data_nechr_dbl_en_1() -> (Vec<String>, (u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'v';
+    let by2 = b'r';
+    let mut v0 = vec![by1, by2];
+    let v1: Vec<u8> = EN_DAT_S1
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = EN_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 144 + 768;
+    (v, (by1, by2), match_cnt)
+}
+
+pub fn create_data_nechr_dbl_ja_1() -> (Vec<String>, (u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'v';
+    let by2 = b'r';
+    let bbb1 = {
+        let bytes = r"じ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb2 = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let mut v0 = vec![by1, by2];
+    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = JA_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 134 + 834;
+    (v, (by1, by2), match_cnt)
+}
+
+pub fn create_data_nechr_tpl_en_1() -> (Vec<String>, (u8, u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'x';
+    let by2 = b'v';
+    let by3 = b'r';
+    let mut v0 = vec![by1, by2, by3];
+    let v1: Vec<u8> = EN_DAT_S1
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 || c == by3 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = EN_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 || c == by3 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 63 + 144 + 768;
+    (v, (by1, by2, by3), match_cnt)
+}
+
+pub fn create_data_nechr_tpl_ja_1() -> (Vec<String>, (u8, u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'x';
+    let by2 = b'v';
+    let by3 = b'r';
+    let bbb1 = {
+        let bytes = r"ど".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb2 = {
+        let bytes = r"じ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb3 = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let mut v0 = vec![by1, by2, by3];
+    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 || c == bbb3 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = JA_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 || c == bbb3 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 123 + 134 + 834;
+    (v, (by1, by2, by3), match_cnt)
+}
+
+pub fn create_data_nechr_qpl_en_1() -> (Vec<String>, (u8, u8, u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'z';
+    let by2 = b'x';
+    let by3 = b'v';
+    let by4 = b'r';
+    let mut v0 = vec![by1, by2, by3, by4];
+    let v1: Vec<u8> = EN_DAT_S1
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 || c == by3 || c == by4 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = EN_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == by1 || c == by2 || c == by3 || c == by4 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 10 + 63 + 144 + 768;
+    (v, (by1, by2, by3, by4), match_cnt)
+}
+
+pub fn create_data_nechr_qpl_ja_1() -> (Vec<String>, (u8, u8, u8, u8), usize) {
+    let by0 = b' ';
+    let by1 = b'z';
+    let by2 = b'x';
+    let by3 = b'v';
+    let by4 = b'r';
+    let bbb1 = {
+        let bytes = r"ぷ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb2 = {
+        let bytes = r"ど".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb3 = {
+        let bytes = r"じ".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let bbb4 = {
+        let bytes = r"る".as_bytes();
+        bytes[bytes.len() - 1]
+    };
+    let mut v0 = vec![by1, by2, by3, by4];
+    let v1: Vec<u8> = (JA_DAT_S1.to_string() + JA_DAT_S2)
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 || c == bbb3 || c == bbb4 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let v2: Vec<u8> = JA_DAT_S2
+        .to_string()
+        .bytes()
+        .map(|c| {
+            if c == bbb1 || c == bbb2 || c == bbb3 || c == bbb4 {
+                by0
+            } else {
+                v0.rotate_left(1);
+                v0[0]
+            }
+        })
+        .collect();
+    let s1: String = String::from_utf8_lossy(&v1).to_string();
+    let s2: String = String::from_utf8_lossy(&v2).to_string();
+    let mut v: Vec<String> = Vec::new();
+    let mut i = 0;
+    loop {
+        i += 1;
+        if i > 21 {
+            break;
+        }
+        if i % 2 == 0 {
+            v.push(s1.clone());
+        } else {
+            v.push(s2.clone());
+        }
+    }
+    let match_cnt = 30 + 123 + 134 + 834;
+    (v, (by1, by2, by3, by4), match_cnt)
+}
+//}}}
+//{{{ etc
 pub fn create_data_mem_en_1() -> (Vec<String>, &'static str, usize) {
     let s1 = EN_DAT_S1.to_string();
     let s2 = EN_DAT_S2.to_string();
@@ -537,6 +896,7 @@ pub fn create_data_set_ja_1() -> (Vec<Vec<u8>>, usize) {
     }
     (v, 144)
 }
+//}}}
 
 // data for test
 const EN_DAT_S1: &str = r#"You could not possibly have come at a better time, my dear Watson, he said cordially. I was afraid that you were engaged. So I am. Very much so. Then I can wait in the next room. Not at all. This gentleman, Mr. Wilson, has been my partner and helper in many of my most successful cases, and I have no doubt that he will be of the utmost use to me in yours also.

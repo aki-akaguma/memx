@@ -330,6 +330,12 @@ macro_rules! packed_integers {
                 Self::new(propagate_a_high_bit(self.0))
             }
         }
+        impl core::ops::BitOr for $packed {
+            type Output = Self;
+            fn bitor(self, rhs: Self) -> Self::Output {
+                Self::new(self.0 | rhs.0)
+            }
+        }
     )+}
 }
 

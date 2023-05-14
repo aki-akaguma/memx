@@ -16,7 +16,7 @@ test:
 	cargo test --offline --features test_alignment_check $(TEST_THR)
 
 AC_TESTS=--test memeq
-AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
+AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl --test memnechr_dbl --test memrnechr_dbl --test memnechr_tpl --test memrnechr_tpl --test memnechr_qpl --test memrnechr_qpl
 
 test-alignment-check:
 	cargo test --offline --features test_alignment_check $(AC_TESTS)
@@ -28,9 +28,9 @@ test-no-default-features:
 	cargo test --offline --no-default-features
 
 MIRI_TESTS=
-MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
-MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl
-MIRI_TESTS=--test memchr --test memrchr
+MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl --test memnechr_dbl --test memrnechr_dbl --test memnechr_tpl --test memrnechr_tpl  --test memnechr_qpl --test memrnechr_qpl
+MIRI_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl --test memnechr_dbl --test memrnechr_dbl --test memnechr_tpl --test memrnechr_tpl  --test memnechr_qpl --test memrnechr_qpl
+MIRI_TESTS=--test memnechr_qpl --test memrnechr_qpl
 
 MIRI=env MIRIFLAGS=-Zmiri-backtrace=full cargo +nightly miri test
 MIRI=cargo +nightly miri test
@@ -80,8 +80,8 @@ tarpaulin:
 
 COV_ENV1 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage'
 COV_ENV2 = CARGO_INCREMENTAL=0 LLVM_PROFILE_FILE='$(CURDIR)/target/profraw/cargo-test-%p-%m.profraw' RUSTFLAGS='-Cinstrument-coverage -C target-feature=-sse2,-avx2'
-GRCOV_TEST=
 GRCOV_TEST=--test memchr --test memrchr
+GRCOV_TEST=
 
 grcov:
 	@rm -rf $(CURDIR)/target/profraw
@@ -123,11 +123,12 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl
-bench_nms = bench-memnechr bench-memrnechr
+bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memnechr
+#bench_nms = bench-memchr_qpl bench-memnechr_qpl
+#bench_nms = bench-memnechr bench-memnechr_dbl bench-memnechr_tpl bench-memnechr_qpl
+#bench_nms = bench-memrnechr bench-memrnechr_dbl bench-memrnechr_tpl bench-memrnechr_qpl
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -201,6 +202,7 @@ bench-dat-check:
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memmem
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrmem
+	@#
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memchr_dbl
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_dbl
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_dbl
@@ -213,6 +215,21 @@ bench-dat-check:
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memchr_qpl
 	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_qpl
 	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrchr_qpl
+	@#
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_dbl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_dbl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_dbl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_dbl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_tpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_tpl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_tpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_tpl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_qpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memnechr_qpl
+	AKI_TEST_DAT=en.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_qpl
+	AKI_TEST_DAT=ja.1 $(ENV_DAT_CHECK) --bench=bench-memrnechr_qpl
+
+#bench-dat-check1:
 
 bench-build-all: $(foreach bnm,$(bench_nms),$(foreach tbm,$(target_base),target/stamp.build/stamp.build.$(bnm).$(tbm)))
 

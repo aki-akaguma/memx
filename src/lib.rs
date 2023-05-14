@@ -80,40 +80,6 @@ pub fn memrchr(buf: &[u8], c1: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x != c)`, not included libc.
-pub fn memnechr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
-    #[rustfmt::skip]
-    #[cfg(not(feature = "test_pointer_width"))]
-    let r = {
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memnechr_sgl_impl(buf, needle) }
-        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memnechr_sgl_impl(buf, needle) }
-    };
-    #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memnechr_sgl_impl(buf, needle);
-    //
-    r
-}
-
-/// This is same as `buf.iter().rposition(|&x| x != c)`, not included libc.
-pub fn memrnechr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
-    #[rustfmt::skip]
-    #[cfg(not(feature = "test_pointer_width"))]
-    let r = {
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-        { arch::x86::_memrnechr_sgl_impl(buf, needle) }
-        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
-        { mem::_memrnechr_sgl_impl(buf, needle) }
-    };
-    #[cfg(feature = "test_pointer_width")]
-    let r = mem::_memrnechr_sgl_impl(buf, needle);
-    //
-    r
-}
-
 /// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
 pub fn memchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     let needle = B1Dbl::new(c1, c2);
@@ -212,6 +178,142 @@ pub fn memrchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> 
     };
     #[cfg(feature = "test_pointer_width")]
     let r = mem::_memrchr_qpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().position(|&x| x != c1)`, not included libc.
+pub fn memnechr(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memnechr_sgl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memnechr_sgl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memnechr_sgl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x != c1)`, not included libc.
+pub fn memrnechr(buf: &[u8], c1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(c1);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrnechr_sgl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrnechr_sgl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrnechr_sgl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().position(|&x| x != c1 && x != c2)`, not included libc.
+pub fn memnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memnechr_dbl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memnechr_dbl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memnechr_dbl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2)`, not included libc.
+pub fn memrnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(c1, c2);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrnechr_dbl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrnechr_dbl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrnechr_dbl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().position(|&x| x != c1 && x != c2 && x != c3)`, not included libc.
+pub fn memnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memnechr_tpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memnechr_tpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memnechr_tpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2 && x != c3)`, not included libc.
+pub fn memrnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(c1, c2, c3);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrnechr_tpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrnechr_tpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrnechr_tpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().position(|&x| x != c1 && x != c2 && x != c3 && x != c4)`, not included libc.
+pub fn memnechr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memnechr_qpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memnechr_qpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memnechr_qpl_impl(buf, needle);
+    //
+    r
+}
+
+/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2 && x != c3 && x != c4)`, not included libc.
+pub fn memrnechr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(c1, c2, c3, c4);
+    #[rustfmt::skip]
+    #[cfg(not(feature = "test_pointer_width"))]
+    let r = {
+        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+        { arch::x86::_memrnechr_qpl_impl(buf, needle) }
+        #[cfg(not(any(target_arch = "x86_64", target_arch = "x86")))]
+        { mem::_memrnechr_qpl_impl(buf, needle) }
+    };
+    #[cfg(feature = "test_pointer_width")]
+    let r = mem::_memrnechr_qpl_impl(buf, needle);
     //
     r
 }
