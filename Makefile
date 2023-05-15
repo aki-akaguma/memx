@@ -132,8 +132,8 @@ bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memc
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
-target_base = i686-unknown-linux i586-unknown-linux
-#target_base = x86_64-unknown-linux
+#target_base = i686-unknown-linux i586-unknown-linux
+target_base = x86_64-unknown-linux
 
 define build-templ =
 target/stamp.build/stamp.build.$(1).$(2):

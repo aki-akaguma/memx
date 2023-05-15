@@ -352,16 +352,16 @@ packed_integers! {
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */
 
-mod needle;
-pub(crate) use needle::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
-pub(crate) use needle::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
-pub(crate) use needle::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
-pub(crate) use needle::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
+mod needles;
+pub(crate) use needles::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
+pub(crate) use needles::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
+pub(crate) use needles::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
+pub(crate) use needles::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
 
-pub use needle::dbl::B1Dbl;
-pub use needle::qpl::B1Qpl;
-pub use needle::sgl::B1Sgl;
-pub use needle::tpl::B1Tpl;
+pub use needles::dbl::B1Dbl;
+pub use needles::qpl::B1Qpl;
+pub use needles::sgl::B1Sgl;
+pub use needles::tpl::B1Tpl;
 
 // ascii stochastics
 #[rustfmt::skip]
