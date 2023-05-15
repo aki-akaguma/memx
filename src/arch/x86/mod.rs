@@ -151,11 +151,11 @@ mod cpuid {
 cpufeatures::new!(cpuid_avx2, "avx2");
 cpufeatures::new!(cpuid_sse2, "sse2");
 
-mod needle;
-pub(crate) use needle::dbl::{MMB16Dbl, MMB32Dbl};
-pub(crate) use needle::qpl::{MMB16Qpl, MMB32Qpl};
-pub(crate) use needle::sgl::{MMB16Sgl, MMB32Sgl};
-pub(crate) use needle::tpl::{MMB16Tpl, MMB32Tpl};
+mod needles;
+pub(crate) use needles::dbl::{MMB16Dbl, MMB32Dbl};
+pub(crate) use needles::qpl::{MMB16Qpl, MMB32Qpl};
+pub(crate) use needles::sgl::{MMB16Sgl, MMB32Sgl};
+pub(crate) use needles::tpl::{MMB16Tpl, MMB32Tpl};
 
 use crate::utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
 use crate::RangeError;

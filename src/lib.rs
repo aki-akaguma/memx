@@ -38,17 +38,17 @@ use core::cmp::Ordering;
 pub mod arch;
 pub mod iter;
 pub mod mem;
-pub mod utils;
+pub(crate) mod utils;
 
-pub use utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
+pub(crate) use utils::{B1Dbl, B1Qpl, B1Sgl, B1Tpl};
 
 /// used by memcpy()
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
 pub struct RangeError;
 
-/// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == c1)`.
-pub fn memchr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
+/// This mimics `libc::memchr()`, same as `buf.iter().position(|&x| x == by1)`.
+pub fn memchr(buf: &[u8], by1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(by1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -63,9 +63,9 @@ pub fn memchr(buf: &[u8], c1: u8) -> Option<usize> {
     r
 }
 
-/// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == c1)`.
-pub fn memrchr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
+/// This mimics `libc::memrchr()`, same as `buf.iter().rposition(|&x| x == by1)`.
+pub fn memrchr(buf: &[u8], by1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(by1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -80,9 +80,9 @@ pub fn memrchr(buf: &[u8], c1: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x == c1 || x == c2)`.
-pub fn memchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    let needle = B1Dbl::new(c1, c2);
+/// This is same as `buf.iter().position(|&x| x == by1 || x == by2)`.
+pub fn memchr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(by1, by2);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -97,9 +97,9 @@ pub fn memchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2)`.
-pub fn memrchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    let needle = B1Dbl::new(c1, c2);
+/// This is same as `buf.iter().rposition(|&x| x == by1 || x == by2)`.
+pub fn memrchr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(by1, by2);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -114,9 +114,9 @@ pub fn memrchr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x == c1 || x == c2 || x == c3)`.
-pub fn memchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    let needle = B1Tpl::new(c1, c2, c3);
+/// This is same as `buf.iter().position(|&x| x == by1 || x == by2 || x == by3)`.
+pub fn memchr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(by1, by2, by3);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -131,9 +131,9 @@ pub fn memchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2 || x == c3)`.
-pub fn memrchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    let needle = B1Tpl::new(c1, c2, c3);
+/// This is same as `buf.iter().rposition(|&x| x == by1 || x == by2 || x == by3)`.
+pub fn memrchr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(by1, by2, by3);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -148,9 +148,9 @@ pub fn memrchr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x == c1 || x == c2 || x == c3 || x == c4)`.
-pub fn memchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
-    let needle = B1Qpl::new(c1, c2, c3, c4);
+/// This is same as `buf.iter().position(|&x| x == by1 || x == by2 || x == by3 || x == by4)`.
+pub fn memchr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(by1, by2, by3, by4);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -165,9 +165,9 @@ pub fn memchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x == c1 || x == c2 || x == c3 || x == c4)`.
-pub fn memrchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
-    let needle = B1Qpl::new(c1, c2, c3, c4);
+/// This is same as `buf.iter().rposition(|&x| x == by1 || x == by2 || x == by3 || x == by4)`.
+pub fn memrchr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(by1, by2, by3, by4);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -182,9 +182,9 @@ pub fn memrchr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> 
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x != c1)`, not included libc.
-pub fn memnechr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
+/// This is same as `buf.iter().position(|&x| x != by1)`, not included libc.
+pub fn memnechr(buf: &[u8], by1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(by1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -199,9 +199,9 @@ pub fn memnechr(buf: &[u8], c1: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x != c1)`, not included libc.
-pub fn memrnechr(buf: &[u8], c1: u8) -> Option<usize> {
-    let needle = B1Sgl::new(c1);
+/// This is same as `buf.iter().rposition(|&x| x != by1)`, not included libc.
+pub fn memrnechr(buf: &[u8], by1: u8) -> Option<usize> {
+    let needle = B1Sgl::new(by1);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -216,9 +216,9 @@ pub fn memrnechr(buf: &[u8], c1: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x != c1 && x != c2)`, not included libc.
-pub fn memnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    let needle = B1Dbl::new(c1, c2);
+/// This is same as `buf.iter().position(|&x| x != by1 && x != by2)`, not included libc.
+pub fn memnechr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(by1, by2);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -233,9 +233,9 @@ pub fn memnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2)`, not included libc.
-pub fn memrnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
-    let needle = B1Dbl::new(c1, c2);
+/// This is same as `buf.iter().rposition(|&x| x != by1 && x != by2)`, not included libc.
+pub fn memrnechr_dbl(buf: &[u8], by1: u8, by2: u8) -> Option<usize> {
+    let needle = B1Dbl::new(by1, by2);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -250,9 +250,9 @@ pub fn memrnechr_dbl(buf: &[u8], c1: u8, c2: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x != c1 && x != c2 && x != c3)`, not included libc.
-pub fn memnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    let needle = B1Tpl::new(c1, c2, c3);
+/// This is same as `buf.iter().position(|&x| x != by1 && x != by2 && x != by3)`, not included libc.
+pub fn memnechr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(by1, by2, by3);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -267,9 +267,9 @@ pub fn memnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2 && x != c3)`, not included libc.
-pub fn memrnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
-    let needle = B1Tpl::new(c1, c2, c3);
+/// This is same as `buf.iter().rposition(|&x| x != by1 && x != by2 && x != by3)`, not included libc.
+pub fn memrnechr_tpl(buf: &[u8], by1: u8, by2: u8, by3: u8) -> Option<usize> {
+    let needle = B1Tpl::new(by1, by2, by3);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -284,9 +284,9 @@ pub fn memrnechr_tpl(buf: &[u8], c1: u8, c2: u8, c3: u8) -> Option<usize> {
     r
 }
 
-/// This is same as `buf.iter().position(|&x| x != c1 && x != c2 && x != c3 && x != c4)`, not included libc.
-pub fn memnechr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
-    let needle = B1Qpl::new(c1, c2, c3, c4);
+/// This is same as `buf.iter().position(|&x| x != by1 && x != by2 && x != by3 && x != by4)`, not included libc.
+pub fn memnechr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(by1, by2, by3, by4);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
@@ -301,9 +301,9 @@ pub fn memnechr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize>
     r
 }
 
-/// This is same as `buf.iter().rposition(|&x| x != c1 && x != c2 && x != c3 && x != c4)`, not included libc.
-pub fn memrnechr_qpl(buf: &[u8], c1: u8, c2: u8, c3: u8, c4: u8) -> Option<usize> {
-    let needle = B1Qpl::new(c1, c2, c3, c4);
+/// This is same as `buf.iter().rposition(|&x| x != by1 && x != by2 && x != by3 && x != by4)`, not included libc.
+pub fn memrnechr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Option<usize> {
+    let needle = B1Qpl::new(by1, by2, by3, by4);
     #[rustfmt::skip]
     #[cfg(not(feature = "test_pointer_width"))]
     let r = {
