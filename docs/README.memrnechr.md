@@ -6,37 +6,37 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |   11.736 µs |   20.988 µs |   12.079 µs |   20.984 µs |
-| memx_memrnechr          |    5.470 µs |    6.133 µs |    5.384 µs |    6.019 µs |
-| memx_memrnechr_basic    |    7.273 µs |    9.294 µs |    7.279 µs |    9.235 µs |
-| memx_memrnechr_sse2     |    5.136 µs |    6.156 µs |    5.164 µs |    5.955 µs |
-| memx_memnechr_avx2      |    5.465 µs |    6.092 µs |    5.364 µs |    5.948 µs |
+| std_memrnechr           |   11.176 µs |   21.297 µs |   11.475 µs |   22.406 µs |
+| memx_memrnechr          |    5.391 µs |    6.047 µs |    5.324 µs |    6.017 µs |
+| memx_memrnechr_basic    |    7.300 µs |    9.291 µs |    7.298 µs |    9.207 µs |
+| memx_memrnechr_sse2     |    5.452 µs |    6.551 µs |    5.487 µs |    6.415 µs |
+| memx_memnechr_avx2      |    5.392 µs |    6.035 µs |    5.332 µs |    6.035 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |   30.420 µs |   50.169 µs |   30.908 µs |   50.274 µs |
-| memx_memrnechr          |   14.408 µs |   17.331 µs |   14.768 µs |   17.581 µs |
-| memx_memrnechr_basic    |   15.777 µs |   21.284 µs |   15.910 µs |   21.364 µs |
-| memx_memrnechr_sse2     |   11.785 µs |   14.065 µs |   12.176 µs |   13.902 µs |
+| std_memrnechr           |   30.069 µs |   49.447 µs |   30.156 µs |   49.418 µs |
+| memx_memrnechr          |   14.395 µs |   17.757 µs |   15.087 µs |   17.696 µs |
+| memx_memrnechr_basic    |   15.724 µs |   21.179 µs |   15.703 µs |   21.155 µs |
+| memx_memrnechr_sse2     |   12.121 µs |   14.517 µs |   12.350 µs |   13.881 µs |
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |   28.994 µs |   46.539 µs |   28.323 µs |   45.172 µs |
-| memx_memrnechr          |   20.462 µs |   22.528 µs |   20.289 µs |   22.389 µs |
-| memx_memrnechr_basic    |   18.335 µs |   28.187 µs |   19.382 µs |   28.669 µs |
-| memx_memrnechr_sse2     |   16.334 µs |   18.321 µs |   16.787 µs |   18.131 µs |
+| std_memrnechr           |   28.474 µs |   45.121 µs |   28.309 µs |   45.172 µs |
+| memx_memrnechr          |   20.734 µs |   24.071 µs |   21.683 µs |   23.816 µs |
+| memx_memrnechr_basic    |   21.401 µs |   33.238 µs |   19.872 µs |   31.356 µs |
+| memx_memrnechr_sse2     |   17.130 µs |   18.543 µs |   18.597 µs |   20.931 µs |
 
   3. i586-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrnechr           |   28.819 µs |   45.024 µs |   29.062 µs |   45.937 µs |
-| memx_memrnechr          |   20.007 µs |   22.472 µs |   20.350 µs |   22.000 µs |
-| memx_memrnechr_basic    |   19.959 µs |   26.738 µs |   25.001 µs |   33.454 µs |
+| std_memrnechr           |   28.098 µs |   44.993 µs |   28.675 µs |   45.074 µs |
+| memx_memrnechr          |   21.418 µs |   25.527 µs |   22.279 µs |   24.495 µs |
+| memx_memrnechr_basic    |   19.648 µs |   31.352 µs |   20.093 µs |   31.326 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)

@@ -6,42 +6,42 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr_dbl          |   14.953 µs |   23.831 µs |   12.353 µs |   21.933 µs |
-| memchr_memchr_dbl       |    7.164 µs |    7.726 µs |    7.069 µs |    7.638 µs |
-| memx_memchr_dbl         |    5.931 µs |    6.626 µs |    5.692 µs |    6.546 µs |
-| memx_memchr_w_basic     |    8.969 µs |   11.638 µs |    8.703 µs |   11.371 µs |
-| memx_memchr_w_sse2      |    5.840 µs |    6.927 µs |    5.829 µs |    7.166 µs |
-| memx_memchr_w_avx2      |    5.965 µs |    6.658 µs |    5.712 µs |    6.604 µs |
+| std_memchr_dbl          |   13.231 µs |   23.129 µs |   12.698 µs |   23.043 µs |
+| memchr_memchr_dbl       |    6.756 µs |    7.663 µs |    6.923 µs |    7.672 µs |
+| memx_memchr_dbl         |    5.800 µs |    6.676 µs |    5.721 µs |    6.625 µs |
+| memx_memchr_w_basic     |    8.828 µs |   12.158 µs |    9.004 µs |   11.964 µs |
+| memx_memchr_w_sse2      |    5.925 µs |    7.024 µs |    5.946 µs |    7.266 µs |
+| memx_memchr_w_avx2      |    5.778 µs |    6.691 µs |    5.739 µs |    6.621 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr_dbl          |   34.409 µs |   54.482 µs |   34.745 µs |   54.408 µs |
-| memchr_memchr_dbl       |   23.178 µs |   27.314 µs |   23.239 µs |   28.868 µs |
-| memx_memchr_dbl         |   20.278 µs |   22.184 µs |   20.240 µs |   22.553 µs |
-| memx_memchr_w_basic     |   21.655 µs |   27.728 µs |   20.755 µs |   27.152 µs |
-| memx_memchr_w_sse2      |   19.062 µs |   20.899 µs |   18.815 µs |   21.298 µs |
+| std_memchr_dbl          |   34.396 µs |   53.992 µs |   34.464 µs |   53.938 µs |
+| memchr_memchr_dbl       |   21.987 µs |   26.918 µs |   21.827 µs |   28.187 µs |
+| memx_memchr_dbl         |   20.219 µs |   22.363 µs |   19.761 µs |   22.715 µs |
+| memx_memchr_w_basic     |   19.011 µs |   26.527 µs |   18.748 µs |   26.157 µs |
+| memx_memchr_w_sse2      |   17.967 µs |   21.484 µs |   17.164 µs |   21.686 µs |
 
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr_dbl          |   35.732 µs |   55.339 µs |   34.646 µs |   54.306 µs |
-| memchr_memchr_dbl       |   40.797 µs |   54.585 µs |   41.978 µs |   59.012 µs |
-| memx_memchr_dbl         |   27.747 µs |   30.255 µs |   27.353 µs |   30.381 µs |
-| memx_memchr_w_basic     |   29.607 µs |   42.060 µs |   34.127 µs |   47.317 µs |
-| memx_memchr_w_sse2      |   26.684 µs |   29.809 µs |   27.312 µs |   29.762 µs |
+| std_memchr_dbl          |   35.572 µs |   55.636 µs |   34.767 µs |   54.448 µs |
+| memchr_memchr_dbl       |   42.535 µs |   53.605 µs |   43.199 µs |   58.502 µs |
+| memx_memchr_dbl         |   27.938 µs |   30.111 µs |   27.781 µs |   30.450 µs |
+| memx_memchr_w_basic     |   29.839 µs |   46.138 µs |   30.601 µs |   47.155 µs |
+| memx_memchr_w_sse2      |   26.037 µs |   30.374 µs |   25.971 µs |   28.993 µs |
 
   3. i586-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memchr_double       |   36.064 µs |   55.808 µs |   36.684 µs |   55.895 µs |
-| memchr_memchr_double    |   41.566 µs |   54.063 µs |   42.801 µs |   59.753 µs |
-| memx_memchr_double      |   26.923 µs |   29.856 µs |   27.612 µs |   30.080 µs |
-| memx_memchr_w_basic     |   32.582 µs |   45.734 µs |   35.367 µs |   50.109 µs |
+| std_memchr_dbl          |   36.138 µs |   56.384 µs |   36.677 µs |   55.752 µs |
+| memchr_memchr_dbl       |   41.318 µs |   52.430 µs |   43.244 µs |   58.727 µs |
+| memx_memchr_dbl         |   28.890 µs |   31.068 µs |   29.227 µs |   31.480 µs |
+| memx_memchr_w_basic     |   31.274 µs |   47.041 µs |   34.523 µs |   50.888 µs |
 
 - `µs` is micro seconds
 - `:en` is english haystack or short length.
