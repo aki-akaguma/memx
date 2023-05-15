@@ -6,45 +6,45 @@
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |   11.762 µs |   20.752 µs |   10.808 µs |   20.020 µs |
-| libc_memrchr            |    5.322 µs |    6.240 µs |   10.844 µs |   20.322 µs |
-| memchr_memrchr          |    5.187 µs |    6.307 µs |    5.100 µs |    6.277 µs |
-| memx_memrchr            |    4.920 µs |    5.659 µs |    4.824 µs |    5.700 µs |
-| memx_memrchr_basic      |    5.521 µs |    7.271 µs |    5.509 µs |    7.374 µs |
-| memx_memrchr_sse2       |    4.861 µs |    5.800 µs |    4.917 µs |    5.873 µs |
-| memx_memrchr_avx2       |    4.904 µs |    5.659 µs |    4.813 µs |    5.680 µs |
+| std_memrchr             |   11.274 µs |   20.522 µs |   11.130 µs |   20.152 µs |
+| libc_memrchr            |    5.332 µs |    6.276 µs |   10.804 µs |   19.944 µs |
+| memchr_memrchr          |    5.186 µs |    6.308 µs |    5.106 µs |    6.269 µs |
+| memx_memrchr            |    4.903 µs |    5.549 µs |    4.825 µs |    5.543 µs |
+| memx_memrchr_basic      |    6.495 µs |    8.680 µs |    6.507 µs |    8.669 µs |
+| memx_memrchr_sse2       |    5.255 µs |    6.263 µs |    5.240 µs |    6.225 µs |
+| memx_memrchr_avx2       |    4.904 µs |    5.561 µs |    4.821 µs |    5.532 µs |
 
   1. x86_64-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |   29.294 µs |   48.673 µs |   28.776 µs |   48.873 µs |
-| libc_memrchr            |   13.740 µs |   16.472 µs |   33.519 µs |   54.810 µs |
-| memchr_memrchr          |   16.606 µs |   20.771 µs |   16.574 µs |   20.639 µs |
-| memx_memrchr            |   14.229 µs |   16.966 µs |   14.193 µs |   16.868 µs |
-| memx_memrchr_basic      |   14.466 µs |   19.349 µs |   15.023 µs |   19.872 µs |
-| memx_memrchr_sse2       |   12.356 µs |   13.795 µs |   12.209 µs |   13.597 µs |
+| std_memrchr             |   29.111 µs |   47.890 µs |   28.226 µs |   47.997 µs |
+| libc_memrchr            |   13.660 µs |   16.161 µs |   32.948 µs |   53.964 µs |
+| memchr_memrchr          |   16.227 µs |   20.514 µs |   16.234 µs |   20.053 µs |
+| memx_memrchr            |   14.435 µs |   17.287 µs |   14.507 µs |   17.637 µs |
+| memx_memrchr_basic      |   15.310 µs |   22.185 µs |   15.135 µs |   21.245 µs |
+| memx_memrchr_sse2       |   11.647 µs |   13.745 µs |   12.733 µs |   14.284 µs |
 
   2. i686-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |   25.667 µs |   42.307 µs |   26.619 µs |   42.018 µs |
-| libc_memrchr            |   15.993 µs |   18.780 µs |   31.562 µs |   46.676 µs |
-| memchr_memrchr          |   24.886 µs |   33.885 µs |   26.656 µs |   35.722 µs |
-| memx_memrchr            |   20.495 µs |   22.631 µs |   19.691 µs |   22.687 µs |
-| memx_memrchr_basic      |   16.306 µs |   24.632 µs |   19.850 µs |   28.380 µs |
-| memx_memrchr_sse2       |   16.818 µs |   17.510 µs |   15.582 µs |   17.984 µs |
+| std_memrchr             |   26.110 µs |   42.332 µs |   26.344 µs |   42.584 µs |
+| libc_memrchr            |   16.111 µs |   19.111 µs |   31.867 µs |   47.544 µs |
+| memchr_memrchr          |   24.125 µs |   32.402 µs |   26.120 µs |   34.935 µs |
+| memx_memrchr            |   19.841 µs |   23.663 µs |   21.598 µs |   24.846 µs |
+| memx_memrchr_basic      |   20.308 µs |   32.906 µs |   20.891 µs |   34.362 µs |
+| memx_memrchr_sse2       |   16.313 µs |   18.964 µs |   17.675 µs |   19.049 µs |
 
   3. i586-unknown-linux- @Q6600:
 
 |         `name`          |  `gnu:en`   |  `gnu:ja`   |  `musl:en`  |  `musl:ja`  |
 |:------------------------|------------:|------------:|------------:|------------:|
-| std_memrchr             |   26.129 µs |   42.214 µs |   26.333 µs |   42.881 µs |
-| libc_memrchr            |   16.025 µs |   18.447 µs |   31.258 µs |   46.567 µs |
-| memchr_memrchr          |   26.816 µs |   36.011 µs |   26.764 µs |   35.891 µs |
-| memx_memrchr            |   19.601 µs |   21.783 µs |   19.910 µs |   22.346 µs |
-| memx_memrchr_basic      |   21.053 µs |   31.155 µs |   26.745 µs |   37.206 µs |
+| std_memrchr             |   26.118 µs |   42.126 µs |   26.218 µs |   42.019 µs |
+| libc_memrchr            |   16.298 µs |   19.065 µs |   30.441 µs |   45.702 µs |
+| memchr_memrchr          |   26.686 µs |   36.143 µs |   26.542 µs |   36.065 µs |
+| memx_memrchr            |   20.654 µs |   23.185 µs |   20.945 µs |   24.220 µs |
+| memx_memrchr_basic      |   20.719 µs |   33.980 µs |   20.437 µs |   34.758 µs |
 
 
 - compile by rustc 1.53.0 (53cb7b09b 2021-06-17)

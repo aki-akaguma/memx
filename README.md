@@ -42,14 +42,19 @@ Failed lists:
 
 # Benchmark results
 
-| forward search   | backward search   |
-|:-----------------|:------------------|
-| [`memchr()`]     | [`memrchr()`]     |
-| [`memnechr()`]   | [`memrnechr()`]   |
-| [`memmem()`]     | [`memrmem()`]     |
-| [`memchr_dbl()`] | [`memrchr_dbl()`] |
-| [`memchr_tpl()`] | [`memrchr_tpl()`] |
-| [`memchr_qpl()`] | [`memrchr_qpl()`] |
+| forward search     | backward search     |
+|:-------------------|:--------------------|
+| [`memchr()`]       | [`memrchr()`]       |
+| [`memnechr()`]     | [`memrnechr()`]     |
+| [`memmem()`]       | [`memrmem()`]       |
+|                    |                     |
+| [`memchr_dbl()`]   | [`memrchr_dbl()`]   |
+| [`memchr_tpl()`]   | [`memrchr_tpl()`]   |
+| [`memchr_qpl()`]   | [`memrchr_qpl()`]   |
+|                    |                     |
+| [`memnechr_dbl()`] | [`memrnechr_dbl()`] |
+| [`memnechr_tpl()`] | [`memrnechr_tpl()`] |
+| [`memnechr_qpl()`] | [`memrnechr_qpl()`] |
 
 | memory op      |
 |:---------------|
@@ -68,12 +73,20 @@ Failed lists:
 [`memrmem()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrmem.md
 [`memrnechr()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr.md
 [`memset()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memset.md
+
 [`memchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_dbl.md
 [`memrchr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_dbl.md
 [`memchr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_tpl.md
 [`memrchr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_tpl.md
 [`memchr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memchr_qpl.md
 [`memrchr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrchr_qpl.md
+
+[`memnechr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memnechr_dbl.md
+[`memrnechr_dbl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr_dbl.md
+[`memnechr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memnechr_tpl.md
+[`memrnechr_tpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr_tpl.md
+[`memnechr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memnechr_qpl.md
+[`memrnechr_qpl()`]: https://github.com/aki-akaguma/memx/blob/main/docs/README.memrnechr_qpl.md
 
 # Changelogs
 
