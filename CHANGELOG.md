@@ -5,18 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] *
+## [Unreleased]
+
+
+## [0.1.30] (2023-05-15)
 ### Added
 * `memchr_tpl()`, `memrchr_tpl()`, `memchr_qpl()`, `memrchr_qpl()`
+* `memnechr_tpl()`, `memrnechr_tpl()`, `memnechr_qpl()`, `memrnechr_qpl()`
 
 ### Changed
 * update depends: `regex(=1.7)`
 * rename: `memchr_double()` to `memchr_dbl()`
-* refactoring source code: remove unroll loop macro and fine tune
+* refactoring source codes
+* many fine tunes
 
 ### Removed
 * remove depends: `rustc_version`
-
 
 ## [0.1.29] (2023-04-06)
 ### Added
@@ -270,7 +274,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] (2021-05-12)
 * first commit
 
-[Unreleased]: https://github.com/aki-akaguma/memx/compare/v0.1.29..HEAD
+[Unreleased]: https://github.com/aki-akaguma/memx/compare/v0.1.30..HEAD
+[0.1.30]: https://github.com/aki-akaguma/memx/compare/v0.1.29..v0.1.30
 [0.1.29]: https://github.com/aki-akaguma/memx/compare/v0.1.28..v0.1.29
 [0.1.28]: https://github.com/aki-akaguma/memx/compare/v0.1.27..v0.1.28
 [0.1.27]: https://github.com/aki-akaguma/memx/compare/v0.1.26..v0.1.27
