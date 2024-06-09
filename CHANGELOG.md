@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * clippy: clippy::unnecessary_cast
+* clippy: clippy::useless_vec
 
 
 ## [0.1.30] (2023-05-15)

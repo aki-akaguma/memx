@@ -78,7 +78,7 @@ fn test01() {
 #[test]
 fn test02() {
     let buf_g = vec![b'g'];
-    let buf_0 = vec![0_u8];
+    let buf_0 = [0_u8];
     let f = |x: usize| {
         let buf = {
             let mut buf: Vec<u8> = buf_g.clone();
