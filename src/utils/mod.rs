@@ -1,4 +1,5 @@
 #[cfg(feature = "test")]
+#[allow(unused_imports)]
 use core::convert::TryInto;
 
 pub trait PtrOpsPrefetch {
@@ -41,6 +42,7 @@ impl PtrOpsPrefetch for *mut u8 {
     }
 }
 
+#[allow(dead_code)]
 pub trait PtrOps {
     fn is_aligned_u256(&self) -> bool;
     fn is_aligned_u128(&self) -> bool;
@@ -225,6 +227,7 @@ where
 */
 
 /// bitwidth operations
+#[allow(dead_code)]
 pub(crate) trait BitOrt {
     fn is_zeros(&self) -> bool;
     fn is_highs(&self) -> bool;
