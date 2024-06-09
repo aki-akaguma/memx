@@ -515,7 +515,7 @@ fn _set_c2_aa_x1(buf_ptr: *mut u8, c2: B2Sgl) {
 
 #[inline(always)]
 fn _set_c1_aa_x1(buf_ptr: *mut u8, c1: B1Sgl) {
-    let aa_ptr = buf_ptr as *mut u8;
+    let aa_ptr = buf_ptr;
     unsafe { aa_ptr.write(c1.v1) };
 }
 

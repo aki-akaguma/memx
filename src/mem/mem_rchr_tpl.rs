@@ -669,7 +669,7 @@ fn _rchr_tpl_c2_aa_x1(buf_ptr: *const u8, c2: B2Tpl, st_ptr: *const u8) -> Optio
 
 #[inline(always)]
 fn _rchr_tpl_c1_aa_x1(buf_ptr: *const u8, c1: B1Tpl, st_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u8;
+    let aa_ptr = buf_ptr;
     let aac = unsafe { *aa_ptr };
     if aac == c1.v1 || aac == c1.v2 || aac == c1.v3 {
         Some(buf_ptr.usz_offset_from(st_ptr))

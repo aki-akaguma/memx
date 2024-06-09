@@ -673,7 +673,7 @@ fn _nechr_c2_aa_x1(buf_ptr: *const u8, c2: B2Sgl, st_ptr: *const u8) -> Option<u
 
 #[inline(always)]
 fn _nechr_c1_aa_x1(buf_ptr: *const u8, c1: B1Sgl, st_ptr: *const u8) -> Option<usize> {
-    let aa_ptr = buf_ptr as *const u8;
+    let aa_ptr = buf_ptr;
     let aac = unsafe { *aa_ptr };
     if aac != c1.v1 {
         Some(buf_ptr.usz_offset_from(st_ptr))

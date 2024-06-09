@@ -1,4 +1,4 @@
-#[cfg(features = "test")]
+#[cfg(feature = "test")]
 use core::convert::TryInto;
 
 pub trait PtrOpsPrefetch {
