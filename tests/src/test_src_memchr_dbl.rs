@@ -7,7 +7,7 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let mut vv = vec![b'g', b'Z'];
+    let mut vv = [b'g', b'Z'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
@@ -15,7 +15,7 @@ fn test00() {
     }
     //
     let buf = vec![b'a', b'B', b'C'];
-    let mut vv = vec![b'a', b'Z'];
+    let mut vv = [b'a', b'Z'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
@@ -23,7 +23,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'b', b'C'];
-    let mut vv = vec![b'b', b'Z'];
+    let mut vv = [b'b', b'Z'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
@@ -31,7 +31,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'B', b'c'];
-    let mut vv = vec![b'c', b'Z'];
+    let mut vv = [b'c', b'Z'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
@@ -52,14 +52,14 @@ fn test01() {
         b'Y', b'Z'
     ];
     //
-    let mut vv = vec![b'j', b'K'];
+    let mut vv = [b'j', b'K'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = vec![b'j', b'k'];
+    let mut vv = [b'j', b'k'];
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memchr_dbl(&buf, vv[0], vv[1]);
@@ -69,7 +69,7 @@ fn test01() {
 #[test]
 fn test02() {
     let buf_a = vec![b'x'];
-    let buf_0 = vec![0_u8];
+    let buf_0 = [0_u8];
     let f = |x: usize| {
         let buf = {
             let mut buf: Vec<u8> = buf_a.clone();

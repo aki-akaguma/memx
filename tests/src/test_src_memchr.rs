@@ -7,22 +7,22 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let vv = vec![b'g'];
+    let vv = [b'g'];
     let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(1));
     //
     let buf = vec![b'a', b'B', b'C'];
-    let vv = vec![b'a'];
+    let vv = [b'a'];
     let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(0));
     //
     let buf = vec![b'A', b'b', b'C'];
-    let vv = vec![b'b'];
+    let vv = [b'b'];
     let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(1));
     //
     let buf = vec![b'A', b'B', b'c'];
-    let vv = vec![b'c'];
+    let vv = [b'c'];
     let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(2));
     //
@@ -40,14 +40,14 @@ fn test01() {
         b'Y', b'Z'
     ];
     //
-    let vv = vec![b'j'];
+    let vv = [b'j'];
     let r = test_memchr(&buf, vv[0]);
     assert_eq!(r, Some(9));
 }
 #[test]
 fn test02() {
     let buf_a = vec![b'a'];
-    let buf_0 = vec![0_u8];
+    let buf_0 = [0_u8];
     let f = |x: usize| {
         let buf = {
             let mut buf: Vec<u8> = buf_a.clone();

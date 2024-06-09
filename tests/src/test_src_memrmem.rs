@@ -51,7 +51,7 @@ fn test01() {
 }
 #[test]
 fn test02() {
-    let buf_0 = vec![0_u8];
+    let buf_0 = [0_u8];
     let pat = vec![b'g', b'h', b'j'];
     let f = |x: usize| {
         let buf = {

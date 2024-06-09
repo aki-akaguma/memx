@@ -11,7 +11,7 @@ fn test00() {
 #[test]
 fn test01() {
     let mut dst = vec![b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0', b'0'];
-    let src = vec![b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A'];
+    let src = [b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A', b'A'];
     //
     let dst_sl = dst.as_mut_slice();
     //
@@ -20,8 +20,8 @@ fn test01() {
 }
 #[test]
 fn test02() {
-    let dst_0 = vec![0_u8];
-    let src_0 = vec![b'1'];
+    let dst_0 = [0_u8];
+    let src_0 = [b'1'];
     let f = |x: usize| {
         let mut dst: Vec<u8> = dst_0.repeat(x + 1 + x + 16);
         let src: Vec<u8> = src_0.repeat(1 + x);
