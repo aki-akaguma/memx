@@ -13,7 +13,7 @@ test:
 	cargo test --offline --features test_pointer_width_128 $(TEST_THR)
 	cargo test --offline --features test_pointer_width_64 $(TEST_THR)
 	cargo test --offline --features test_pointer_width_32 $(TEST_THR)
-	cargo test --offline --features test_alignment_check $(TEST_THR)
+#	cargo test --offline --features test_alignment_check $(TEST_THR)
 
 AC_TESTS=--test memeq
 AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test memcmp --test memeq --test memcpy --test memset --test memchr_dbl --test memrchr_dbl --test memchr_tpl --test memrchr_tpl --test memchr_qpl --test memrchr_qpl --test memnechr_dbl --test memrnechr_dbl --test memnechr_tpl --test memrnechr_tpl --test memnechr_qpl --test memrnechr_qpl
