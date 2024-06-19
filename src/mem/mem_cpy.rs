@@ -12,32 +12,20 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         return Err(RangeError);
     }
     #[cfg(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     ))]
     {
-        #[cfg(feature = "test_pointer_width_128")]
-        _start_cpy_128(dst, src);
         #[cfg(feature = "test_pointer_width_64")]
         _start_cpy_64(dst, src);
         #[cfg(feature = "test_pointer_width_32")]
         _start_cpy_32(dst, src);
     }
     #[cfg(not(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     )))]
     {
-        #[cfg(target_pointer_width = "128")]
-        _start_cpy_128(dst, src);
         #[cfg(target_pointer_width = "64")]
         _start_cpy_64(dst, src);
         #[cfg(target_pointer_width = "32")]
@@ -821,8 +809,6 @@ mod disasm {
         let a = a.as_mut_slice();
         let b = b.as_slice();
         assert_eq!(do_proc_basic(a, b), Ok(()));
-        #[cfg(target_pointer_width = "128")]
-        do_proc_128(a, b);
         #[cfg(target_pointer_width = "64")]
         do_proc_64(a, b);
         #[cfg(target_pointer_width = "32")]
@@ -830,10 +816,6 @@ mod disasm {
     }
     fn do_proc_basic(a: &mut [u8], b: &[u8]) -> Result<(), RangeError> {
         _memcpy_impl(a, b)
-    }
-    #[cfg(target_pointer_width = "128")]
-    fn do_proc_128(a: &mut [u8], b: &[u8]) {
-        _start_cpy_128(a, b)
     }
     #[cfg(target_pointer_width = "64")]
     fn do_proc_64(a: &mut [u8], b: &[u8]) {

@@ -3,16 +3,10 @@ use crate::utils::*;
 #[inline(never)]
 pub fn _memrnechr_sgl_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
     #[cfg(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     ))]
     {
-        #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_rnechr_128(buf, needle);
         #[cfg(feature = "test_pointer_width_64")]
         let r = _start_rnechr_64(buf, needle);
         #[cfg(feature = "test_pointer_width_32")]
@@ -21,16 +15,10 @@ pub fn _memrnechr_sgl_impl(buf: &[u8], needle: B1Sgl) -> Option<usize> {
         r
     }
     #[cfg(not(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     )))]
     {
-        #[cfg(target_pointer_width = "128")]
-        let r = _start_rnechr_128(buf, needle);
         #[cfg(target_pointer_width = "64")]
         let r = _start_rnechr_64(buf, needle);
         #[cfg(target_pointer_width = "32")]
@@ -139,83 +127,6 @@ fn _rnechr_sgl_to_aligned_u32(
         _unroll_one_rnechr_to_align_x4!(buf_ptr_2, buf_ptr_min, c, start_ptr);
     }
     (Some(buf_ptr_min), None)
-}
-
-#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
-#[inline(always)]
-fn _start_rnechr_128(buf: &[u8], needle: B1Sgl) -> Option<usize> {
-    let buf_len = buf.len();
-    let start_ptr = buf.as_ptr();
-    let mut buf_ptr = unsafe { start_ptr.add(buf_len) };
-    let cc: B16Sgl = needle.into();
-    //
-    if buf_len >= 16 {
-        // to a aligned pointer
-        {
-            if !buf_ptr.is_aligned_u128() {
-                let r = _rnechr_sgl_to_aligned_u128(buf_ptr, needle, start_ptr);
-                if let Some(p) = r.0 {
-                    buf_ptr = p;
-                } else if let Some(v) = r.1 {
-                    return Some(v);
-                }
-            }
-        }
-        // the loop
-        /*
-        {
-            let unroll = 8;
-            let loop_size = 16;
-            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                buf_ptr.prefetch_read_data();
-                let r = _rnechr_c16_aa_x8(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-            }
-        }
-        */
-        {
-            let unroll = 4;
-            let loop_size = 16;
-            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                //buf_ptr.prefetch_read_data();
-                let r = _rnechr_c16_aa_x4(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-            }
-        }
-        /*
-        {
-            let unroll = 2;
-            let loop_size = 16;
-            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                buf_ptr.prefetch_read_data();
-                let r = _rnechr_c16_aa_x2(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 16;
-            while buf_ptr.is_not_under(start_ptr, loop_size * unroll) {
-                buf_ptr = unsafe { buf_ptr.sub(loop_size * unroll) };
-                let r = _rnechr_c16_aa_x1(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-            }
-        }
-    }
-    // the remaining data is the max: 15 bytes.
-    _memrnechr_sgl_remaining_15_bytes_impl(buf_ptr, cc.into(), start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]

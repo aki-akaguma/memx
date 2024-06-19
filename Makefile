@@ -10,7 +10,6 @@ TEST_THR=-- --test-threads=1
 TEST_THR=
 test:
 	cargo test --offline --features test $(TEST_THR)
-	cargo test --offline --features test_pointer_width_128 $(TEST_THR)
 	cargo test --offline --features test_pointer_width_64 $(TEST_THR)
 	cargo test --offline --features test_pointer_width_32 $(TEST_THR)
 #	cargo test --offline --features test_alignment_check $(TEST_THR)
@@ -20,7 +19,6 @@ AC_TESTS=--test memchr --test memrchr --test memnechr --test memrnechr --test me
 
 test-alignment-check:
 	cargo test --offline --features test_alignment_check $(AC_TESTS)
-	cargo test --offline --features test_alignment_check,test_pointer_width_128 $(AC_TESTS)
 	cargo test --offline --features test_alignment_check,test_pointer_width_64 $(AC_TESTS)
 	cargo test --offline --features test_alignment_check,test_pointer_width_32 $(AC_TESTS)
 

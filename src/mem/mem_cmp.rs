@@ -4,16 +4,10 @@ use core::cmp::Ordering;
 #[inline(never)]
 pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
     #[cfg(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     ))]
     {
-        #[cfg(feature = "test_pointer_width_128")]
-        let r = _start_cmp_128(a, b);
         #[cfg(feature = "test_pointer_width_64")]
         let r = _start_cmp_64(a, b);
         #[cfg(feature = "test_pointer_width_32")]
@@ -22,16 +16,10 @@ pub fn _memcmp_impl(a: &[u8], b: &[u8]) -> Ordering {
         r
     }
     #[cfg(not(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     )))]
     {
-        #[cfg(target_pointer_width = "128")]
-        let r = _start_cmp_128(a, b);
         #[cfg(target_pointer_width = "64")]
         let r = _start_cmp_64(a, b);
         #[cfg(target_pointer_width = "32")]
@@ -920,8 +908,6 @@ mod disasm {
         let a = a.as_slice();
         let b = b.as_slice();
         assert_eq!(do_proc_basic(a, b), Ordering::Equal);
-        #[cfg(target_pointer_width = "128")]
-        assert_eq!(do_proc_128(a, b), Ordering::Equal);
         #[cfg(target_pointer_width = "64")]
         assert_eq!(do_proc_64(a, b), Ordering::Equal);
         #[cfg(target_pointer_width = "32")]
@@ -929,10 +915,6 @@ mod disasm {
     }
     fn do_proc_basic(a: &[u8], b: &[u8]) -> Ordering {
         _memcmp_impl(a, b)
-    }
-    #[cfg(target_pointer_width = "128")]
-    fn do_proc_128(a: &[u8], b: &[u8]) -> Ordering {
-        _start_cmp_128(a, b)
     }
     #[cfg(target_pointer_width = "64")]
     fn do_proc_64(a: &[u8], b: &[u8]) -> Ordering {

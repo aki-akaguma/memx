@@ -150,6 +150,7 @@ fn _output(bench_vec: Vec<BenchStr>) -> anyhow::Result<()> {
 }
 
 #[rustfmt::skip]
+#[allow(dead_code)]
 #[derive(Default)]
 pub struct BenchStr {
     pub name: String,   // name
