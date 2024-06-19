@@ -3,32 +3,20 @@ use crate::utils::*;
 #[inline(never)]
 pub fn _memset_impl(buf: &mut [u8], c1: u8) {
     #[cfg(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     ))]
     {
-        #[cfg(feature = "test_pointer_width_128")]
-        _start_set_128(buf, c1);
         #[cfg(feature = "test_pointer_width_64")]
         _start_set_64(buf, c1);
         #[cfg(feature = "test_pointer_width_32")]
         _start_set_32(buf, c1);
     }
     #[cfg(not(all(
-        any(feature = "test", tarpaulin),
-        any(
-            feature = "test_pointer_width_128",
-            feature = "test_pointer_width_64",
-            feature = "test_pointer_width_32"
-        )
+        feature = "test",
+        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
     )))]
     {
-        #[cfg(target_pointer_width = "128")]
-        _start_set_128(buf, c1);
         #[cfg(target_pointer_width = "64")]
         _start_set_64(buf, c1);
         #[cfg(target_pointer_width = "32")]

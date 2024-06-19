@@ -18,7 +18,6 @@ default = []
 test = []
 
 test_pointer_width = ["test"]
-test_pointer_width_128 = ["test_pointer_width"]
 test_pointer_width_64 = ["test_pointer_width"]
 test_pointer_width_32 = ["test_pointer_width"]
 
