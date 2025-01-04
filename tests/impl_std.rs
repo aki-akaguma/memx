@@ -162,7 +162,7 @@ pub struct StdMemchrSglIter<'a> {
     needle1: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemchrSglIter<'a> {
+impl StdMemchrSglIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8) -> StdMemchrSglIter {
@@ -173,7 +173,7 @@ impl<'a> StdMemchrSglIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemchrSglIter<'a> {
+impl Iterator for StdMemchrSglIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -197,7 +197,7 @@ impl<'a> Iterator for StdMemchrSglIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemchrSglIter<'a> {
+impl DoubleEndedIterator for StdMemchrSglIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {
@@ -221,7 +221,7 @@ pub struct StdMemrchrSglIter<'a> {
     needle1: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemrchrSglIter<'a> {
+impl StdMemrchrSglIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8) -> StdMemrchrSglIter {
@@ -232,7 +232,7 @@ impl<'a> StdMemrchrSglIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemrchrSglIter<'a> {
+impl Iterator for StdMemrchrSglIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -255,7 +255,7 @@ impl<'a> Iterator for StdMemrchrSglIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemrchrSglIter<'a> {
+impl DoubleEndedIterator for StdMemrchrSglIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
@@ -281,7 +281,7 @@ pub struct StdMemchrDblIter<'a> {
     needle2: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemchrDblIter<'a> {
+impl StdMemchrDblIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemchrDblIter {
@@ -293,7 +293,7 @@ impl<'a> StdMemchrDblIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemchrDblIter<'a> {
+impl Iterator for StdMemchrDblIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -317,7 +317,7 @@ impl<'a> Iterator for StdMemchrDblIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemchrDblIter<'a> {
+impl DoubleEndedIterator for StdMemchrDblIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {
@@ -346,7 +346,7 @@ pub struct StdMemrchrDblIter<'a> {
     needle2: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemrchrDblIter<'a> {
+impl StdMemrchrDblIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemrchrDblIter {
@@ -358,7 +358,7 @@ impl<'a> StdMemrchrDblIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemrchrDblIter<'a> {
+impl Iterator for StdMemrchrDblIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -385,7 +385,7 @@ impl<'a> Iterator for StdMemrchrDblIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemrchrDblIter<'a> {
+impl DoubleEndedIterator for StdMemrchrDblIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
@@ -412,7 +412,7 @@ pub struct StdMemchrTplIter<'a> {
     needle3: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemchrTplIter<'a> {
+impl StdMemchrTplIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter {
@@ -425,7 +425,7 @@ impl<'a> StdMemchrTplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemchrTplIter<'a> {
+impl Iterator for StdMemchrTplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -454,7 +454,7 @@ impl<'a> Iterator for StdMemchrTplIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemchrTplIter<'a> {
+impl DoubleEndedIterator for StdMemchrTplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {
@@ -485,7 +485,7 @@ pub struct StdMemrchrTplIter<'a> {
     needle3: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemrchrTplIter<'a> {
+impl StdMemrchrTplIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter {
@@ -498,7 +498,7 @@ impl<'a> StdMemrchrTplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemrchrTplIter<'a> {
+impl Iterator for StdMemrchrTplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -526,7 +526,7 @@ impl<'a> Iterator for StdMemrchrTplIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemrchrTplIter<'a> {
+impl DoubleEndedIterator for StdMemrchrTplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
@@ -559,7 +559,7 @@ pub struct StdMemchrQplIter<'a> {
     needle4: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemchrQplIter<'a> {
+impl StdMemchrQplIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(
@@ -579,7 +579,7 @@ impl<'a> StdMemchrQplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemchrQplIter<'a> {
+impl Iterator for StdMemchrQplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -609,7 +609,7 @@ impl<'a> Iterator for StdMemchrQplIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemchrQplIter<'a> {
+impl DoubleEndedIterator for StdMemchrQplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {
@@ -642,7 +642,7 @@ pub struct StdMemrchrQplIter<'a> {
     needle4: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> StdMemrchrQplIter<'a> {
+impl StdMemrchrQplIter<'_> {
     #[allow(dead_code)]
     #[inline]
     pub fn new(
@@ -662,7 +662,7 @@ impl<'a> StdMemrchrQplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemrchrQplIter<'a> {
+impl Iterator for StdMemrchrQplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -691,7 +691,7 @@ impl<'a> Iterator for StdMemrchrQplIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemrchrQplIter<'a> {
+impl DoubleEndedIterator for StdMemrchrQplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
@@ -733,7 +733,7 @@ impl<'a> StdMemmemIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemmemIter<'a> {
+impl Iterator for StdMemmemIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -757,7 +757,7 @@ impl<'a> Iterator for StdMemmemIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemmemIter<'a> {
+impl DoubleEndedIterator for StdMemmemIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {
@@ -792,7 +792,7 @@ impl<'a> StdMemrmemIter<'a> {
         }
     }
 }
-impl<'a> Iterator for StdMemrmemIter<'a> {
+impl Iterator for StdMemrmemIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -815,7 +815,7 @@ impl<'a> Iterator for StdMemrmemIter<'a> {
         (0, Some(self.haystack.len()))
     }
 }
-impl<'a> DoubleEndedIterator for StdMemrmemIter<'a> {
+impl DoubleEndedIterator for StdMemrmemIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
