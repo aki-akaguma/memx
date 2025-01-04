@@ -6,19 +6,11 @@ pub fn run(_program: &str, _args: &[&str]) -> anyhow::Result<()> {
     let mut bench_vec_2 = get_bench("z.bench.gnu.ja.1.log")?;
     let mut bench_vec_3 = {
         let r = get_bench("z.bench.musl.en.1.log");
-        if let Ok(a) = r {
-            a
-        } else {
-            Vec::new()
-        }
+        r.unwrap_or_default()
     };
     let mut bench_vec_4 = {
         let r = get_bench("z.bench.musl.ja.1.log");
-        if let Ok(a) = r {
-            a
-        } else {
-            Vec::new()
-        }
+        r.unwrap_or_default()
     };
     //set_size(&mut bench_vec, "z.size-release.curl.log")?;
     bench_vec_2.sort_by(|a, b| a.name.cmp(&b.name));
