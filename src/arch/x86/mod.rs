@@ -91,6 +91,7 @@ mod cpuid {
         //
         #[inline(always)]
         pub fn has_avx2() -> bool {
+            #[allow(static_mut_refs)]
             let val = unsafe { HAS_AVX2_ATOM.load(Ordering::Relaxed) };
             if val != 0 {
                 val > 0
@@ -104,10 +105,16 @@ mod cpuid {
             // after stabilization
             let cpuid_avx2_token: cpuid_avx2::InitToken = cpuid_avx2::init();
             if cpuid_avx2_token.get() {
-                unsafe { HAS_AVX2_ATOM.store(1, Ordering::Relaxed) };
+                #[allow(static_mut_refs)]
+                unsafe {
+                    HAS_AVX2_ATOM.store(1, Ordering::Relaxed)
+                };
                 true
             } else {
-                unsafe { HAS_AVX2_ATOM.store(-1, Ordering::Relaxed) };
+                #[allow(static_mut_refs)]
+                unsafe {
+                    HAS_AVX2_ATOM.store(-1, Ordering::Relaxed)
+                };
                 false
             }
         }

@@ -10,7 +10,7 @@ pub struct MemchrTplIter<'a> {
     needle3: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> MemchrTplIter<'a> {
+impl MemchrTplIter<'_> {
     #[inline]
     pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> MemchrTplIter {
         MemchrTplIter {
@@ -22,7 +22,7 @@ impl<'a> MemchrTplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MemchrTplIter<'a> {
+impl Iterator for MemchrTplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -52,7 +52,7 @@ impl<'a> Iterator for MemchrTplIter<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for MemchrTplIter<'a> {
+impl DoubleEndedIterator for MemchrTplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position == 0 {

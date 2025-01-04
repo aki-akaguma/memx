@@ -17,7 +17,7 @@ pub struct MemrchrQplIter<'a> {
     needle4: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> MemrchrQplIter<'a> {
+impl MemrchrQplIter<'_> {
     #[inline]
     pub fn new(
         haystack: &[u8],
@@ -36,7 +36,7 @@ impl<'a> MemrchrQplIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MemrchrQplIter<'a> {
+impl Iterator for MemrchrQplIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -66,7 +66,7 @@ impl<'a> Iterator for MemrchrQplIter<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for MemrchrQplIter<'a> {
+impl DoubleEndedIterator for MemrchrQplIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {

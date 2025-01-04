@@ -18,7 +18,7 @@ impl<'a> MemrmemIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MemrmemIter<'a> {
+impl Iterator for MemrmemIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -42,7 +42,7 @@ impl<'a> Iterator for MemrmemIter<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for MemrmemIter<'a> {
+impl DoubleEndedIterator for MemrmemIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {

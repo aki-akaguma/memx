@@ -8,7 +8,7 @@ pub struct MemrchrIter<'a> {
     needle: u8,
     position: usize, // 0: idx is -1, 1: idx is 0, 2: idx is 1
 }
-impl<'a> MemrchrIter<'a> {
+impl MemrchrIter<'_> {
     #[inline]
     pub fn new(haystack: &[u8], needle: u8) -> MemrchrIter {
         MemrchrIter {
@@ -18,7 +18,7 @@ impl<'a> MemrchrIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MemrchrIter<'a> {
+impl Iterator for MemrchrIter<'_> {
     type Item = usize;
     #[inline]
     fn next(&mut self) -> Option<usize> {
@@ -42,7 +42,7 @@ impl<'a> Iterator for MemrchrIter<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for MemrchrIter<'a> {
+impl DoubleEndedIterator for MemrchrIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.position > self.haystack.len() {
