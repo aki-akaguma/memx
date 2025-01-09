@@ -8,7 +8,7 @@ keywords = ["memcmp", "memchr", "memmem"]
 categories = ["algorithms"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-rust-version = "1.56.0"
+rust-version = "1.63.0"
 repository = "https://github.com/aki-akaguma/memx"
 
 [features]
@@ -32,10 +32,11 @@ cpufeatures = "0.2"
 rustversion = "1.0"
 cfg-iif = "0.2"
 
+[build-dependencies]
+rustversion = "1.0"
+
 [target.'cfg(any(target_arch = "x86_64", target_arch = "x86"))'.dev-dependencies]
 x86-alignment-check = "0.1"
-
-[build-dependencies]
 
 [workspace]
 members = [
