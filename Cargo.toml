@@ -38,6 +38,9 @@ rustversion = "1.0"
 [target.'cfg(any(target_arch = "x86_64", target_arch = "x86"))'.dev-dependencies]
 x86-alignment-check = "0.1"
 
+[lints.rust]
+unexpected_cfgs = { level="warn", check-cfg = ['cfg(has_not_static_mut_refs)']}
+
 [workspace]
 members = [
     "xtask",
