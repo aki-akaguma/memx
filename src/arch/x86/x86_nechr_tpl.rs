@@ -337,13 +337,15 @@ unsafe fn _nechr_c16_uu_x1(
     mm_c16: MMB16Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
-    let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
-    let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
-    let mm_0_eq_ab = _mm_or_si128(mm_0_eq_a, mm_0_eq_b);
-    let mm_0_eq_abc = _mm_or_si128(mm_0_eq_ab, mm_0_eq_c);
-    let mask_0_abc = _mm_movemask_epi8(mm_0_eq_abc) as u16;
+    let mask_0_abc = unsafe {
+        let mm_0 = _mm_loadu_si128(buf_ptr as *const __m128i);
+        let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
+        let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
+        let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
+        let mm_0_eq_ab = _mm_or_si128(mm_0_eq_a, mm_0_eq_b);
+        let mm_0_eq_abc = _mm_or_si128(mm_0_eq_ab, mm_0_eq_c);
+        _mm_movemask_epi8(mm_0_eq_abc) as u16
+    };
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
     _return_nechr_tpl(base, mask_0_abc)
@@ -355,13 +357,15 @@ unsafe fn _nechr_c16_aa_x1(
     mm_c16: MMB16Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
-    let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
-    let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
-    let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
-    let mm_0_eq_ab = _mm_or_si128(mm_0_eq_a, mm_0_eq_b);
-    let mm_0_eq_abc = _mm_or_si128(mm_0_eq_ab, mm_0_eq_c);
-    let mask_0_abc = _mm_movemask_epi8(mm_0_eq_abc) as u16;
+    let mask_0_abc = unsafe {
+        let mm_0 = _mm_load_si128(buf_ptr as *const __m128i);
+        let mm_0_eq_a = _mm_cmpeq_epi8(mm_0, mm_c16.v1);
+        let mm_0_eq_b = _mm_cmpeq_epi8(mm_0, mm_c16.v2);
+        let mm_0_eq_c = _mm_cmpeq_epi8(mm_0, mm_c16.v3);
+        let mm_0_eq_ab = _mm_or_si128(mm_0_eq_a, mm_0_eq_b);
+        let mm_0_eq_abc = _mm_or_si128(mm_0_eq_ab, mm_0_eq_c);
+        _mm_movemask_epi8(mm_0_eq_abc) as u16
+    };
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
     _return_nechr_tpl(base, mask_0_abc)
@@ -373,11 +377,11 @@ unsafe fn _nechr_c16_aa_x2(
     mm_c16: MMB16Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c16_aa_x1(buf_ptr, mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x1(buf_ptr, mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c16_aa_x1(buf_ptr.add(16), mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x1(buf_ptr.add(16), mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
@@ -390,11 +394,11 @@ unsafe fn _nechr_c16_aa_x4(
     mm_c16: MMB16Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c16_aa_x2(buf_ptr, mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x2(buf_ptr, mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c16_aa_x2(buf_ptr.add(16 * 2), mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x2(buf_ptr.add(16 * 2), mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
@@ -407,11 +411,11 @@ unsafe fn _nechr_c16_aa_x8(
     mm_c16: MMB16Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c16_aa_x4(buf_ptr, mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x4(buf_ptr, mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr);
+    let r = unsafe { _nechr_c16_aa_x4(buf_ptr.add(16 * 4), mm_c16, st_ptr) };
     if r.is_some() {
         return r;
     }
@@ -424,13 +428,15 @@ unsafe fn _nechr_c32_uu_x1(
     mm_c32: MMB32Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
-    let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
-    let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
-    let mm_0_eq_ab = _mm256_or_si256(mm_0_eq_a, mm_0_eq_b);
-    let mm_0_eq_abc = _mm256_or_si256(mm_0_eq_ab, mm_0_eq_c);
-    let mask_0_abc = _mm256_movemask_epi8(mm_0_eq_abc) as u32;
+    let mask_0_abc = unsafe {
+        let mm_0 = _mm256_loadu_si256(buf_ptr as *const __m256i);
+        let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
+        let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
+        let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
+        let mm_0_eq_ab = _mm256_or_si256(mm_0_eq_a, mm_0_eq_b);
+        let mm_0_eq_abc = _mm256_or_si256(mm_0_eq_ab, mm_0_eq_c);
+        _mm256_movemask_epi8(mm_0_eq_abc) as u32
+    };
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
     _return_nechr_tpl(base, mask_0_abc)
@@ -442,13 +448,15 @@ unsafe fn _nechr_c32_aa_x1(
     mm_c32: MMB32Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
-    let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
-    let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
-    let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
-    let mm_0_eq_ab = _mm256_or_si256(mm_0_eq_a, mm_0_eq_b);
-    let mm_0_eq_abc = _mm256_or_si256(mm_0_eq_ab, mm_0_eq_c);
-    let mask_0_abc = _mm256_movemask_epi8(mm_0_eq_abc) as u32;
+    let mask_0_abc = unsafe {
+        let mm_0 = _mm256_load_si256(buf_ptr as *const __m256i);
+        let mm_0_eq_a = _mm256_cmpeq_epi8(mm_0, mm_c32.v1);
+        let mm_0_eq_b = _mm256_cmpeq_epi8(mm_0, mm_c32.v2);
+        let mm_0_eq_c = _mm256_cmpeq_epi8(mm_0, mm_c32.v3);
+        let mm_0_eq_ab = _mm256_or_si256(mm_0_eq_a, mm_0_eq_b);
+        let mm_0_eq_abc = _mm256_or_si256(mm_0_eq_ab, mm_0_eq_c);
+        _mm256_movemask_epi8(mm_0_eq_abc) as u32
+    };
     let base = buf_ptr.usz_offset_from(st_ptr);
     //
     _return_nechr_tpl(base, mask_0_abc)
@@ -460,11 +468,11 @@ unsafe fn _nechr_c32_aa_x2(
     mm_c32: MMB32Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c32_aa_x1(buf_ptr, mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x1(buf_ptr, mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c32_aa_x1(buf_ptr.add(32), mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x1(buf_ptr.add(32), mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }
@@ -477,11 +485,11 @@ unsafe fn _nechr_c32_aa_x4(
     mm_c32: MMB32Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c32_aa_x2(buf_ptr, mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x2(buf_ptr, mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x2(buf_ptr.add(32 * 2), mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }
@@ -494,11 +502,11 @@ unsafe fn _nechr_c32_aa_x8(
     mm_c32: MMB32Tpl,
     st_ptr: *const u8,
 ) -> Option<usize> {
-    let r = _nechr_c32_aa_x4(buf_ptr, mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x4(buf_ptr, mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }
-    let r = _nechr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr);
+    let r = unsafe { _nechr_c32_aa_x4(buf_ptr.add(32 * 4), mm_c32, st_ptr) };
     if r.is_some() {
         return r;
     }

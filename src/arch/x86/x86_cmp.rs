@@ -178,40 +178,44 @@ fn _memcmp_sse2_impl(a: &[u8], b: &[u8]) -> Ordering {
 
 #[inline(always)]
 unsafe fn _cmp_b16_uu_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let mm_0_a = _mm_loadu_si128(a_ptr as *const __m128i);
-    let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
+    let mask_0 = unsafe {
+        let mm_0_a = _mm_loadu_si128(a_ptr as *const __m128i);
+        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
+        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
+        _mm_movemask_epi8(mm_0_eq) as u64
+    };
     //
     if mask_0 == 0xffff {
         Ordering::Equal
     } else {
         let bits = !mask_0;
         let pos = bits.trailing_zeros() as usize;
-        let aa_ptr = a_ptr.add(pos);
-        let bb_ptr = b_ptr.add(pos);
-        let aac = *aa_ptr;
-        let bbc = *bb_ptr;
+        let aa_ptr = unsafe { a_ptr.add(pos) };
+        let bb_ptr = unsafe { b_ptr.add(pos) };
+        let aac = unsafe { *aa_ptr };
+        let bbc = unsafe { *bb_ptr };
         aac.cmp(&bbc)
     }
 }
 
 #[inline(always)]
 unsafe fn _cmp_b16_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
-    let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
+    let mask_0 = unsafe {
+        let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
+        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
+        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
+        _mm_movemask_epi8(mm_0_eq) as u64
+    };
     //
     if mask_0 == 0xffff {
         Ordering::Equal
     } else {
         let bits = !mask_0;
         let pos = bits.trailing_zeros() as usize;
-        let aa_ptr = a_ptr.add(pos);
-        let bb_ptr = b_ptr.add(pos);
-        let aac = *aa_ptr;
-        let bbc = *bb_ptr;
+        let aa_ptr = unsafe { a_ptr.add(pos) };
+        let bb_ptr = unsafe { b_ptr.add(pos) };
+        let aac = unsafe { *aa_ptr };
+        let bbc = unsafe { *bb_ptr };
         aac.cmp(&bbc)
     }
 }
@@ -254,20 +258,22 @@ fn _cmp_b16_au_x16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 unsafe fn _cmp_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
-    let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
-    let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-    let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
+    let mask_0 = unsafe {
+        let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
+        let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
+        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
+        _mm_movemask_epi8(mm_0_eq) as u64
+    };
     //
     if mask_0 == 0xffff {
         Ordering::Equal
     } else {
         let bits = !mask_0;
         let pos = bits.trailing_zeros() as usize;
-        let aa_ptr = a_ptr.add(pos);
-        let bb_ptr = b_ptr.add(pos);
-        let aac = *aa_ptr;
-        let bbc = *bb_ptr;
+        let aa_ptr = unsafe { a_ptr.add(pos) };
+        let bb_ptr = unsafe { b_ptr.add(pos) };
+        let aac = unsafe { *aa_ptr };
+        let bbc = unsafe { *bb_ptr };
         aac.cmp(&bbc)
     }
 }

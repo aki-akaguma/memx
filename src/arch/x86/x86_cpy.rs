@@ -182,14 +182,18 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 
 #[inline(always)]
 unsafe fn _cpy_b16_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-    _mm_storeu_si128(a_ptr as *mut __m128i, mm_0_b);
+    unsafe {
+        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
+        _mm_storeu_si128(a_ptr as *mut __m128i, mm_0_b);
+    }
 }
 
 #[inline(always)]
 unsafe fn _cpy_b16_au_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-    _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
+    unsafe {
+        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
+        _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
+    }
 }
 
 #[inline(always)]
@@ -218,8 +222,10 @@ fn _cpy_b16_au_x16(a_ptr: *mut u8, b_ptr: *const u8) {
 
 #[inline(always)]
 unsafe fn _cpy_b16_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
-    _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
+    unsafe {
+        let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
+        _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
+    }
 }
 
 #[inline(always)]

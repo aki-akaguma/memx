@@ -136,12 +136,16 @@ macro_rules! read_native_integer_impl {
         #[inline(always)]
         pub(crate) unsafe fn $fn_name(buf_ptr: *const u8) -> $ty {
             const SIZE_OF: usize = core::mem::size_of::<$ty>();
-            let input = core::slice::from_raw_parts(buf_ptr, SIZE_OF);
+            let input = unsafe {
+                core::slice::from_raw_parts(buf_ptr, SIZE_OF)
+            };
             let (int_bytes, _rest) = input.split_at(SIZE_OF);
             #[cfg(feature = "test")]
             let r = $ty::from_ne_bytes(int_bytes.try_into().unwrap());
             #[cfg(not(feature = "test"))]
-            let r = $ty::from_ne_bytes(*int_bytes.as_ptr().cast::<[u8; SIZE_OF]>());
+            let r = $ty::from_ne_bytes( unsafe {
+                *int_bytes.as_ptr().cast::<[u8; SIZE_OF]>()
+            });
             //
             r
         }
@@ -159,12 +163,16 @@ macro_rules! read_little_integer_impl {
         #[inline(always)]
         pub(crate) unsafe fn $fn_name(buf_ptr: *const u8) -> $ty {
             const SIZE_OF: usize = core::mem::size_of::<$ty>();
-            let input = core::slice::from_raw_parts(buf_ptr, SIZE_OF);
+            let input = unsafe {
+                core::slice::from_raw_parts(buf_ptr, SIZE_OF)
+            };
             let (int_bytes, _rest) = input.split_at(SIZE_OF);
             #[cfg(feature = "test")]
             let r = $ty::from_le_bytes(int_bytes.try_into().unwrap());
             #[cfg(not(feature = "test"))]
-            let r = $ty::from_le_bytes(*int_bytes.as_ptr().cast::<[u8; SIZE_OF]>());
+            let r = $ty::from_le_bytes( unsafe {
+                *int_bytes.as_ptr().cast::<[u8; SIZE_OF]>()
+            });
             //
             r
         }
@@ -182,12 +190,16 @@ macro_rules! read_big_integer_impl {
         #[inline(always)]
         pub(crate) unsafe fn $fn_name(buf_ptr: *const u8) -> $ty {
             const SIZE_OF: usize = core::mem::size_of::<$ty>();
-            let input = core::slice::from_raw_parts(buf_ptr, SIZE_OF);
+            let input = unsafe {
+                core::slice::from_raw_parts(buf_ptr, SIZE_OF)
+            };
             let (int_bytes, _rest) = input.split_at(SIZE_OF);
             #[cfg(feature = "test")]
             let r = $ty::from_be_bytes(int_bytes.try_into().unwrap());
             #[cfg(not(feature = "test"))]
-            let r = $ty::from_be_bytes(*int_bytes.as_ptr().cast::<[u8; SIZE_OF]>());
+            let r = $ty::from_be_bytes(unsafe {
+                *int_bytes.as_ptr().cast::<[u8; SIZE_OF]>()
+            });
             //
             r
         }

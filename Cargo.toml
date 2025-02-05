@@ -8,7 +8,7 @@ keywords = ["memcmp", "memchr", "memmem"]
 categories = ["algorithms"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-rust-version = "1.63.0"
+rust-version = "1.65.0"
 repository = "https://github.com/aki-akaguma/memx"
 
 [features]
