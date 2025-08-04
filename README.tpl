@@ -79,7 +79,7 @@ at your option.
 [crate-link]: https://crates.io/crates/{{crate}}
 [docs-image]: https://docs.rs/{{crate}}/badge.svg
 [docs-link]: https://docs.rs/{{crate}}/
-[rustc-image]: https://img.shields.io/badge/rustc-1.56+-blue.svg
+[rustc-image]: https://img.shields.io/badge/rustc-1.65+-blue.svg
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [test-ubuntu-image]: https://github.com/aki-akaguma/{{crate}}/actions/workflows/test-ubuntu.yml/badge.svg
 [test-ubuntu-link]: https://github.com/aki-akaguma/{{crate}}/actions/workflows/test-ubuntu.yml

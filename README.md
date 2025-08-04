@@ -8,37 +8,15 @@
 [![Test mac][test-windows-image]][test-windows-link]
 [![Test win][test-macos-image]][test-macos-link]
 
-`memx` minics libc.
+`memx` is a Rust library that provides a set of functions for memory manipulation, similar to the standard C library's `<string.h>`, but implemented in pure Rust and optimized for performance.
 
-This crate is implemented memory functions like libc memcmp(), memchr(),
-memmem(), memcpy(), memset().
 
 ## Features
 
-- Rewriting with rust lang.
-- minimum support rustc 1.56.1 (59eed8a2a 2021-11-01)
-
-## Todo
-
-- [ ] Support the zero overhead trait.
-- [x] Support more fast routine on armv7-android
-- [x] Support more fast routine on x86_64
-- [x] Support #!\[no_std\]
-
-## Support status of miri :: rustc 1.68.0-nightly (77429957a 2023-01-01)
-
-Ok lists:
-
-- cargo +nightly miri test --target=x86_64-unknown-linux-gnu
-- cargo +nightly miri test --target=i686-unknown-linux-gnu
-- cargo +nightly miri test --target=i586-unknown-linux-gnu
-- cargo +nightly miri test --target=aarch64-unknown-linux-gnu
-- cargo +nightly miri test --target=armv7-unknown-linux-gnueabihf
-
-Failed lists:
-
-- nothing
-
+- A rich set of memory search, comparison, and manipulation functions.
+- Optimized implementations for x86 and x86-64 architectures using SSE2 and AVX2.
+- `no_std` compatibility for use in embedded systems and other resource-constrained environments.
+- A full suite of iterators for all search functions, providing an idiomatic Rust interface.
 
 # Benchmark results
 
@@ -109,7 +87,7 @@ at your option.
 [crate-link]: https://crates.io/crates/memx
 [docs-image]: https://docs.rs/memx/badge.svg
 [docs-link]: https://docs.rs/memx/
-[rustc-image]: https://img.shields.io/badge/rustc-1.56+-blue.svg
+[rustc-image]: https://img.shields.io/badge/rustc-1.65+-blue.svg
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [test-ubuntu-image]: https://github.com/aki-akaguma/memx/actions/workflows/test-ubuntu.yml/badge.svg
 [test-ubuntu-link]: https://github.com/aki-akaguma/memx/actions/workflows/test-ubuntu.yml
