@@ -1,5 +1,5 @@
 #[inline]
-pub fn memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter {
+pub fn memchr_dbl_iter(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter<'_> {
     MemchrDblIter::new(haystack, needle1, needle2)
 }
 
@@ -11,7 +11,7 @@ pub struct MemchrDblIter<'a> {
 }
 impl MemchrDblIter<'_> {
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> MemchrDblIter<'_> {
         MemchrDblIter {
             needle1,
             needle2,

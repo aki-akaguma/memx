@@ -34,10 +34,6 @@ fn print_version_and_exit(_program: &str) {
 }
 
 fn print_help_and_exit(program: &str) {
-    println!(
-        "[usage] {} {{ {} }}",
-        program,
-        concat!("shape_benchmark_results",)
-    );
+    println!("[usage] {program} {{ shape_benchmark_results }}",);
     std::process::exit(0);
 }

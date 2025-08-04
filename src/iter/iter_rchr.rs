@@ -1,5 +1,5 @@
 #[inline]
-pub fn memrchr_iter(haystack: &[u8], needle: u8) -> MemrchrIter {
+pub fn memrchr_iter(haystack: &[u8], needle: u8) -> MemrchrIter<'_> {
     MemrchrIter::new(haystack, needle)
 }
 
@@ -10,7 +10,7 @@ pub struct MemrchrIter<'a> {
 }
 impl MemrchrIter<'_> {
     #[inline]
-    pub fn new(haystack: &[u8], needle: u8) -> MemrchrIter {
+    pub fn new(haystack: &[u8], needle: u8) -> MemrchrIter<'_> {
         MemrchrIter {
             needle,
             haystack,

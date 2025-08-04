@@ -6,7 +6,7 @@ mod test_std_iter_memrchr_qpl {
         by2: u8,
         by3: u8,
         by4: u8,
-    ) -> super::impl_std::StdMemrchrQplIter {
+    ) -> super::impl_std::StdMemrchrQplIter<'_> {
         super::impl_std::_std_memrchr_qpl_iter(buf, by1, by2, by3, by4)
     }
     //
@@ -19,7 +19,7 @@ mod test_memx_iter_memrchr_qpl {
         by2: u8,
         by3: u8,
         by4: u8,
-    ) -> memx::iter::MemrchrQplIter {
+    ) -> memx::iter::MemrchrQplIter<'_> {
         memx::iter::memrchr_qpl_iter(buf, by1, by2, by3, by4)
     }
     //

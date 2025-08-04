@@ -117,35 +117,47 @@ pub fn _std_memrnechr_qpl(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> Opt
         .rposition(|&x| x != by1 && x != by2 && x != by3 && x != by4)
 }
 
-pub fn _std_memchr_iter(buf: &[u8], by1: u8) -> StdMemchrSglIter {
+pub fn _std_memchr_iter(buf: &[u8], by1: u8) -> StdMemchrSglIter<'_> {
     StdMemchrSglIter::new(buf, by1)
 }
 
-pub fn _std_memrchr_iter(buf: &[u8], by1: u8) -> StdMemrchrSglIter {
+pub fn _std_memrchr_iter(buf: &[u8], by1: u8) -> StdMemrchrSglIter<'_> {
     StdMemrchrSglIter::new(buf, by1)
 }
 
-pub fn _std_memchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemchrDblIter {
+pub fn _std_memchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemchrDblIter<'_> {
     StdMemchrDblIter::new(buf, by1, by2)
 }
 
-pub fn _std_memrchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemrchrDblIter {
+pub fn _std_memrchr_dbl_iter(buf: &[u8], by1: u8, by2: u8) -> StdMemrchrDblIter<'_> {
     StdMemrchrDblIter::new(buf, by1, by2)
 }
 
-pub fn _std_memchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemchrTplIter {
+pub fn _std_memchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemchrTplIter<'_> {
     StdMemchrTplIter::new(buf, by1, by2, by3)
 }
 
-pub fn _std_memrchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemrchrTplIter {
+pub fn _std_memrchr_tpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8) -> StdMemrchrTplIter<'_> {
     StdMemrchrTplIter::new(buf, by1, by2, by3)
 }
 
-pub fn _std_memchr_qpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> StdMemchrQplIter {
+pub fn _std_memchr_qpl_iter(
+    buf: &[u8],
+    by1: u8,
+    by2: u8,
+    by3: u8,
+    by4: u8,
+) -> StdMemchrQplIter<'_> {
     StdMemchrQplIter::new(buf, by1, by2, by3, by4)
 }
 
-pub fn _std_memrchr_qpl_iter(buf: &[u8], by1: u8, by2: u8, by3: u8, by4: u8) -> StdMemrchrQplIter {
+pub fn _std_memrchr_qpl_iter(
+    buf: &[u8],
+    by1: u8,
+    by2: u8,
+    by3: u8,
+    by4: u8,
+) -> StdMemrchrQplIter<'_> {
     StdMemrchrQplIter::new(buf, by1, by2, by3, by4)
 }
 
@@ -165,7 +177,7 @@ pub struct StdMemchrSglIter<'a> {
 impl StdMemchrSglIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8) -> StdMemchrSglIter {
+    pub fn new(haystack: &[u8], needle1: u8) -> StdMemchrSglIter<'_> {
         StdMemchrSglIter {
             needle1,
             haystack,
@@ -224,7 +236,7 @@ pub struct StdMemrchrSglIter<'a> {
 impl StdMemrchrSglIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8) -> StdMemrchrSglIter {
+    pub fn new(haystack: &[u8], needle1: u8) -> StdMemrchrSglIter<'_> {
         StdMemrchrSglIter {
             needle1,
             haystack,
@@ -284,7 +296,7 @@ pub struct StdMemchrDblIter<'a> {
 impl StdMemchrDblIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemchrDblIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemchrDblIter<'_> {
         StdMemchrDblIter {
             needle1,
             needle2,
@@ -349,7 +361,7 @@ pub struct StdMemrchrDblIter<'a> {
 impl StdMemrchrDblIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemrchrDblIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8) -> StdMemrchrDblIter<'_> {
         StdMemrchrDblIter {
             needle1,
             needle2,
@@ -415,7 +427,7 @@ pub struct StdMemchrTplIter<'a> {
 impl StdMemchrTplIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemchrTplIter<'_> {
         StdMemchrTplIter {
             needle1,
             needle2,
@@ -488,7 +500,7 @@ pub struct StdMemrchrTplIter<'a> {
 impl StdMemrchrTplIter<'_> {
     #[allow(dead_code)]
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> StdMemrchrTplIter<'_> {
         StdMemrchrTplIter {
             needle1,
             needle2,
@@ -568,7 +580,7 @@ impl StdMemchrQplIter<'_> {
         needle2: u8,
         needle3: u8,
         needle4: u8,
-    ) -> StdMemchrQplIter {
+    ) -> StdMemchrQplIter<'_> {
         StdMemchrQplIter {
             needle1,
             needle2,
@@ -651,7 +663,7 @@ impl StdMemrchrQplIter<'_> {
         needle2: u8,
         needle3: u8,
         needle4: u8,
-    ) -> StdMemrchrQplIter {
+    ) -> StdMemrchrQplIter<'_> {
         StdMemrchrQplIter {
             needle1,
             needle2,

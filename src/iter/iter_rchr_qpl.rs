@@ -5,7 +5,7 @@ pub fn memrchr_qpl_iter(
     needle2: u8,
     needle3: u8,
     needle4: u8,
-) -> MemrchrQplIter {
+) -> MemrchrQplIter<'_> {
     MemrchrQplIter::new(haystack, needle1, needle2, needle3, needle4)
 }
 
@@ -25,7 +25,7 @@ impl MemrchrQplIter<'_> {
         needle2: u8,
         needle3: u8,
         needle4: u8,
-    ) -> MemrchrQplIter {
+    ) -> MemrchrQplIter<'_> {
         MemrchrQplIter {
             needle1,
             needle2,

@@ -1,5 +1,10 @@
 #[inline]
-pub fn memchr_tpl_iter(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> MemchrTplIter {
+pub fn memchr_tpl_iter(
+    haystack: &[u8],
+    needle1: u8,
+    needle2: u8,
+    needle3: u8,
+) -> MemchrTplIter<'_> {
     MemchrTplIter::new(haystack, needle1, needle2, needle3)
 }
 
@@ -12,7 +17,7 @@ pub struct MemchrTplIter<'a> {
 }
 impl MemchrTplIter<'_> {
     #[inline]
-    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> MemchrTplIter {
+    pub fn new(haystack: &[u8], needle1: u8, needle2: u8, needle3: u8) -> MemchrTplIter<'_> {
         MemchrTplIter {
             needle1,
             needle2,
