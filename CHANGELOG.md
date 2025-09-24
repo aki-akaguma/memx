@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 * lifetime
 * clippy: clippy::useless_concat
+* clippy: clippy::needless_range_loop
 
 ## [0.1.32] (2024-06-19)
 ### Changed

@@ -71,9 +71,9 @@ fn test_memrnechr_qpl_long_buffer() {
     let buf = [b'a'; 1024];
     let mut expected_idx = None;
     let mut long_buf = buf.to_vec();
-    for i in 0..1024 {
+    for (i, item) in long_buf.iter_mut().enumerate().take(1024) {
         if i == 512 {
-            long_buf[i] = b'x';
+            *item = b'x';
             expected_idx = Some(i);
         }
     }
