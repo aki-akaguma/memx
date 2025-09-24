@@ -1,6 +1,6 @@
 [package]
 name = "memx"
-version = "0.1.32"
+version = "0.2.0"
 authors = ["aki <aki.akaguma@hotmail.com>"]
 edition = "2021"
 description = "memory functions like libc memcmp(), memchr(), memmem(), memcpy(), memset()"
