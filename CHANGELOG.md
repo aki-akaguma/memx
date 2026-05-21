@@ -18,15 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * lifetime
-* clippy: clippy::useless_concat
-* clippy: clippy::needless_range_loop
+* `clippy::useless_concat`
+* `clippy::needless_range_loop`
 
 ## [0.1.32] (2024-06-19)
 ### Changed
 * `test_pointer_width_128` was removed
 
 ### Fixed
-* clippy: unexpected_cfgs
+* `clippy::unexpected_cfgs`
 
 ## [0.1.31] (2024-06-09)
 ### Changed
@@ -36,8 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * build support 1.60.0 on github workflows
 
 ### Fixed
-* clippy: clippy::unnecessary_cast
-* clippy: clippy::useless_vec
+* `clippy::unnecessary_cast`
+* `clippy::useless_vec`
 * `#[allow(dead_code)]`: pub trait PtrOps, pub(crate) trait BitOrt
 
 ## [0.1.30] (2023-05-15)
@@ -104,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * `$(MAKE)`
-* clippy: `uninlined_format_args`
+* `clippy::uninlined_format_args`
 
 ## [0.1.26] (2023-02-12)
 ### Added
@@ -122,7 +122,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * `LICENSE-APACHE`, `LICENSE-MIT`
-* clippy: `redundant_field_names`, `unnecessary_unwrap`, `needless_bool`
+* `clippy::redundant_field_names`
+* `clippy::unnecessary_unwrap`, `clippy::needless_bool`
 
 ## [0.1.25] (2023-01-28)
 ### Added
@@ -131,8 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 * Makefile: rustc version `1.66.0` to `1.66.1`
-* clippy: `redundant_clone`, `bool_assert_comparison`, `manual_find`
-* clippy: `needless_borrow`
+* `clippy::redundant_clone`, `clippy::bool_assert_comparison`
+* `clippy::manual_find`, `clippy::needless_borrow`
 * bug: `signal: 4, SIGILL: illegal instruction`, `_mm256_cmpeq_epi8()` requires `AVX2` instead of `AVX`
 
 ## [0.1.24] (2023-01-10)
@@ -157,7 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * revert memcpy() to simpe code because of poor performance
 
 ### Fixed
-* clippy friendly: x86_rnechr.rs, mem_rchr.rs, mem_rnechr.rs, mem_set.rs
+* clippy friendly: `x86_rnechr.rs`, `mem_rchr.rs`, `mem_rnechr.rs`, `mem_set.rs`
 
 ## [0.1.22] (2023-01-04)
 ### Added
