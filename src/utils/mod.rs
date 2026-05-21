@@ -378,7 +378,22 @@ pub use needles::qpl::B1Qpl;
 pub use needles::sgl::B1Sgl;
 pub use needles::tpl::B1Tpl;
 
-// ascii stochastics
+/// ASCII Character Rarity Weights (Stochastic Search Weights)
+///
+/// These weights are used by the `memmem` algorithm to select the optimal
+/// character in the needle to scan for first. A higher weight indicates a
+/// "rarer" character in typical English text and source code.
+///
+/// Logic:
+/// By searching for the rarest character in the needle first, we minimize
+/// "false positives" in the initial scan, allowing the sliding window to
+/// skip more of the haystack efficiently.
+///
+/// How to adjust:
+/// The current values are based on standard character frequency analysis
+/// (e.g., character distribution of common ASCII text and source code).
+/// If the target data is not English/Source Code (e.g., binary protocols),
+/// these weights can be recalculated based on the frequency of each byte.
 #[rustfmt::skip]
 const _ASCII_STOCHAS: [u8; 128] = [
     // 0x00: NUL,

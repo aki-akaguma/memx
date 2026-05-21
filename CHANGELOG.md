@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+* code review report `docs/review.1.md`
+* documentation for stochastic search weights in `src/utils/mod.rs`
 
 
 ## [0.2.0] (2025-09-24)
