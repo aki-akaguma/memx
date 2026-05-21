@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-//#![tarpaulin::skip]
-#![cfg(not(tarpaulin_include))]
 
 // ref.) https://en.wikipedia.org/wiki/Memory_ordering
 pub fn memory_barrier<T>(_arg: T) {

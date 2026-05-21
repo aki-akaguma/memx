@@ -1,4 +1,3 @@
-#![cfg(not(tarpaulin_include))]
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 mod barrier;

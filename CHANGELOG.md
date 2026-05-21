@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * documentation for stochastic search weights in `src/utils/mod.rs`
 * AArch64 support for `prefetch_read_data` using inline assembly
 
+### Removed
+* `#![cfg(not(tarpaulin_include))]` from xbench
 
 
 ## [0.2.0] (2025-09-24)
