@@ -10,16 +10,27 @@ impl PtrOpsPrefetch for *const u8 {
     fn prefetch_read_data(&self) {
         // TODO: Replace with core::intrinsics::prefetch_read_data
         // after stabilization
-        // The cache line size of x86_64 is 64 bytes.
         #[cfg(not(miri))]
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
         {
-            #[cfg(target_arch = "x86")]
-            use core::arch::x86 as mmx;
-            #[cfg(target_arch = "x86_64")]
-            use core::arch::x86_64 as mmx;
-            //
-            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
+            // x86 / x86_64
+            #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+            unsafe {
+                #[cfg(target_arch = "x86")]
+                use core::arch::x86 as mmx;
+                #[cfg(target_arch = "x86_64")]
+                use core::arch::x86_64 as mmx;
+                mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0);
+            }
+            // AArch64
+            // AArch64 intrinsics are currently unstable, so we use inline asm for stable Rust.
+            #[cfg(target_arch = "aarch64")]
+            unsafe {
+                core::arch::asm!(
+                    "prfm pldl1keep, [{x}]",
+                    x = in(reg) *self,
+                    options(nostack, preserves_flags, readonly)
+                );
+            }
         }
     }
 }
@@ -28,16 +39,27 @@ impl PtrOpsPrefetch for *mut u8 {
     fn prefetch_read_data(&self) {
         // TODO: Replace with core::intrinsics::prefetch_read_data
         // after stabilization
-        // The cache line size of x86_64 is 64 bytes.
         #[cfg(not(miri))]
-        #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
         {
-            #[cfg(target_arch = "x86")]
-            use core::arch::x86 as mmx;
-            #[cfg(target_arch = "x86_64")]
-            use core::arch::x86_64 as mmx;
-            //
-            unsafe { mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0) };
+            // x86 / x86_64
+            #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
+            unsafe {
+                #[cfg(target_arch = "x86")]
+                use core::arch::x86 as mmx;
+                #[cfg(target_arch = "x86_64")]
+                use core::arch::x86_64 as mmx;
+                mmx::_mm_prefetch(*self as *const i8, mmx::_MM_HINT_T0);
+            }
+            // AArch64
+            // AArch64 intrinsics are currently unstable, so we use inline asm for stable Rust.
+            #[cfg(target_arch = "aarch64")]
+            unsafe {
+                core::arch::asm!(
+                    "prfm pldl1keep, [{x}]",
+                    x = in(reg) *self,
+                    options(nostack, preserves_flags, readonly)
+                );
+            }
         }
     }
 }

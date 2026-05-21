@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * code review report `docs/review.1.md`
 * documentation for stochastic search weights in `src/utils/mod.rs`
+* AArch64 support for `prefetch_read_data` using inline assembly
+
 
 
 ## [0.2.0] (2025-09-24)
