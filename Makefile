@@ -121,12 +121,12 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 	@touch target/stamp/stamp.test-rustc.$(1).$(2)
 endef
 
-bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
+bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
 #bench_nms = bench-memcmp bench-memeq
 #bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memchr_qpl bench-memnechr_qpl
-#bench_nms = bench-memnechr bench-memnechr_dbl bench-memnechr_tpl bench-memnechr_qpl
-#bench_nms = bench-memrnechr bench-memrnechr_dbl bench-memrnechr_tpl bench-memrnechr_qpl
+#bench_nms = bench-memmem bench-memrmem
+#bench_nms = bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
