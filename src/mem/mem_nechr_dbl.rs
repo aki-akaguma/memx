@@ -28,40 +28,22 @@ pub fn _memnechr_dbl_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
     }
 }
 
-macro_rules! _unroll_one_nechr_to_align_x1 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        if $buf_ptr_2 >= $buf_ptr_end {
-            break;
+#[inline(always)]
+fn _nechr_dbl_to_aligned<const ALIGN: usize>(
+    buf_ptr: *const u8,
+    c: B1Dbl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let remaining_align = ALIGN - ((buf_ptr as usize) & (ALIGN - 1));
+    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
+    let mut cur_ptr = buf_ptr;
+    while cur_ptr < buf_ptr_end {
+        if let Some(pos) = _nechr_c1_aa_x1(cur_ptr, c, start_ptr) {
+            return (None, Some(pos));
         }
-        let r = _nechr_c1_aa_x1($buf_ptr_2, $c, $start_ptr);
-        if r.is_some() {
-            return (None, r);
-        }
-        $buf_ptr_2 = unsafe { $buf_ptr_2.add(1) };
-    }};
-}
-
-macro_rules! _unroll_one_nechr_to_align_x4 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_nechr_to_align_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_nechr_to_align_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_nechr_to_align_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_nechr_to_align_x1!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-    }};
-}
-
-macro_rules! _unroll_one_nechr_to_align_x8 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_nechr_to_align_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_nechr_to_align_x4!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-    }};
-}
-
-macro_rules! _unroll_one_nechr_to_align_x16 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_nechr_to_align_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-        _unroll_one_nechr_to_align_x8!($buf_ptr_2, $buf_ptr_end, $c, $start_ptr);
-    }};
+        cur_ptr = unsafe { cur_ptr.add(1) };
+    }
+    (Some(buf_ptr_end), None)
 }
 
 #[inline(always)]
@@ -70,14 +52,7 @@ pub(crate) fn _nechr_dbl_to_aligned_u256(
     c: B1Dbl,
     start_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_nechr_to_align_x16!(buf_ptr_2, buf_ptr_end, c, start_ptr);
-        _unroll_one_nechr_to_align_x16!(buf_ptr_2, buf_ptr_end, c, start_ptr);
-    }
-    (Some(buf_ptr_end), None)
+    _nechr_dbl_to_aligned::<32>(buf_ptr, c, start_ptr)
 }
 
 #[inline(always)]
@@ -86,13 +61,7 @@ pub(crate) fn _nechr_dbl_to_aligned_u128(
     c: B1Dbl,
     start_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_nechr_to_align_x16!(buf_ptr_2, buf_ptr_end, c, start_ptr);
-    }
-    (Some(buf_ptr_end), None)
+    _nechr_dbl_to_aligned::<16>(buf_ptr, c, start_ptr)
 }
 
 #[inline(always)]
@@ -101,13 +70,7 @@ fn _nechr_dbl_to_aligned_u64(
     c: B1Dbl,
     start_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_nechr_to_align_x8!(buf_ptr_2, buf_ptr_end, c, start_ptr);
-    }
-    (Some(buf_ptr_end), None)
+    _nechr_dbl_to_aligned::<8>(buf_ptr, c, start_ptr)
 }
 
 #[inline(always)]
@@ -116,13 +79,7 @@ fn _nechr_dbl_to_aligned_u32(
     c: B1Dbl,
     start_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_nechr_to_align_x4!(buf_ptr_2, buf_ptr_end, c, start_ptr);
-    }
-    (Some(buf_ptr_end), None)
+    _nechr_dbl_to_aligned::<4>(buf_ptr, c, start_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]

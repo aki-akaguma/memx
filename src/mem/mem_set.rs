@@ -24,93 +24,41 @@ pub fn _memset_impl(buf: &mut [u8], c1: u8) {
     }
 }
 
-macro_rules! _unroll_one_set_to_aligned_x1 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr) => {{
-        if $buf_ptr_2 >= $buf_ptr_end {
-            break;
-        }
-        _set_c1_aa_x1($buf_ptr_2, $c);
-        $buf_ptr_2 = unsafe { $buf_ptr_2.add(1) };
-    }};
+#[inline(always)]
+fn _set_to_aligned<const ALIGN: usize>(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
+    let remaining_align = ALIGN - ((buf_ptr as usize) & (ALIGN - 1));
+    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
+    let mut cur_ptr = buf_ptr;
+    while cur_ptr < buf_ptr_end {
+        _set_c1_aa_x1(cur_ptr, c);
+        cur_ptr = unsafe { cur_ptr.add(1) };
+    }
+    buf_ptr_end
 }
 
-macro_rules! _unroll_one_set_to_aligned_x2 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr) => {{
-        _unroll_one_set_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c);
-        _unroll_one_set_to_aligned_x1!($buf_ptr_2, $buf_ptr_end, $c);
-    }};
-}
-
-macro_rules! _unroll_one_set_to_aligned_x4 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr) => {{
-        _unroll_one_set_to_aligned_x2!($buf_ptr_2, $buf_ptr_end, $c);
-        _unroll_one_set_to_aligned_x2!($buf_ptr_2, $buf_ptr_end, $c);
-    }};
-}
-
-macro_rules! _unroll_one_set_to_aligned_x8 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr) => {{
-        _unroll_one_set_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c);
-        _unroll_one_set_to_aligned_x4!($buf_ptr_2, $buf_ptr_end, $c);
-    }};
-}
-
-macro_rules! _unroll_one_set_to_aligned_x16 {
-    ($buf_ptr_2:expr, $buf_ptr_end:expr, $c:expr) => {{
-        _unroll_one_set_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c);
-        _unroll_one_set_to_aligned_x8!($buf_ptr_2, $buf_ptr_end, $c);
-    }};
-}
-
+#[inline(always)]
 pub(crate) fn _set_to_aligned_u256(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
-    let remaining_align = 0x20_usize - ((buf_ptr as usize) & 0x1F_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_set_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c);
-        _unroll_one_set_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c);
-    }
-    buf_ptr_end
+    _set_to_aligned::<32>(buf_ptr, c)
 }
 
+#[inline(always)]
 pub(crate) fn _set_to_aligned_u128(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
-    let remaining_align = 0x10_usize - ((buf_ptr as usize) & 0x0F_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_set_to_aligned_x16!(buf_ptr_2, buf_ptr_end, c);
-    }
-    buf_ptr_end
+    _set_to_aligned::<16>(buf_ptr, c)
 }
 
+#[inline(always)]
 fn _set_to_aligned_u64(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
-    let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_set_to_aligned_x8!(buf_ptr_2, buf_ptr_end, c);
-    }
-    buf_ptr_end
+    _set_to_aligned::<8>(buf_ptr, c)
 }
 
+#[inline(always)]
 fn _set_to_aligned_u32(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
-    let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_set_to_aligned_x4!(buf_ptr_2, buf_ptr_end, c);
-    }
-    buf_ptr_end
+    _set_to_aligned::<4>(buf_ptr, c)
 }
 
+#[inline(always)]
 fn _set_to_aligned_u16(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
-    let remaining_align = 0x02_usize - ((buf_ptr as usize) & 0x01_usize);
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr;
-    loop {
-        _unroll_one_set_to_aligned_x2!(buf_ptr_2, buf_ptr_end, c);
-    }
-    buf_ptr_end
+    _set_to_aligned::<2>(buf_ptr, c)
 }
 
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]

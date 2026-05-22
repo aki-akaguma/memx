@@ -6,6 +6,9 @@ readme: README.md
 README.md: README.tpl src/lib.rs
 	cargo readme > $@
 
+check:
+	cargo check --offline
+
 TEST_THR=-- --test-threads=1
 TEST_THR=
 test:
@@ -122,11 +125,13 @@ target/stamp/stamp.test-rustc.$(1).$(2):
 endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
-bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
-#bench_nms = bench-memcmp bench-memeq
-#bench_nms = bench-memcpy bench-memset
-#bench_nms = bench-memmem bench-memrmem
-#bench_nms = bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
+#bench_nms = bench-memchr
+#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
+#bench_nms = bench-memchr_dbl bench-memrchr_dbl bench-memnechr_dbl bench-memrnechr_dbl
+#bench_nms = bench-memchr_tpl bench-memrchr_tpl bench-memnechr_tpl bench-memrnechr_tpl
+#bench_nms = bench-memchr_qpl bench-memrchr_qpl bench-memnechr_qpl bench-memrnechr_qpl
+#bench_nms = bench-memcmp bench-memeq bench-memmem bench-memrmem
+bench_nms = bench-memcpy bench-memset
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
@@ -262,6 +267,10 @@ clean-memeq:
 	@rm -f target/stamp.build/stamp.build.bench-memeq.*
 	@rm -f target/stamp.bench/stamp.bench.bench-memeq.*
 
+clean-memnechr:
+	@rm -f target/stamp.build/stamp.build.bench-memnechr.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memnechr.*
+
 clean-memmem:
 	@rm -f target/stamp.build/stamp.build.bench-memmem.*
 	@rm -f target/stamp.bench/stamp.bench.bench-memmem.*
@@ -273,6 +282,10 @@ clean-memrchr:
 clean-memrmem:
 	@rm -f target/stamp.build/stamp.build.bench-memrmem.*
 	@rm -f target/stamp.bench/stamp.bench.bench-memrmem.*
+
+clean-memrnechr:
+	@rm -f target/stamp.build/stamp.build.bench-memrnechr.*
+	@rm -f target/stamp.bench/stamp.bench.bench-memrnechr.*
 
 clean-memset:
 	@rm -f target/stamp.build/stamp.build.bench-memset.*

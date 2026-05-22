@@ -34,96 +34,38 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     Ok(())
 }
 
-macro_rules! _unroll_one_cpy_to_aligned_x1 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _cpy_b1_aa_x1($a_ptr_2, $b_ptr_2);
-        $a_ptr_2 = unsafe { $a_ptr_2.add(1) };
-        $b_ptr_2 = unsafe { $b_ptr_2.add(1) };
-        if $a_ptr_2 >= $a_ptr_end {
-            break $label;
-        }
-    }};
-}
-
-macro_rules! _unroll_one_cpy_to_aligned_x2 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_cpy_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_cpy_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_cpy_to_aligned_x4 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_cpy_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_cpy_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_cpy_to_aligned_x8 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_cpy_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_cpy_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_cpy_to_aligned_x16 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_cpy_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_cpy_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
+#[inline(always)]
+fn _cpy_to_aligned<const ALIGN: usize>(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8, *const u8) {
+    let remaining_align = ALIGN - ((a_ptr as usize) & (ALIGN - 1));
+    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
+    let mut a_ptr_cur = a_ptr;
+    let mut b_ptr_cur = b_ptr;
+    while a_ptr_cur < a_ptr_end {
+        _cpy_b1_aa_x1(a_ptr_cur, b_ptr_cur);
+        a_ptr_cur = unsafe { a_ptr_cur.add(1) };
+        b_ptr_cur = unsafe { b_ptr_cur.add(1) };
+    }
+    (a_ptr_end, unsafe { b_ptr.add(remaining_align) })
 }
 
 #[inline(always)]
 pub(crate) fn _cpy_to_aligned_u256(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8, *const u8) {
-    let remaining_align = 0x20_usize - ((a_ptr as usize) & 0x1F_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_cpy_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_cpy_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (a_ptr_end, b_ptr_end)
+    _cpy_to_aligned::<32>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _cpy_to_aligned_u128(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8, *const u8) {
-    let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_cpy_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (a_ptr_end, b_ptr_end)
+    _cpy_to_aligned::<16>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _cpy_to_aligned_u64(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8, *const u8) {
-    let remaining_align = 0x08_usize - ((a_ptr as usize) & 0x07_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_cpy_to_aligned_x8!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (a_ptr_end, b_ptr_end)
+    _cpy_to_aligned::<8>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
 pub(crate) fn _cpy_to_aligned_u32(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8, *const u8) {
-    let remaining_align = 0x04_usize - ((a_ptr as usize) & 0x03_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_cpy_to_aligned_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (a_ptr_end, b_ptr_end)
+    _cpy_to_aligned::<4>(a_ptr, b_ptr)
 }
 
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]

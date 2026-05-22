@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * documentation for stochastic search weights in `src/utils/mod.rs`
 * AArch64 support for `prefetch_read_data` using inline assembly
 
+### Changed
+* refactored alignment loops in all core memory manipulation modules (`memchr`, `memcmp`, `memeq`, `memcpy`, `memset`, etc.) to use generic structured loops instead of macros
+
+
 ### Removed
 * `#![cfg(not(tarpaulin_include))]` from xbench
 

@@ -28,46 +28,27 @@ pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
     }
 }
 
-macro_rules! _unroll_one_eq_to_aligned_x1 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        if $a_ptr_2 >= $a_ptr_end {
-            break $label;
-        }
-        let r = _eq_b1_aa_x1($a_ptr_2, $b_ptr_2);
+#[inline(always)]
+fn _eq_to_aligned<const ALIGN: usize>(
+    a_ptr: *const u8,
+    b_ptr: *const u8,
+) -> (Option<(*const u8, *const u8)>, Option<bool>) {
+    let remaining_align = ALIGN - ((a_ptr as usize) & (ALIGN - 1));
+    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
+    let mut a_ptr_cur = a_ptr;
+    let mut b_ptr_cur = b_ptr;
+    while a_ptr_cur < a_ptr_end {
+        let r = _eq_b1_aa_x1(a_ptr_cur, b_ptr_cur);
         if !r {
             return (None, Some(r));
         }
-        $a_ptr_2 = unsafe { $a_ptr_2.add(1) };
-        $b_ptr_2 = unsafe { $b_ptr_2.add(1) };
-    }};
-}
-
-macro_rules! _unroll_one_eq_to_aligned_x2 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_eq_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_aligned_x1!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_eq_to_aligned_x4 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_eq_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_aligned_x2!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_eq_to_aligned_x8 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_eq_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_aligned_x4!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
-}
-
-macro_rules! _unroll_one_eq_to_aligned_x16 {
-    ($a_ptr_2:expr, $b_ptr_2:expr, $a_ptr_end:expr, $label:tt) => {{
-        _unroll_one_eq_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-        _unroll_one_eq_to_aligned_x8!($a_ptr_2, $b_ptr_2, $a_ptr_end, $label);
-    }};
+        a_ptr_cur = unsafe { a_ptr_cur.add(1) };
+        b_ptr_cur = unsafe { b_ptr_cur.add(1) };
+    }
+    (
+        Some((a_ptr_end, unsafe { b_ptr.add(remaining_align) })),
+        None,
+    )
 }
 
 #[inline(always)]
@@ -75,16 +56,7 @@ pub(crate) fn _eq_to_aligned_u256(
     a_ptr: *const u8,
     b_ptr: *const u8,
 ) -> (Option<(*const u8, *const u8)>, Option<bool>) {
-    let remaining_align = 0x20_usize - ((a_ptr as usize) & 0x1F_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (Some((a_ptr_end, b_ptr_end)), None)
+    _eq_to_aligned::<32>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
@@ -92,15 +64,7 @@ pub(crate) fn _eq_to_aligned_u128(
     a_ptr: *const u8,
     b_ptr: *const u8,
 ) -> (Option<(*const u8, *const u8)>, Option<bool>) {
-    let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_eq_to_aligned_x16!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (Some((a_ptr_end, b_ptr_end)), None)
+    _eq_to_aligned::<16>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
@@ -108,15 +72,7 @@ pub(crate) fn _eq_to_aligned_u64(
     a_ptr: *const u8,
     b_ptr: *const u8,
 ) -> (Option<(*const u8, *const u8)>, Option<bool>) {
-    let remaining_align = 0x08_usize - ((a_ptr as usize) & 0x07_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_eq_to_aligned_x8!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (Some((a_ptr_end, b_ptr_end)), None)
+    _eq_to_aligned::<8>(a_ptr, b_ptr)
 }
 
 #[inline(always)]
@@ -124,15 +80,7 @@ fn _eq_to_aligned_u32(
     a_ptr: *const u8,
     b_ptr: *const u8,
 ) -> (Option<(*const u8, *const u8)>, Option<bool>) {
-    let remaining_align = 0x04_usize - ((a_ptr as usize) & 0x03_usize);
-    let a_ptr_end = unsafe { a_ptr.add(remaining_align) };
-    let b_ptr_end = unsafe { b_ptr.add(remaining_align) };
-    let mut a_ptr_2 = a_ptr;
-    let mut b_ptr_2 = b_ptr;
-    'near: loop {
-        _unroll_one_eq_to_aligned_x4!(a_ptr_2, b_ptr_2, a_ptr_end, 'near);
-    }
-    (Some((a_ptr_end, b_ptr_end)), None)
+    _eq_to_aligned::<4>(a_ptr, b_ptr)
 }
 
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]

@@ -28,40 +28,23 @@ pub fn _memrchr_qpl_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
     }
 }
 
-macro_rules! _unroll_one_rchr_to_aligned_x1 {
-    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
-        if $buf_ptr_2 <= $buf_ptr_min {
-            break;
+#[inline(always)]
+fn _rchr_qpl_to_aligned<const ALIGN: usize>(
+    buf_ptr_cur: *const u8,
+    c: B1Qpl,
+    st_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let buf_ptr_end = buf_ptr_cur;
+    let remaining_align = (buf_ptr_end as usize) & (ALIGN - 1);
+    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
+    let mut cur_ptr = buf_ptr_end;
+    while cur_ptr > buf_ptr_min {
+        cur_ptr = unsafe { cur_ptr.sub(1) };
+        if let Some(pos) = _rchr_qpl_c1_aa_x1(cur_ptr, c, st_ptr) {
+            return (None, Some(pos));
         }
-        $buf_ptr_2 = unsafe { $buf_ptr_2.sub(1) };
-        let r = _rchr_qpl_c1_aa_x1($buf_ptr_2, $c, $start_ptr);
-        if r.is_some() {
-            return (None, r);
-        }
-    }};
-}
-
-macro_rules! _unroll_one_rchr_to_aligned_x4 {
-    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_rchr_to_aligned_x1!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-        _unroll_one_rchr_to_aligned_x1!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-        _unroll_one_rchr_to_aligned_x1!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-        _unroll_one_rchr_to_aligned_x1!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-    }};
-}
-
-macro_rules! _unroll_one_rchr_to_aligned_x8 {
-    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_rchr_to_aligned_x4!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-        _unroll_one_rchr_to_aligned_x4!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-    }};
-}
-
-macro_rules! _unroll_one_rchr_to_aligned_x16 {
-    ($buf_ptr_2:expr, $buf_ptr_min:expr, $c:expr, $start_ptr:expr) => {{
-        _unroll_one_rchr_to_aligned_x8!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-        _unroll_one_rchr_to_aligned_x8!($buf_ptr_2, $buf_ptr_min, $c, $start_ptr);
-    }};
+    }
+    (Some(buf_ptr_min), None)
 }
 
 #[inline(always)]
@@ -70,15 +53,7 @@ pub(crate) fn _rchr_qpl_to_aligned_u256(
     c: B1Qpl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let buf_ptr_end = buf_ptr_cur;
-    let remaining_align = (buf_ptr_end as usize) & 0x1F_usize;
-    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr_end;
-    loop {
-        _unroll_one_rchr_to_aligned_x16!(buf_ptr_2, buf_ptr_min, c, st_ptr);
-        _unroll_one_rchr_to_aligned_x16!(buf_ptr_2, buf_ptr_min, c, st_ptr);
-    }
-    (Some(buf_ptr_min), None)
+    _rchr_qpl_to_aligned::<32>(buf_ptr_cur, c, st_ptr)
 }
 
 #[inline(always)]
@@ -87,14 +62,7 @@ pub(crate) fn _rchr_qpl_to_aligned_u128(
     c: B1Qpl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let buf_ptr_end = buf_ptr_cur;
-    let remaining_align = (buf_ptr_end as usize) & 0x0F_usize;
-    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr_end;
-    loop {
-        _unroll_one_rchr_to_aligned_x16!(buf_ptr_2, buf_ptr_min, c, st_ptr);
-    }
-    (Some(buf_ptr_min), None)
+    _rchr_qpl_to_aligned::<16>(buf_ptr_cur, c, st_ptr)
 }
 
 #[inline(always)]
@@ -103,14 +71,7 @@ fn _rchr_qpl_to_aligned_u64(
     c: B1Qpl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let buf_ptr_end = buf_ptr_cur;
-    let remaining_align = (buf_ptr_end as usize) & 0x07_usize;
-    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr_end;
-    loop {
-        _unroll_one_rchr_to_aligned_x8!(buf_ptr_2, buf_ptr_min, c, st_ptr);
-    }
-    (Some(buf_ptr_min), None)
+    _rchr_qpl_to_aligned::<8>(buf_ptr_cur, c, st_ptr)
 }
 
 #[inline(always)]
@@ -119,14 +80,7 @@ fn _rchr_qpl_to_aligned_u32(
     c: B1Qpl,
     st_ptr: *const u8,
 ) -> (Option<*const u8>, Option<usize>) {
-    let buf_ptr_end = buf_ptr_cur;
-    let remaining_align = (buf_ptr_end as usize) & 0x03_usize;
-    let buf_ptr_min = unsafe { buf_ptr_end.sub(remaining_align) };
-    let mut buf_ptr_2 = buf_ptr_end;
-    loop {
-        _unroll_one_rchr_to_aligned_x4!(buf_ptr_2, buf_ptr_min, c, st_ptr);
-    }
-    (Some(buf_ptr_min), None)
+    _rchr_qpl_to_aligned::<4>(buf_ptr_cur, c, st_ptr)
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
