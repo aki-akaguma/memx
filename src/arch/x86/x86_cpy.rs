@@ -114,65 +114,31 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    b_ptr.prefetch_read_data();
-                    _cpy_b16_aa_x16(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    b_ptr.prefetch_read_data();
-                    _cpy_b16_aa_x8(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    unsafe { _cpy_b16_aa_x1(a_ptr, b_ptr) };
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) =
+                _unroll_loop_dual_action_with_prefetch::<8, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    unsafe { _cpy_b16_aa_x1(ap, bp) };
+                });
+            a_ptr = ap;
+            b_ptr = bp;
+
+            let (ap, bp) = _unroll_loop_dual_action::<1, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                unsafe { _cpy_b16_aa_x1(ap, bp) };
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         } else {
-            {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    b_ptr.prefetch_read_data();
-                    _cpy_b16_au_x16(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    b_ptr.prefetch_read_data();
-                    _cpy_b16_au_x8(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    unsafe { _cpy_b16_au_x1(a_ptr, b_ptr) };
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) =
+                _unroll_loop_dual_action_with_prefetch::<8, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    unsafe { _cpy_b16_au_x1(ap, bp) };
+                });
+            a_ptr = ap;
+            b_ptr = bp;
+
+            let (ap, bp) = _unroll_loop_dual_action::<1, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                unsafe { _cpy_b16_au_x1(ap, bp) };
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         }
     }
     // the remaining data is the max: 15 bytes.
@@ -182,75 +148,22 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
 
 #[inline(always)]
 unsafe fn _cpy_b16_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    unsafe {
-        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-        _mm_storeu_si128(a_ptr as *mut __m128i, mm_0_b);
-    }
+    let mm_0_b = unsafe { _mm_loadu_si128(b_ptr as *const __m128i) };
+    unsafe { _mm_storeu_si128(a_ptr as *mut __m128i, mm_0_b) };
 }
 
 #[inline(always)]
 unsafe fn _cpy_b16_au_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    unsafe {
-        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-        _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
-    }
-}
-
-#[inline(always)]
-fn _cpy_b16_au_x2(a_ptr: *mut u8, b_ptr: *const u8) {
-    unsafe { _cpy_b16_au_x1(a_ptr, b_ptr) };
-    unsafe { _cpy_b16_au_x1(a_ptr.add(16), b_ptr.add(16)) }
-}
-
-#[inline(always)]
-fn _cpy_b16_au_x4(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_au_x2(a_ptr, b_ptr);
-    _cpy_b16_au_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) });
-}
-
-#[inline(always)]
-fn _cpy_b16_au_x8(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_au_x4(a_ptr, b_ptr);
-    _cpy_b16_au_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) });
-}
-
-#[inline(always)]
-fn _cpy_b16_au_x16(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_au_x8(a_ptr, b_ptr);
-    _cpy_b16_au_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) });
+    let mm_0_b = unsafe { _mm_loadu_si128(b_ptr as *const __m128i) };
+    unsafe { _mm_store_si128(a_ptr as *mut __m128i, mm_0_b) };
 }
 
 #[inline(always)]
 unsafe fn _cpy_b16_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
-    unsafe {
-        let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
-        _mm_store_si128(a_ptr as *mut __m128i, mm_0_b);
-    }
+    let mm_0_b = unsafe { _mm_load_si128(b_ptr as *const __m128i) };
+    unsafe { _mm_store_si128(a_ptr as *mut __m128i, mm_0_b) };
 }
 
-#[inline(always)]
-fn _cpy_b16_aa_x2(a_ptr: *mut u8, b_ptr: *const u8) {
-    unsafe { _cpy_b16_aa_x1(a_ptr, b_ptr) };
-    unsafe { _cpy_b16_aa_x1(a_ptr.add(16), b_ptr.add(16)) }
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x4(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x2(a_ptr, b_ptr);
-    _cpy_b16_aa_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) });
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x8(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x4(a_ptr, b_ptr);
-    _cpy_b16_aa_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) });
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x16(a_ptr: *mut u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x8(a_ptr, b_ptr);
-    _cpy_b16_aa_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) });
-}
 
 #[cfg(test)]
 mod disasm {

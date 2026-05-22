@@ -1,27 +1,20 @@
-use crate::utils::*;
+use crate::utils::B1Sgl;
+use crate::utils::B2Sgl;
+use crate::utils::B4Sgl;
+use crate::utils::B8Sgl;
+use crate::utils::B16Sgl;
+use crate::utils::PtrOps;
+use crate::utils::_unroll_loop_action;
 
 #[inline(never)]
 pub fn _memset_impl(buf: &mut [u8], c1: u8) {
+    #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+    _start_set_64(buf, c1);
     #[cfg(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
+        not(any(target_pointer_width = "64", feature = "test_pointer_width_64")),
+        any(target_pointer_width = "32", feature = "test_pointer_width_32")
     ))]
-    {
-        #[cfg(feature = "test_pointer_width_64")]
-        _start_set_64(buf, c1);
-        #[cfg(feature = "test_pointer_width_32")]
-        _start_set_32(buf, c1);
-    }
-    #[cfg(not(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
-    )))]
-    {
-        #[cfg(target_pointer_width = "64")]
-        _start_set_64(buf, c1);
-        #[cfg(target_pointer_width = "32")]
-        _start_set_32(buf, c1);
-    }
+    _start_set_32(buf, c1);
 }
 
 #[inline(always)]
@@ -63,7 +56,7 @@ fn _set_to_aligned_u16(buf_ptr: *mut u8, c: B1Sgl) -> *mut u8 {
 
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_set_128(buf: &mut [u8], c_1: u8) {
+pub(crate) fn _start_set_128(buf: &mut [u8], c_1: u8) {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_mut_ptr();
     let end_ptr = unsafe { buf_ptr.add(buf_len) };
@@ -79,45 +72,21 @@ fn _start_set_128(buf: &mut [u8], c_1: u8) {
         }
         // the loop
         {
-            let unroll = 8;
-            let loop_size = 16;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c16_aa_x8(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        /*
-        {
-            let unroll = 4;
-            let loop_size = 16;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c16_aa_x4(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<8, 16, _>(buf_ptr, end_ptr, |p| {
+                _set_c16_aa_x1(p, cc);
+            });
         }
         {
-            let unroll = 2;
-            let loop_size = 16;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c16_aa_x2(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 16;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c16_aa_x1(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<1, 16, _>(buf_ptr, end_ptr, |p| {
+                _set_c16_aa_x1(p, cc);
+            });
         }
     }
     // the remaining data is the max: 15 bytes.
     _memset_remaining_15_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
-//#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
 fn _start_set_64(buf: &mut [u8], c_1: u8) {
     let buf_len = buf.len();
@@ -135,53 +104,26 @@ fn _start_set_64(buf: &mut [u8], c_1: u8) {
         }
         // the loop
         {
-            let unroll = 16;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c8_aa_x16(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<16, 8, _>(buf_ptr, end_ptr, |p| {
+                _set_c8_aa_x1(p, cc);
+            });
         }
         {
-            let unroll = 8;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c8_aa_x8(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        /*
-        {
-            let unroll = 4;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c8_aa_x4(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<8, 8, _>(buf_ptr, end_ptr, |p| {
+                _set_c8_aa_x1(p, cc);
+            });
         }
         {
-            let unroll = 2;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c8_aa_x2(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c8_aa_x1(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<1, 8, _>(buf_ptr, end_ptr, |p| {
+                _set_c8_aa_x1(p, cc);
+            });
         }
     }
     // the remaining data is the max: 7 bytes.
     _memset_remaining_7_bytes_impl(buf_ptr, cc.into(), end_ptr)
 }
 
-//#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
+#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
 fn _start_set_32(buf: &mut [u8], c_1: u8) {
     let buf_len = buf.len();
@@ -199,38 +141,14 @@ fn _start_set_32(buf: &mut [u8], c_1: u8) {
         }
         // the loop
         {
-            let unroll = 8;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c4_aa_x8(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        /*
-        {
-            let unroll = 4;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c4_aa_x4(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<8, 4, _>(buf_ptr, end_ptr, |p| {
+                _set_c4_aa_x1(p, cc);
+            });
         }
         {
-            let unroll = 2;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c4_aa_x2(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                _set_c4_aa_x1(buf_ptr, cc);
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
+            buf_ptr = _unroll_loop_action::<1, 4, _>(buf_ptr, end_ptr, |p| {
+                _set_c4_aa_x1(p, cc);
+            });
         }
     }
     // the remaining data is the max: 3 bytes.
@@ -319,9 +237,8 @@ fn _memset_remaining_3_bytes_impl_unaligned(buf_ptr: *mut u8, cc: B2Sgl, end_ptr
     }
     // the remaining data is the max: 1 bytes.
     {
-        let unroll = 1;
         let loop_size = 1;
-        if buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             _set_c1_aa_x1(buf_ptr, cc.into());
         }
     }
@@ -339,9 +256,8 @@ fn _memset_remaining_3_bytes_impl_aligned(buf_ptr: *mut u8, cc: B2Sgl, end_ptr: 
     }
     // the remaining data is the max: 1 bytes.
     {
-        let unroll = 1;
         let loop_size = 1;
-        if buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
+        if buf_ptr.is_not_over(end_ptr, loop_size) {
             _set_c1_aa_x1(buf_ptr, cc.into());
         }
     }
@@ -361,20 +277,23 @@ fn _set_c16_aa_x1(buf_ptr: *mut u8, c16: B16Sgl) {
 
 #[inline(always)]
 fn _set_c16_aa_x2(buf_ptr: *mut u8, c16: B16Sgl) {
-    _set_c16_aa_x1(buf_ptr, c16);
-    _set_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16);
+    _unroll_loop_action::<2, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 2) }, |p| {
+        _set_c16_aa_x1(p, c16);
+    });
 }
 
 #[inline(always)]
 fn _set_c16_aa_x4(buf_ptr: *mut u8, c16: B16Sgl) {
-    _set_c16_aa_x2(buf_ptr, c16);
-    _set_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16);
+    _unroll_loop_action::<4, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 4) }, |p| {
+        _set_c16_aa_x1(p, c16);
+    });
 }
 
 #[inline(always)]
 fn _set_c16_aa_x8(buf_ptr: *mut u8, c16: B16Sgl) {
-    _set_c16_aa_x4(buf_ptr, c16);
-    _set_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16);
+    _unroll_loop_action::<8, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 8) }, |p| {
+        _set_c16_aa_x1(p, c16);
+    });
 }
 
 #[inline(always)]
@@ -391,26 +310,30 @@ fn _set_c8_aa_x1(buf_ptr: *mut u8, c8: B8Sgl) {
 
 #[inline(always)]
 fn _set_c8_aa_x2(buf_ptr: *mut u8, c8: B8Sgl) {
-    _set_c8_aa_x1(buf_ptr, c8);
-    _set_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8);
+    _unroll_loop_action::<2, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 2) }, |p| {
+        _set_c8_aa_x1(p, c8);
+    });
 }
 
 #[inline(always)]
 fn _set_c8_aa_x4(buf_ptr: *mut u8, c8: B8Sgl) {
-    _set_c8_aa_x2(buf_ptr, c8);
-    _set_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8);
+    _unroll_loop_action::<4, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 4) }, |p| {
+        _set_c8_aa_x1(p, c8);
+    });
 }
 
 #[inline(always)]
 fn _set_c8_aa_x8(buf_ptr: *mut u8, c8: B8Sgl) {
-    _set_c8_aa_x4(buf_ptr, c8);
-    _set_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8);
+    _unroll_loop_action::<8, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 8) }, |p| {
+        _set_c8_aa_x1(p, c8);
+    });
 }
 
 #[inline(always)]
 fn _set_c8_aa_x16(buf_ptr: *mut u8, c8: B8Sgl) {
-    _set_c8_aa_x8(buf_ptr, c8);
-    _set_c8_aa_x8(unsafe { buf_ptr.add(8 * 8) }, c8);
+    _unroll_loop_action::<16, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 16) }, |p| {
+        _set_c8_aa_x1(p, c8);
+    });
 }
 
 #[inline(always)]
@@ -421,20 +344,23 @@ fn _set_c4_aa_x1(buf_ptr: *mut u8, c4: B4Sgl) {
 
 #[inline(always)]
 fn _set_c4_aa_x2(buf_ptr: *mut u8, c4: B4Sgl) {
-    _set_c4_aa_x1(buf_ptr, c4);
-    _set_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4);
+    _unroll_loop_action::<2, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 2) }, |p| {
+        _set_c4_aa_x1(p, c4);
+    });
 }
 
 #[inline(always)]
 fn _set_c4_aa_x4(buf_ptr: *mut u8, c4: B4Sgl) {
-    _set_c4_aa_x2(buf_ptr, c4);
-    _set_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4);
+    _unroll_loop_action::<4, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 4) }, |p| {
+        _set_c4_aa_x1(p, c4);
+    });
 }
 
 #[inline(always)]
 fn _set_c4_aa_x8(buf_ptr: *mut u8, c4: B4Sgl) {
-    _set_c4_aa_x4(buf_ptr, c4);
-    _set_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4);
+    _unroll_loop_action::<8, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 8) }, |p| {
+        _set_c4_aa_x1(p, c4);
+    });
 }
 
 #[inline(always)]
@@ -454,34 +380,6 @@ fn _set_c1_aa_x1(buf_ptr: *mut u8, c1: B1Sgl) {
     let aa_ptr = buf_ptr;
     unsafe { aa_ptr.write(c1.v1) };
 }
-
-#[inline(always)]
-fn _set_c1_aa_x2(buf_ptr: *mut u8, c1: B1Sgl) {
-    _set_c1_aa_x1(buf_ptr, c1);
-    _set_c1_aa_x1(unsafe { buf_ptr.add(1) }, c1);
-}
-
-#[inline(always)]
-fn _set_c1_aa_x4(buf_ptr: *mut u8, c1: B1Sgl) {
-    _set_c1_aa_x2(buf_ptr, c1);
-    _set_c1_aa_x2(unsafe { buf_ptr.add(2) }, c1);
-}
-
-#[inline(always)]
-fn _set_c1_aa_x8(buf_ptr: *mut u8, c1: B1Sgl) {
-    _set_c1_aa_x4(buf_ptr, c1);
-    _set_c1_aa_x4(unsafe { buf_ptr.add(4) }, c1);
-}
-/*
- * The simple implement:
-
-#[inline(always)]
-pub fn _memset_impl(buf: &mut [u8], c: u8) {
-    for i in 0..buf.len() {
-        buf[i] = c;
-    }
-}
-*/
 
 #[cfg(test)]
 mod disasm {

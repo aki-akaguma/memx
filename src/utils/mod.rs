@@ -1,3 +1,17 @@
+mod needles;
+pub(crate) use needles::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
+pub(crate) use needles::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
+pub(crate) use needles::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
+pub(crate) use needles::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
+
+pub use needles::dbl::B1Dbl;
+pub use needles::qpl::B1Qpl;
+pub use needles::sgl::B1Sgl;
+pub use needles::tpl::B1Tpl;
+
+pub(crate) mod unroll;
+pub(crate) use unroll::*;
+
 #[cfg(feature = "test")]
 #[allow(unused_imports)]
 use core::convert::TryInto;
@@ -154,6 +168,7 @@ impl PtrOps for *mut u8 {
 }
 
 macro_rules! read_native_integer_impl {
+
     ($($fn_name:ident: $ty:ident,)+) => {$(
         #[inline(always)]
         pub(crate) unsafe fn $fn_name(buf_ptr: *const u8) -> $ty {
@@ -388,17 +403,6 @@ packed_integers! {
  * https://pzemtsov.github.io/2019/09/26/making-a-char-searcher-in-c.html
  * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
 */
-
-mod needles;
-pub(crate) use needles::dbl::{B16Dbl, B2Dbl, B4Dbl, B8Dbl};
-pub(crate) use needles::qpl::{B16Qpl, B2Qpl, B4Qpl, B8Qpl};
-pub(crate) use needles::sgl::{B16Sgl, B2Sgl, B4Sgl, B8Sgl};
-pub(crate) use needles::tpl::{B16Tpl, B2Tpl, B4Tpl, B8Tpl};
-
-pub use needles::dbl::B1Dbl;
-pub use needles::qpl::B1Qpl;
-pub use needles::sgl::B1Sgl;
-pub use needles::tpl::B1Tpl;
 
 /// ASCII Character Rarity Weights (Stochastic Search Weights)
 ///

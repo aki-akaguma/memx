@@ -121,59 +121,61 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            {
-                let unroll = 4;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_aa_x4(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                let r = unsafe { _eq_b16_aa_x1(ap, bp) };
+                if r {
+                    None
+                } else {
+                    Some(false)
                 }
+            });
+            if let Some(res) = r {
+                return res;
             }
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = unsafe { _eq_b16_aa_x1(a_ptr, b_ptr) };
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            a_ptr = ap;
+            b_ptr = bp;
+
+            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                let r = unsafe { _eq_b16_aa_x1(ap, bp) };
+                if r {
+                    None
+                } else {
+                    Some(false)
                 }
+            });
+            if let Some(res) = r {
+                return res;
             }
+            a_ptr = ap;
+            b_ptr = bp;
         } else {
-            {
-                let unroll = 4;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    a_ptr.prefetch_read_data();
-                    b_ptr.prefetch_read_data();
-                    let r = _eq_b16_au_x4(a_ptr, b_ptr);
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                let r = unsafe { _eq_b16_au_x1(ap, bp) };
+                if r {
+                    None
+                } else {
+                    Some(false)
                 }
+            });
+            if let Some(res) = r {
+                return res;
             }
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    let r = unsafe { _eq_b16_au_x1(a_ptr, b_ptr) };
-                    if !r {
-                        return r;
-                    }
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
+            a_ptr = ap;
+            b_ptr = bp;
+
+            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                let r = unsafe { _eq_b16_au_x1(ap, bp) };
+                if r {
+                    None
+                } else {
+                    Some(false)
                 }
+            });
+            if let Some(res) = r {
+                return res;
             }
+            a_ptr = ap;
+            b_ptr = bp;
         }
         // the remaining data is the max: 15 bytes.
         basic::_memeq_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
@@ -182,108 +184,31 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
 
 #[inline(always)]
 unsafe fn _eq_b16_uu_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    unsafe {
-        let mm_0_a = _mm_loadu_si128(a_ptr as *const __m128i);
-        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-        let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
-        mask_0 == 0xffff
-    }
+    let mm_0_a = unsafe { _mm_loadu_si128(a_ptr as *const __m128i) };
+    let mm_0_b = unsafe { _mm_loadu_si128(b_ptr as *const __m128i) };
+    let mm_0_eq = unsafe { _mm_cmpeq_epi8(mm_0_a, mm_0_b) };
+    let mask_0 = unsafe { _mm_movemask_epi8(mm_0_eq) } as u32;
+    mask_0 == 0xffff
 }
 
 #[inline(always)]
 unsafe fn _eq_b16_au_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    unsafe {
-        let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
-        let mm_0_b = _mm_loadu_si128(b_ptr as *const __m128i);
-        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-        let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
-        mask_0 == 0xffff
-    }
-}
-
-#[inline(always)]
-fn _eq_b16_au_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = unsafe { _eq_b16_au_x1(a_ptr, b_ptr) };
-    if !r {
-        return r;
-    }
-    unsafe { _eq_b16_au_x1(a_ptr.add(16), b_ptr.add(16)) }
-}
-
-#[inline(always)]
-fn _eq_b16_au_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_au_x2(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_au_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
-}
-
-#[inline(always)]
-fn _eq_b16_au_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_au_x4(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_au_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) })
-}
-
-#[inline(always)]
-fn _eq_b16_au_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_au_x8(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_au_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) })
+    let mm_0_a = unsafe { _mm_load_si128(a_ptr as *const __m128i) };
+    let mm_0_b = unsafe { _mm_loadu_si128(b_ptr as *const __m128i) };
+    let mm_0_eq = unsafe { _mm_cmpeq_epi8(mm_0_a, mm_0_b) };
+    let mask_0 = unsafe { _mm_movemask_epi8(mm_0_eq) } as u32;
+    mask_0 == 0xffff
 }
 
 #[inline(always)]
 unsafe fn _eq_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    unsafe {
-        let mm_0_a = _mm_load_si128(a_ptr as *const __m128i);
-        let mm_0_b = _mm_load_si128(b_ptr as *const __m128i);
-        let mm_0_eq = _mm_cmpeq_epi8(mm_0_a, mm_0_b);
-        let mask_0 = _mm_movemask_epi8(mm_0_eq) as u64;
-        mask_0 == 0xffff
-    }
+    let mm_0_a = unsafe { _mm_load_si128(a_ptr as *const __m128i) };
+    let mm_0_b = unsafe { _mm_load_si128(b_ptr as *const __m128i) };
+    let mm_0_eq = unsafe { _mm_cmpeq_epi8(mm_0_a, mm_0_b) };
+    let mask_0 = unsafe { _mm_movemask_epi8(mm_0_eq) } as u32;
+    mask_0 == 0xffff
 }
 
-#[inline(always)]
-fn _eq_b16_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = unsafe { _eq_b16_aa_x1(a_ptr, b_ptr) };
-    if !r {
-        return r;
-    }
-    unsafe { _eq_b16_aa_x1(a_ptr.add(16), b_ptr.add(16)) }
-}
-
-#[inline(always)]
-fn _eq_b16_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_aa_x2(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_aa_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
-}
-
-#[inline(always)]
-fn _eq_b16_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_aa_x4(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_aa_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) })
-}
-
-#[inline(always)]
-fn _eq_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let r = _eq_b16_aa_x8(a_ptr, b_ptr);
-    if !r {
-        return r;
-    }
-    _eq_b16_aa_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) })
-}
 
 #[cfg(test)]
 mod disasm {

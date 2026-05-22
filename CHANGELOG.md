@@ -10,10 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * code review report `docs/review.1.md`
 * documentation for stochastic search weights in `src/utils/mod.rs`
 * AArch64 support for `prefetch_read_data` using inline assembly
+* generic loop unrolling infrastructure in `src/utils/mod.rs` (`_unroll_loop`, `_unroll_loop_with_prefetch`, `_unroll_loop_dual`, `_unroll_loop_dual_action`, etc.)
 
 ### Changed
-* refactored alignment loops in all core memory manipulation modules (`memchr`, `memcmp`, `memeq`, `memcpy`, `memset`, etc.) to use generic structured loops instead of macros
+* refactored all core memory manipulation modules in `src/mem/` to use generic structured loops and unrolling infrastructure for improved maintainability
+* refactored all x86 architecture-specific modules in `src/arch/x86/` to use generic unrolling utilities, ensuring consistency across the codebase
+* optimized alignment logic in both core and architecture-specific modules
+* moved generic loop unrolling infrastructure to a dedicated module `src/utils/unroll.rs` and added detailed developer documentation
 
+### Fixed
+* restored and verified "rewindable" (non-consuming) iterator semantics to match project requirements
 
 ### Removed
 * `#![cfg(not(tarpaulin_include))]` from xbench

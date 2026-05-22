@@ -1,5 +1,9 @@
 use super::super::RangeError;
-use crate::utils::*;
+use crate::utils::_read_a_native_endian_from_ptr_u16;
+use crate::utils::_unroll_loop_dual_action;
+use crate::utils::_unroll_loop_dual_action_with_prefetch;
+use crate::utils::PtrOps;
+use crate::utils::PtrOpsPrefetch;
 
 #[inline(never)]
 pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
@@ -11,26 +15,13 @@ pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
     if dst_len < src_len {
         return Err(RangeError);
     }
+    #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+    _start_cpy_64(dst, src);
     #[cfg(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
+        not(any(target_pointer_width = "64", feature = "test_pointer_width_64")),
+        any(target_pointer_width = "32", feature = "test_pointer_width_32")
     ))]
-    {
-        #[cfg(feature = "test_pointer_width_64")]
-        _start_cpy_64(dst, src);
-        #[cfg(feature = "test_pointer_width_32")]
-        _start_cpy_32(dst, src);
-    }
-    #[cfg(not(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
-    )))]
-    {
-        #[cfg(target_pointer_width = "64")]
-        _start_cpy_64(dst, src);
-        #[cfg(target_pointer_width = "32")]
-        _start_cpy_32(dst, src);
-    }
+    _start_cpy_32(dst, src);
     Ok(())
 }
 
@@ -70,7 +61,7 @@ pub(crate) fn _cpy_to_aligned_u32(a_ptr: *mut u8, b_ptr: *const u8) -> (*mut u8,
 
 //#[cfg(any(target_pointer_width = "128", feature = "test_pointer_width_128"))]
 #[inline(always)]
-fn _start_cpy_128(dst: &mut [u8], src: &[u8]) {
+pub(crate) fn _start_cpy_128(dst: &mut [u8], src: &[u8]) {
     let src_len = src.len();
     let mut a_ptr = dst.as_mut_ptr();
     let mut b_ptr = src.as_ptr();
@@ -81,89 +72,42 @@ fn _start_cpy_128(dst: &mut [u8], src: &[u8]) {
         // to a aligned pointer
         {
             if !a_ptr.is_aligned_u128() {
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    _cpy_b16_uu_x1(a_ptr, b_ptr);
-                    let remaining_align = 0x10_usize - ((a_ptr as usize) & 0x0F_usize);
-                    a_ptr = unsafe { a_ptr.add(remaining_align) };
-                    b_ptr = unsafe { b_ptr.add(remaining_align) };
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let (ap, bp) = _cpy_to_aligned_u128(a_ptr, b_ptr);
-                    a_ptr = ap;
-                    b_ptr = bp;
-                }
+                let (ap, bp) = _cpy_to_aligned_u128(a_ptr, b_ptr);
+                a_ptr = ap;
+                b_ptr = bp;
             }
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            /*
-            {
-                let unroll = 16;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_aa_x16(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_aa_x8(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_aa_x4(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_aa_x2(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_aa_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action_with_prefetch::<8, 16, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    _cpy_b16_aa_x1(ap, bp);
+                },
+            );
+            a_ptr = ap;
+            b_ptr = bp;
+            //
+            let (ap, bp) = _unroll_loop_dual_action::<1, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b16_aa_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         } else {
-            {
-                let unroll = 1;
-                let loop_size = 16;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b16_au_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action::<1, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b16_au_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         }
     }
     // the remaining data is the max: 15 bytes.
     _memcpy_remaining_15_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-//#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+#[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
 fn _start_cpy_64(dst: &mut [u8], src: &[u8]) {
     let src_len = src.len();
@@ -176,89 +120,42 @@ fn _start_cpy_64(dst: &mut [u8], src: &[u8]) {
         // to a aligned pointer
         {
             if !a_ptr.is_aligned_u64() {
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    _cpy_b8_uu_x1(a_ptr, b_ptr);
-                    let remaining_align = 0x08_usize - ((a_ptr as usize) & 0x07_usize);
-                    a_ptr = unsafe { a_ptr.add(remaining_align) };
-                    b_ptr = unsafe { b_ptr.add(remaining_align) };
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let (ap, bp) = _cpy_to_aligned_u64(a_ptr, b_ptr);
-                    a_ptr = ap;
-                    b_ptr = bp;
-                }
+                let (ap, bp) = _cpy_to_aligned_u64(a_ptr, b_ptr);
+                a_ptr = ap;
+                b_ptr = bp;
             }
         }
         // the loop
         if b_ptr.is_aligned_u64() {
-            /*
-            {
-                let unroll = 16;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_aa_x16(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_aa_x8(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_aa_x4(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_aa_x2(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            {
-                let unroll = 1;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_aa_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action_with_prefetch::<8, 8, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    _cpy_b8_aa_x1(ap, bp);
+                },
+            );
+            a_ptr = ap;
+            b_ptr = bp;
+            //
+            let (ap, bp) = _unroll_loop_dual_action::<1, 8, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b8_aa_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         } else {
-            {
-                let unroll = 1;
-                let loop_size = 8;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b8_au_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action::<1, 8, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b8_au_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         }
     }
     // the remaining data is the max: 7 bytes.
     _memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
-//#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
+#[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
 fn _start_cpy_32(dst: &mut [u8], src: &[u8]) {
     let src_len = src.len();
@@ -271,82 +168,35 @@ fn _start_cpy_32(dst: &mut [u8], src: &[u8]) {
         // to a aligned pointer
         {
             if !a_ptr.is_aligned_u32() {
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    _cpy_b4_uu_x1(a_ptr, b_ptr);
-                    let remaining_align = 0x04_usize - ((a_ptr as usize) & 0x03_usize);
-                    a_ptr = unsafe { a_ptr.add(remaining_align) };
-                    b_ptr = unsafe { b_ptr.add(remaining_align) };
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let (ap, bp) = _cpy_to_aligned_u32(a_ptr, b_ptr);
-                    a_ptr = ap;
-                    b_ptr = bp;
-                }
+                let (ap, bp) = _cpy_to_aligned_u32(a_ptr, b_ptr);
+                a_ptr = ap;
+                b_ptr = bp;
             }
         }
         // the loop
         if b_ptr.is_aligned_u32() {
-            /*
-            {
-                let unroll = 16;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_aa_x16(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 8;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_aa_x8(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            /*
-            {
-                let unroll = 4;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_aa_x4(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            {
-                let unroll = 2;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_aa_x2(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
-            */
-            {
-                let unroll = 1;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_aa_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action_with_prefetch::<8, 4, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    _cpy_b4_aa_x1(ap, bp);
+                },
+            );
+            a_ptr = ap;
+            b_ptr = bp;
+            //
+            let (ap, bp) = _unroll_loop_dual_action::<1, 4, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b4_aa_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         } else {
-            {
-                let unroll = 1;
-                let loop_size = 4;
-                while a_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                    _cpy_b4_au_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size * unroll) };
-                    b_ptr = unsafe { b_ptr.add(loop_size * unroll) };
-                }
-            }
+            let (ap, bp) = _unroll_loop_dual_action::<1, 4, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                _cpy_b4_au_x1(ap, bp);
+            });
+            a_ptr = ap;
+            b_ptr = bp;
         }
     }
     // the remaining data is the max: 3 bytes.
@@ -359,52 +209,20 @@ pub(crate) fn _memcpy_remaining_15_bytes_impl(
     src_ptr: *const u8,
     end_ptr: *mut u8,
 ) {
-    let a_ptr = dst_ptr;
-    let b_ptr = src_ptr;
-    /*
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
-    if a_ptr.is_aligned_u64() && b_ptr.is_aligned_u64() {
+    if a_ptr.is_aligned_u64() {
         let loop_size = 8;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near: loop {
-                for _ in 0..16 {
-                    if aa_ptr >= eend_ptr {
-                        break 'near;
-                    }
-                    _cpy_b8_aa_x1(aa_ptr, bb_ptr);
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
-                }
+            if b_ptr.is_aligned_u64() {
+                _cpy_b8_aa_x1(a_ptr, b_ptr);
+            } else {
+                _cpy_b8_au_x1(a_ptr, b_ptr);
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
-        }
-    } else {
-        let loop_size = 8;
-        if a_ptr.is_not_over(end_ptr, loop_size) {
-            let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near: loop {
-                for _ in 0..16 {
-                    if aa_ptr >= eend_ptr {
-                        break 'near;
-                    }
-                    _cpy_b8_uu_x1(aa_ptr, bb_ptr);
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
-                }
-            }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    */
-    // the remaining data is the max: 7 bytes.
     _memcpy_remaining_7_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
@@ -416,46 +234,18 @@ pub(crate) fn _memcpy_remaining_7_bytes_impl(
 ) {
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
-    if a_ptr.is_aligned_u32() && b_ptr.is_aligned_u32() {
+    if a_ptr.is_aligned_u32() {
         let loop_size = 4;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near_aa: loop {
-                for _ in 0..8 {
-                    if aa_ptr >= eend_ptr {
-                        break 'near_aa;
-                    }
-                    _cpy_b4_aa_x1(aa_ptr, bb_ptr);
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
-                }
+            if b_ptr.is_aligned_u32() {
+                _cpy_b4_aa_x1(a_ptr, b_ptr);
+            } else {
+                _cpy_b4_au_x1(a_ptr, b_ptr);
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
-        }
-    } else {
-        let loop_size = 4;
-        if a_ptr.is_not_over(end_ptr, loop_size) {
-            let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near_uu: loop {
-                for _ in 0..8 {
-                    if aa_ptr >= eend_ptr {
-                        break 'near_uu;
-                    }
-                    _cpy_b4_uu_x1(aa_ptr, bb_ptr);
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
-                }
-            }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    // the remaining data is the max: 3 bytes.
     _memcpy_remaining_3_bytes_impl(a_ptr, b_ptr, end_ptr)
 }
 
@@ -467,278 +257,102 @@ pub(crate) fn _memcpy_remaining_3_bytes_impl(
 ) {
     let mut a_ptr = dst_ptr;
     let mut b_ptr = src_ptr;
-    /*
-    if a_ptr.is_aligned_u16() && b_ptr.is_aligned_u16() {
+    if a_ptr.is_aligned_u16() {
         let loop_size = 2;
         if a_ptr.is_not_over(end_ptr, loop_size) {
-            let eend_ptr = unsafe { end_ptr.sub(loop_size) };
-            let mut aa_ptr = a_ptr;
-            let mut bb_ptr = b_ptr;
-            'near2: loop {
-                for _ in 0..16 {
-                    if aa_ptr >= eend_ptr {
-                        break 'near2;
-                    }
-                    _cpy_b2_aa_x1(aa_ptr, bb_ptr);
-                    aa_ptr = unsafe { aa_ptr.add(loop_size) };
-                    bb_ptr = unsafe { bb_ptr.add(loop_size) };
-                }
+            if b_ptr.is_aligned_u16() {
+                _cpy_b2_aa_x1(a_ptr, b_ptr);
+            } else {
+                _cpy_b2_uu_x1(a_ptr, b_ptr);
             }
-            a_ptr = aa_ptr;
-            b_ptr = bb_ptr;
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
-    */
     {
         let loop_size = 1;
-        if a_ptr.is_not_over(end_ptr, loop_size) {
-            'near_1: loop {
-                for _ in 0..8 {
-                    if a_ptr >= end_ptr {
-                        break 'near_1;
-                    }
-                    _cpy_b1_aa_x1(a_ptr, b_ptr);
-                    a_ptr = unsafe { a_ptr.add(loop_size) };
-                    b_ptr = unsafe { b_ptr.add(loop_size) };
-                }
-            }
+        while a_ptr < end_ptr {
+            _cpy_b1_aa_x1(a_ptr, b_ptr);
+            a_ptr = unsafe { a_ptr.add(loop_size) };
+            b_ptr = unsafe { b_ptr.add(loop_size) };
         }
     }
 }
 
 #[inline(always)]
-fn _cpy_b16_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b16_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u128).read_unaligned() };
     unsafe { (a_ptr as *mut u128).write_unaligned(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b16_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b16_au_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u128).read_unaligned() };
     unsafe { (a_ptr as *mut u128).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b16_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u128).read() };
     unsafe { (a_ptr as *mut u128).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b16_aa_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x1(a_ptr, b_ptr);
-    _cpy_b16_aa_x1(unsafe { a_ptr.add(16) }, unsafe { b_ptr.add(16) })
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x2(a_ptr, b_ptr);
-    _cpy_b16_aa_x2(unsafe { a_ptr.add(16 * 2) }, unsafe { b_ptr.add(16 * 2) })
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x4(a_ptr, b_ptr);
-    _cpy_b16_aa_x4(unsafe { a_ptr.add(16 * 4) }, unsafe { b_ptr.add(16 * 4) })
-}
-
-#[inline(always)]
-fn _cpy_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b16_aa_x8(a_ptr, b_ptr);
-    _cpy_b16_aa_x8(unsafe { a_ptr.add(16 * 8) }, unsafe { b_ptr.add(16 * 8) })
-}
-
-#[inline(always)]
-fn _cpy_b8_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b8_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u64).read_unaligned() };
     unsafe { (a_ptr as *mut u64).write_unaligned(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b8_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b8_au_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u64).read_unaligned() };
     unsafe { (a_ptr as *mut u64).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b8_au_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_au_x1(a_ptr, b_ptr);
-    _cpy_b8_au_x1(unsafe { a_ptr.add(8) }, unsafe { b_ptr.add(8) })
-}
-
-#[inline(always)]
-fn _cpy_b8_au_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_au_x2(a_ptr, b_ptr);
-    _cpy_b8_au_x2(unsafe { a_ptr.add(8 * 2) }, unsafe { b_ptr.add(8 * 2) })
-}
-
-#[inline(always)]
-fn _cpy_b8_au_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_au_x4(a_ptr, b_ptr);
-    _cpy_b8_au_x4(unsafe { a_ptr.add(8 * 4) }, unsafe { b_ptr.add(8 * 4) })
-}
-
-#[inline(always)]
-fn _cpy_b8_au_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_au_x8(a_ptr, b_ptr);
-    _cpy_b8_au_x8(unsafe { a_ptr.add(8 * 8) }, unsafe { b_ptr.add(8 * 8) })
-}
-
-#[inline(always)]
-fn _cpy_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b8_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u64).read() };
     unsafe { (a_ptr as *mut u64).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b8_aa_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_aa_x1(a_ptr, b_ptr);
-    _cpy_b8_aa_x1(unsafe { a_ptr.add(8) }, unsafe { b_ptr.add(8) })
-}
-
-#[inline(always)]
-fn _cpy_b8_aa_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_aa_x2(a_ptr, b_ptr);
-    _cpy_b8_aa_x2(unsafe { a_ptr.add(8 * 2) }, unsafe { b_ptr.add(8 * 2) })
-}
-
-#[inline(always)]
-fn _cpy_b8_aa_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_aa_x4(a_ptr, b_ptr);
-    _cpy_b8_aa_x4(unsafe { a_ptr.add(8 * 4) }, unsafe { b_ptr.add(8 * 4) })
-}
-
-#[inline(always)]
-fn _cpy_b8_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b8_aa_x8(a_ptr, b_ptr);
-    _cpy_b8_aa_x8(unsafe { a_ptr.add(8 * 8) }, unsafe { b_ptr.add(8 * 8) })
-}
-
-#[inline(always)]
-fn _cpy_b4_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b4_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u32).read_unaligned() };
     unsafe { (a_ptr as *mut u32).write_unaligned(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b4_au_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b4_au_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u32).read_unaligned() };
     unsafe { (a_ptr as *mut u32).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b4_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { (b_ptr as *const u32).read() };
     unsafe { (a_ptr as *mut u32).write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b4_aa_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b4_aa_x1(a_ptr, b_ptr);
-    _cpy_b4_aa_x1(unsafe { a_ptr.add(4) }, unsafe { b_ptr.add(4) })
-}
-
-#[inline(always)]
-fn _cpy_b4_aa_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b4_aa_x2(a_ptr, b_ptr);
-    _cpy_b4_aa_x2(unsafe { a_ptr.add(4 * 2) }, unsafe { b_ptr.add(4 * 2) })
-}
-
-#[inline(always)]
-fn _cpy_b4_aa_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b4_aa_x4(a_ptr, b_ptr);
-    _cpy_b4_aa_x4(unsafe { a_ptr.add(4 * 4) }, unsafe { b_ptr.add(4 * 4) })
-}
-
-#[inline(always)]
-fn _cpy_b4_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b4_aa_x8(a_ptr, b_ptr);
-    _cpy_b4_aa_x8(unsafe { a_ptr.add(4 * 8) }, unsafe { b_ptr.add(4 * 8) })
-}
-
-#[inline(always)]
-fn _cpy_b2_uu_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b2_uu_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { _read_a_native_endian_from_ptr_u16(b_ptr) };
     let aa_ptr = a_ptr as *mut u16;
     unsafe { aa_ptr.write_unaligned(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b2_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b2_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { _read_a_native_endian_from_ptr_u16(b_ptr) };
     let aa_ptr = a_ptr as *mut u16;
     unsafe { aa_ptr.write(bc) };
 }
 
 #[inline(always)]
-fn _cpy_b2_aa_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b2_aa_x1(a_ptr, b_ptr);
-    _cpy_b2_aa_x1(unsafe { a_ptr.add(2) }, unsafe { b_ptr.add(2) })
-}
-
-#[inline(always)]
-fn _cpy_b2_aa_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b2_aa_x2(a_ptr, b_ptr);
-    _cpy_b2_aa_x2(unsafe { a_ptr.add(2 * 2) }, unsafe { b_ptr.add(2 * 2) })
-}
-
-#[inline(always)]
-fn _cpy_b2_aa_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b2_aa_x4(a_ptr, b_ptr);
-    _cpy_b2_aa_x4(unsafe { a_ptr.add(2 * 4) }, unsafe { b_ptr.add(2 * 4) })
-}
-
-#[inline(always)]
-fn _cpy_b2_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b2_aa_x8(a_ptr, b_ptr);
-    _cpy_b2_aa_x8(unsafe { a_ptr.add(2 * 8) }, unsafe { b_ptr.add(2 * 8) })
-}
-
-#[inline(always)]
-fn _cpy_b1_aa_x1(a_ptr: *const u8, b_ptr: *const u8) {
+fn _cpy_b1_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let bc = unsafe { *b_ptr };
-    let aa_ptr = a_ptr as *mut u8;
+    let aa_ptr = a_ptr;
     unsafe { aa_ptr.write(bc) };
 }
-
-#[inline(always)]
-fn _cpy_b1_aa_x2(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b1_aa_x1(a_ptr, b_ptr);
-    _cpy_b1_aa_x1(unsafe { a_ptr.add(1) }, unsafe { b_ptr.add(1) })
-}
-
-#[inline(always)]
-fn _cpy_b1_aa_x4(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b1_aa_x2(a_ptr, b_ptr);
-    _cpy_b1_aa_x2(unsafe { a_ptr.add(2) }, unsafe { b_ptr.add(2) })
-}
-
-#[inline(always)]
-fn _cpy_b1_aa_x8(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b1_aa_x4(a_ptr, b_ptr);
-    _cpy_b1_aa_x4(unsafe { a_ptr.add(4) }, unsafe { b_ptr.add(4) })
-}
-
-#[inline(always)]
-fn _cpy_b1_aa_x16(a_ptr: *const u8, b_ptr: *const u8) {
-    _cpy_b1_aa_x8(a_ptr, b_ptr);
-    _cpy_b1_aa_x8(unsafe { a_ptr.add(8) }, unsafe { b_ptr.add(8) })
-}
-
-/*
- * The simple implement:
-
-#[inline(always)]
-pub fn _memcpy_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
-    if dst.len() < src.len() {
-        return Err(RangeError);
-    }
-    for i in 0..src.len() {
-        dst[i] = src[i];
-    }
-    Ok(())
-}
-*/
 
 #[cfg(test)]
 mod disasm {

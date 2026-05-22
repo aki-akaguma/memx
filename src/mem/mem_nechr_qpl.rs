@@ -1,90 +1,39 @@
-use crate::utils::*;
+use crate::utils::B1Qpl;
+use crate::utils::B2Qpl;
+use crate::utils::B4Qpl;
+use crate::utils::B8Qpl;
+use crate::utils::B16Qpl;
+use crate::utils::BitOrt;
+use crate::utils::HighBitProp;
+use crate::utils::PackedU128;
+use crate::utils::PackedU16;
+use crate::utils::PackedU32;
+use crate::utils::PackedU64;
+use crate::utils::PtrOps;
+use crate::utils::PtrOpsPrefetch;
+use crate::utils::_read_a_little_endian_from_ptr_u128;
+use crate::utils::_read_a_little_endian_from_ptr_u16;
+use crate::utils::_read_a_little_endian_from_ptr_u32;
+use crate::utils::_read_a_little_endian_from_ptr_u64;
+use crate::utils::_unroll_loop;
+use crate::utils::_unroll_loop_with_prefetch;
 
 #[inline(never)]
 pub fn _memnechr_qpl_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
+    #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
+    let r = _start_nechr_qpl_64(buf, needle);
     #[cfg(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
+        not(any(target_pointer_width = "64", feature = "test_pointer_width_64")),
+        any(target_pointer_width = "32", feature = "test_pointer_width_32")
     ))]
-    {
-        #[cfg(feature = "test_pointer_width_64")]
-        let r = _start_nechr_64(buf, needle);
-        #[cfg(feature = "test_pointer_width_32")]
-        let r = _start_nechr_32(buf, needle);
-        //
-        r
-    }
-    #[cfg(not(all(
-        feature = "test",
-        any(feature = "test_pointer_width_64", feature = "test_pointer_width_32")
-    )))]
-    {
-        #[cfg(target_pointer_width = "64")]
-        let r = _start_nechr_64(buf, needle);
-        #[cfg(target_pointer_width = "32")]
-        let r = _start_nechr_32(buf, needle);
-        //
-        r
-    }
-}
-
-#[inline(always)]
-fn _nechr_qpl_to_aligned<const ALIGN: usize>(
-    buf_ptr: *const u8,
-    c: B1Qpl,
-    start_ptr: *const u8,
-) -> (Option<*const u8>, Option<usize>) {
-    let remaining_align = ALIGN - ((buf_ptr as usize) & (ALIGN - 1));
-    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
-    let mut cur_ptr = buf_ptr;
-    while cur_ptr < buf_ptr_end {
-        if let Some(pos) = _nechr_c1_aa_x1(cur_ptr, c, start_ptr) {
-            return (None, Some(pos));
-        }
-        cur_ptr = unsafe { cur_ptr.add(1) };
-    }
-    (Some(buf_ptr_end), None)
-}
-
-#[inline(always)]
-pub(crate) fn _nechr_qpl_to_aligned_u256(
-    buf_ptr: *const u8,
-    c: B1Qpl,
-    start_ptr: *const u8,
-) -> (Option<*const u8>, Option<usize>) {
-    _nechr_qpl_to_aligned::<32>(buf_ptr, c, start_ptr)
-}
-
-#[inline(always)]
-pub(crate) fn _nechr_qpl_to_aligned_u128(
-    buf_ptr: *const u8,
-    c: B1Qpl,
-    start_ptr: *const u8,
-) -> (Option<*const u8>, Option<usize>) {
-    _nechr_qpl_to_aligned::<16>(buf_ptr, c, start_ptr)
-}
-
-#[inline(always)]
-fn _nechr_qpl_to_aligned_u64(
-    buf_ptr: *const u8,
-    c: B1Qpl,
-    start_ptr: *const u8,
-) -> (Option<*const u8>, Option<usize>) {
-    _nechr_qpl_to_aligned::<8>(buf_ptr, c, start_ptr)
-}
-
-#[inline(always)]
-fn _nechr_qpl_to_aligned_u32(
-    buf_ptr: *const u8,
-    c: B1Qpl,
-    start_ptr: *const u8,
-) -> (Option<*const u8>, Option<usize>) {
-    _nechr_qpl_to_aligned::<4>(buf_ptr, c, start_ptr)
+    let r = _start_nechr_qpl_32(buf, needle);
+    //
+    r
 }
 
 #[cfg(any(target_pointer_width = "64", feature = "test_pointer_width_64"))]
 #[inline(always)]
-fn _start_nechr_64(buf: &[u8], needle: B1Qpl) -> Option<usize> {
+fn _start_nechr_qpl_64(buf: &[u8], needle: B1Qpl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -96,76 +45,32 @@ fn _start_nechr_64(buf: &[u8], needle: B1Qpl) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u64() {
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    let r = _nechr_c8_uu_x1(buf_ptr, cc, start_ptr);
-                    if r.is_some() {
-                        return r;
-                    }
-                    let remaining_align = 0x08_usize - ((buf_ptr as usize) & 0x07_usize);
-                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let r = _nechr_qpl_to_aligned_u64(buf_ptr, needle, start_ptr);
-                    if let Some(p) = r.0 {
-                        buf_ptr = p;
-                    } else if let Some(v) = r.1 {
-                        return Some(v);
-                    }
+                let r = _nechr_qpl_to_aligned_u64(buf_ptr, needle, start_ptr);
+                if let Some(p) = r.0 {
+                    buf_ptr = p;
+                } else if let Some(v) = r.1 {
+                    return Some(v);
                 }
             }
         }
         // the loop
-        /*
         {
-            let unroll = 8;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
-                let r = _nechr_c8_aa_x8(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            let (r, p) = _unroll_loop_with_prefetch::<4, 8, _>(buf_ptr, end_ptr, |p| {
+                _nechr_c8_aa_x1(p, cc, start_ptr)
+            });
+            if r.is_some() {
+                return r;
             }
+            buf_ptr = p;
         }
-        */
         {
-            let unroll = 4;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                //buf_ptr.prefetch_read_data();
-                let r = _nechr_c8_aa_x4(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            let (r, p) = _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| {
+                _nechr_c8_aa_x1(p, cc, start_ptr)
+            });
+            if r.is_some() {
+                return r;
             }
-        }
-        /*
-        {
-            let unroll = 2;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _nechr_c8_aa_x2(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 8;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _nechr_c8_aa_x1(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
-            }
+            buf_ptr = p;
         }
     }
     // the remaining data is the max: 7 bytes.
@@ -174,7 +79,7 @@ fn _start_nechr_64(buf: &[u8], needle: B1Qpl) -> Option<usize> {
 
 #[cfg(any(target_pointer_width = "32", feature = "test_pointer_width_32"))]
 #[inline(always)]
-fn _start_nechr_32(buf: &[u8], needle: B1Qpl) -> Option<usize> {
+fn _start_nechr_qpl_32(buf: &[u8], needle: B1Qpl) -> Option<usize> {
     let buf_len = buf.len();
     let mut buf_ptr = buf.as_ptr();
     let start_ptr = buf_ptr;
@@ -186,75 +91,32 @@ fn _start_nechr_32(buf: &[u8], needle: B1Qpl) -> Option<usize> {
         // to a aligned pointer
         {
             if !buf_ptr.is_aligned_u32() {
-                #[cfg(not(feature = "test_alignment_check"))]
-                {
-                    let r = _nechr_c4_uu_x1(buf_ptr, cc, start_ptr);
-                    if r.is_some() {
-                        return r;
-                    }
-                    let remaining_align = 0x04_usize - ((buf_ptr as usize) & 0x03_usize);
-                    buf_ptr = unsafe { buf_ptr.add(remaining_align) };
-                }
-                #[cfg(feature = "test_alignment_check")]
-                {
-                    let r = _nechr_qpl_to_aligned_u32(buf_ptr, needle, start_ptr);
-                    if let Some(p) = r.0 {
-                        buf_ptr = p;
-                    } else if let Some(v) = r.1 {
-                        return Some(v);
-                    }
+                let r = _nechr_qpl_to_aligned_u32(buf_ptr, needle, start_ptr);
+                if let Some(p) = r.0 {
+                    buf_ptr = p;
+                } else if let Some(v) = r.1 {
+                    return Some(v);
                 }
             }
         }
         // the loop
-        /*
         {
-            let unroll = 8;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                buf_ptr.prefetch_read_data();
-                let r = _nechr_c4_aa_x8(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            let (r, p) = _unroll_loop_with_prefetch::<4, 4, _>(buf_ptr, end_ptr, |p| {
+                _nechr_c4_aa_x1(p, cc, start_ptr)
+            });
+            if r.is_some() {
+                return r;
             }
+            buf_ptr = p;
         }
-        */
         {
-            let unroll = 4;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _nechr_c4_aa_x4(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
+            let (r, p) = _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| {
+                _nechr_c4_aa_x1(p, cc, start_ptr)
+            });
+            if r.is_some() {
+                return r;
             }
-        }
-        /*
-        {
-            let unroll = 2;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _nechr_c4_aa_x2(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size * unroll) };
-            }
-        }
-        */
-        {
-            let unroll = 1;
-            let loop_size = 4;
-            while buf_ptr.is_not_over(end_ptr, loop_size * unroll) {
-                let r = _nechr_c4_aa_x1(buf_ptr, cc, start_ptr);
-                if r.is_some() {
-                    return r;
-                }
-                buf_ptr = unsafe { buf_ptr.add(loop_size) };
-            }
+            buf_ptr = p;
         }
     }
     // the remaining data is the max: 3 bytes.
@@ -376,41 +238,26 @@ fn _nechr_c16_aa_x1(buf_ptr: *const u8, c16: B16Qpl, st_ptr: *const u8) -> Optio
 
 #[inline(always)]
 fn _nechr_c16_aa_x2(buf_ptr: *const u8, c16: B16Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c16_aa_x1(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c16_aa_x1(unsafe { buf_ptr.add(16) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<2, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 2) }, |p| {
+        _nechr_c16_aa_x1(p, c16, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c16_aa_x4(buf_ptr: *const u8, c16: B16Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c16_aa_x2(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c16_aa_x2(unsafe { buf_ptr.add(16 * 2) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<4, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 4) }, |p| {
+        _nechr_c16_aa_x1(p, c16, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c16_aa_x8(buf_ptr: *const u8, c16: B16Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c16_aa_x4(buf_ptr, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c16_aa_x4(unsafe { buf_ptr.add(16 * 4) }, c16, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<8, 16, _>(buf_ptr, unsafe { buf_ptr.add(16 * 8) }, |p| {
+        _nechr_c16_aa_x1(p, c16, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
@@ -437,41 +284,26 @@ fn _nechr_c8_aa_x1(buf_ptr: *const u8, c8: B8Qpl, st_ptr: *const u8) -> Option<u
 
 #[inline(always)]
 fn _nechr_c8_aa_x2(buf_ptr: *const u8, c8: B8Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c8_aa_x1(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c8_aa_x1(unsafe { buf_ptr.add(8) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<2, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 2) }, |p| {
+        _nechr_c8_aa_x1(p, c8, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c8_aa_x4(buf_ptr: *const u8, c8: B8Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c8_aa_x2(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c8_aa_x2(unsafe { buf_ptr.add(8 * 2) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<4, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 4) }, |p| {
+        _nechr_c8_aa_x1(p, c8, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c8_aa_x8(buf_ptr: *const u8, c8: B8Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c8_aa_x4(buf_ptr, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c8_aa_x4(unsafe { buf_ptr.add(8 * 4) }, c8, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<8, 8, _>(buf_ptr, unsafe { buf_ptr.add(8 * 8) }, |p| {
+        _nechr_c8_aa_x1(p, c8, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
@@ -498,41 +330,26 @@ fn _nechr_c4_aa_x1(buf_ptr: *const u8, c4: B4Qpl, st_ptr: *const u8) -> Option<u
 
 #[inline(always)]
 fn _nechr_c4_aa_x2(buf_ptr: *const u8, c4: B4Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c4_aa_x1(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c4_aa_x1(unsafe { buf_ptr.add(4) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<2, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 2) }, |p| {
+        _nechr_c4_aa_x1(p, c4, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c4_aa_x4(buf_ptr: *const u8, c4: B4Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c4_aa_x2(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c4_aa_x2(unsafe { buf_ptr.add(4 * 2) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<4, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 4) }, |p| {
+        _nechr_c4_aa_x1(p, c4, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
 fn _nechr_c4_aa_x8(buf_ptr: *const u8, c4: B4Qpl, st_ptr: *const u8) -> Option<usize> {
-    let r = _nechr_c4_aa_x4(buf_ptr, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    let r = _nechr_c4_aa_x4(unsafe { buf_ptr.add(4 * 4) }, c4, st_ptr);
-    if r.is_some() {
-        return r;
-    }
-    None
+    let (r, _) = _unroll_loop::<8, 4, _>(buf_ptr, unsafe { buf_ptr.add(4 * 8) }, |p| {
+        _nechr_c4_aa_x1(p, c4, st_ptr)
+    });
+    r
 }
 
 #[inline(always)]
@@ -563,16 +380,56 @@ fn _nechr_c1_aa_x1(buf_ptr: *const u8, c1: B1Qpl, st_ptr: *const u8) -> Option<u
     }
 }
 
-/*
- * The simple implement:
+#[inline(always)]
+fn _nechr_qpl_to_aligned<const ALIGN: usize>(
+    buf_ptr: *const u8,
+    c: B1Qpl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    let remaining_align = ALIGN - ((buf_ptr as usize) & (ALIGN - 1));
+    let buf_ptr_end = unsafe { buf_ptr.add(remaining_align) };
+    let mut cur_ptr = buf_ptr;
+    while cur_ptr < buf_ptr_end {
+        if let Some(pos) = _nechr_c1_aa_x1(cur_ptr, c, start_ptr) {
+            return (None, Some(pos));
+        }
+        cur_ptr = unsafe { cur_ptr.add(1) };
+    }
+    (Some(buf_ptr_end), None)
+}
 
 #[inline(always)]
-pub fn _memnechr_qpl_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
-    for i in 0..buf.len() {
-        if buf[i] != needle.v1 && buf[i] != needle.v2 && buf[i] != needle.v3 && buf[i] != needle.v4 {
-            return Some(i);
-        }
-    }
-    None
+pub(crate) fn _nechr_qpl_to_aligned_u256(
+    buf_ptr: *const u8,
+    c: B1Qpl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    _nechr_qpl_to_aligned::<32>(buf_ptr, c, start_ptr)
 }
-*/
+
+#[inline(always)]
+pub(crate) fn _nechr_qpl_to_aligned_u128(
+    buf_ptr: *const u8,
+    c: B1Qpl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    _nechr_qpl_to_aligned::<16>(buf_ptr, c, start_ptr)
+}
+
+#[inline(always)]
+fn _nechr_qpl_to_aligned_u64(
+    buf_ptr: *const u8,
+    c: B1Qpl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    _nechr_qpl_to_aligned::<8>(buf_ptr, c, start_ptr)
+}
+
+#[inline(always)]
+fn _nechr_qpl_to_aligned_u32(
+    buf_ptr: *const u8,
+    c: B1Qpl,
+    start_ptr: *const u8,
+) -> (Option<*const u8>, Option<usize>) {
+    _nechr_qpl_to_aligned::<4>(buf_ptr, c, start_ptr)
+}

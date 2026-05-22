@@ -126,12 +126,13 @@ endef
 
 #bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr bench-memcmp bench-memeq bench-memcpy bench-memset bench-memmem bench-memrmem bench-memchr_dbl bench-memrchr_dbl bench-memchr_tpl bench-memrchr_tpl bench-memchr_qpl bench-memrchr_qpl bench-memnechr_dbl bench-memrnechr_dbl bench-memnechr_tpl bench-memrnechr_tpl bench-memnechr_qpl bench-memrnechr_qpl
 #bench_nms = bench-memchr
-#bench_nms = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
-#bench_nms = bench-memchr_dbl bench-memrchr_dbl bench-memnechr_dbl bench-memrnechr_dbl
-#bench_nms = bench-memchr_tpl bench-memrchr_tpl bench-memnechr_tpl bench-memrnechr_tpl
-#bench_nms = bench-memchr_qpl bench-memrchr_qpl bench-memnechr_qpl bench-memrnechr_qpl
-#bench_nms = bench-memcmp bench-memeq bench-memmem bench-memrmem
-bench_nms = bench-memcpy bench-memset
+bench_nms_chr = bench-memchr bench-memrchr bench-memnechr bench-memrnechr
+bench_nms_dbl = bench-memchr_dbl bench-memrchr_dbl bench-memnechr_dbl bench-memrnechr_dbl
+bench_nms_tpl = bench-memchr_tpl bench-memrchr_tpl bench-memnechr_tpl bench-memrnechr_tpl
+bench_nms_qpl = bench-memchr_qpl bench-memrchr_qpl bench-memnechr_qpl bench-memrnechr_qpl
+bench_nms_cmp = bench-memcmp bench-memeq bench-memmem bench-memrmem
+bench_nms_cpy = bench-memcpy bench-memset
+bench_nms = $(bench_nms_chr) $(bench_nms_dbl) $(bench_nms_tpl) $(bench_nms_qpl) $(bench_nms_cmp) $(bench_nms_cpy)
 
 #target_base = x86_64-unknown-linux i686-unknown-linux i586-unknown-linux
 #target_base = x86_64-unknown-linux i686-unknown-linux
