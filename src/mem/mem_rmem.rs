@@ -1,5 +1,5 @@
-use crate::utils::B1Sgl;
 use crate::utils::_ascii_stochas;
+use crate::utils::B1Sgl;
 
 #[inline(never)]
 pub fn _memrmem_impl(haystack: &[u8], needle: &[u8]) -> Option<usize> {
@@ -37,15 +37,12 @@ fn _memrmem_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let mut curr_idx = hay_len - nee_len;
     while curr_idx > 0 {
         let r = super::_memrchr_sgl_impl(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte));
-        if let Some(pos) = r {
-            let r_idx = pos;
-            if super::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
-                return Some(r_idx);
-            }
-            curr_idx = pos;
-        } else {
-            return None;
+        let pos = r?;
+        let r_idx = pos;
+        if super::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+            return Some(r_idx);
         }
+        curr_idx = pos;
     }
     None
 }
@@ -59,16 +56,13 @@ fn _memrmem_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     let mut curr_idx = hay_len;
     while curr_idx > 0 {
         let r = super::_memrchr_sgl_impl(&haystack[..curr_idx], B1Sgl::new(nee_last_byte));
-        if let Some(pos) = r {
-            if pos >= nee_last_idx {
-                let r_idx = pos - nee_last_idx;
-                if super::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
-                    return Some(r_idx);
-                }
-                curr_idx = pos;
-            } else {
-                return None;
+        let pos = r?;
+        if pos >= nee_last_idx {
+            let r_idx = pos - nee_last_idx;
+            if super::_memeq_impl(&haystack[r_idx..(r_idx + nee_len)], needle) {
+                return Some(r_idx);
             }
+            curr_idx = pos;
         } else {
             return None;
         }

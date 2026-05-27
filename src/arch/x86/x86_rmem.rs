@@ -1,6 +1,6 @@
 use crate::mem as basic;
-use crate::utils::B1Sgl;
 use crate::utils::_ascii_stochas;
+use crate::utils::B1Sgl;
 
 #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
 use super::cpuid;
@@ -96,15 +96,12 @@ fn _memrmem_sse2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx > 0 {
         let r =
             unsafe { super::_memrchr_sgl_sse2(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte)) };
-        if let Some(pos) = r {
-            let r_idx = pos;
-            if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
-                return Some(r_idx);
-            }
-            curr_idx = pos;
-        } else {
-            return None;
+        let pos = r?;
+        let r_idx = pos;
+        if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
+            return Some(r_idx);
         }
+        curr_idx = pos;
     }
     None
 }
@@ -119,16 +116,13 @@ fn _memrmem_sse2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx > 0 {
         let r =
             unsafe { super::_memrchr_sgl_sse2(&haystack[..curr_idx], B1Sgl::new(nee_last_byte)) };
-        if let Some(pos) = r {
-            if pos >= nee_last_idx {
-                let r_idx = pos - nee_last_idx;
-                if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
-                    return Some(r_idx);
-                }
-                curr_idx = pos;
-            } else {
-                return None;
+        let pos = r?;
+        if pos >= nee_last_idx {
+            let r_idx = pos - nee_last_idx;
+            if unsafe { super::_memeq_sse2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
+                return Some(r_idx);
             }
+            curr_idx = pos;
         } else {
             return None;
         }
@@ -173,15 +167,12 @@ fn _memrmem_avx2_impl_1st(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx > 0 {
         let r =
             unsafe { super::_memrchr_sgl_avx2(&haystack[..curr_idx], B1Sgl::new(nee_1st_byte)) };
-        if let Some(pos) = r {
-            let r_idx = pos;
-            if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
-                return Some(r_idx);
-            }
-            curr_idx = pos;
-        } else {
-            return None;
+        let pos = r?;
+        let r_idx = pos;
+        if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
+            return Some(r_idx);
         }
+        curr_idx = pos;
     }
     None
 }
@@ -196,16 +187,13 @@ fn _memrmem_avx2_impl_last(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     while curr_idx > 0 {
         let r =
             unsafe { super::_memrchr_sgl_avx2(&haystack[..curr_idx], B1Sgl::new(nee_last_byte)) };
-        if let Some(pos) = r {
-            if pos >= nee_last_idx {
-                let r_idx = pos - nee_last_idx;
-                if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
-                    return Some(r_idx);
-                }
-                curr_idx = pos;
-            } else {
-                return None;
+        let pos = r?;
+        if pos >= nee_last_idx {
+            let r_idx = pos - nee_last_idx;
+            if unsafe { super::_memeq_avx2(&haystack[r_idx..(r_idx + nee_len)], needle) } {
+                return Some(r_idx);
             }
+            curr_idx = pos;
         } else {
             return None;
         }
