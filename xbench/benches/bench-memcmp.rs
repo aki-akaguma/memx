@@ -1,5 +1,6 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::cmp::Ordering;
+use std::hint::black_box;
 
 mod barrier;
 use barrier::cache_line_flush;
