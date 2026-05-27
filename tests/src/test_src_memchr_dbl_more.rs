@@ -8,49 +8,49 @@ fn test_memchr_dbl_empty_buffer() {
 
 #[test]
 fn test_memchr_dbl_single_element_found_1() {
-    let buf = [b'a'];
+    let buf = *b"a";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(0));
 }
 
 #[test]
 fn test_memchr_dbl_single_element_found_2() {
-    let buf = [b'b'];
+    let buf = *b"b";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(0));
 }
 
 #[test]
 fn test_memchr_dbl_single_element_not_found() {
-    let buf = [b'c'];
+    let buf = *b"c";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), None);
 }
 
 #[test]
 fn test_memchr_dbl_needle_at_start() {
-    let buf = [b'a', b'c', b'd'];
+    let buf = *b"acd";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(0));
 }
 
 #[test]
 fn test_memchr_dbl_needle_at_middle() {
-    let buf = [b'c', b'b', b'd'];
+    let buf = *b"cbd";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(1));
 }
 
 #[test]
 fn test_memchr_dbl_needle_at_end() {
-    let buf = [b'c', b'd', b'b'];
+    let buf = *b"cdb";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(2));
 }
 
 #[test]
 fn test_memchr_dbl_needle_not_found() {
-    let buf = [b'c', b'd', b'e'];
+    let buf = *b"cde";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), None);
 }
 
 #[test]
 fn test_memchr_dbl_multiple_occurrences() {
-    let buf = [b'a', b'c', b'b', b'd', b'a'];
+    let buf = *b"acbda";
     assert_eq!(test_memchr_dbl(&buf, b'a', b'b'), Some(0));
 }
 

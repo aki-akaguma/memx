@@ -9,22 +9,22 @@ fn test_memeq_empty_buffers() {
 
 #[test]
 fn test_memeq_equal_buffers() {
-    let buf1 = [b'a', b'b', b'c'];
-    let buf2 = [b'a', b'b', b'c'];
+    let buf1 = *b"abc";
+    let buf2 = *b"abc";
     assert!(test_memeq(&buf1, &buf2));
 }
 
 #[test]
 fn test_memeq_different_buffers() {
-    let buf1 = [b'a', b'b', b'c'];
-    let buf2 = [b'a', b'b', b'd'];
+    let buf1 = *b"abc";
+    let buf2 = *b"abd";
     assert!(!test_memeq(&buf1, &buf2));
 }
 
 #[test]
 fn test_memeq_different_lengths() {
-    let buf1 = [b'a', b'b'];
-    let buf2 = [b'a', b'b', b'c'];
+    let buf1 = *b"ab";
+    let buf2 = *b"abc";
     assert!(!test_memeq(&buf1, &buf2));
 }
 

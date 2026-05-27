@@ -8,55 +8,55 @@ fn test_memnechr_tpl_empty_buffer() {
 
 #[test]
 fn test_memnechr_tpl_single_element_found() {
-    let buf = [b'd'];
+    let buf = *b"d";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), Some(0));
 }
 
 #[test]
 fn test_memnechr_tpl_single_element_not_found_1() {
-    let buf = [b'a'];
+    let buf = *b"a";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), None);
 }
 
 #[test]
 fn test_memnechr_tpl_single_element_not_found_2() {
-    let buf = [b'b'];
+    let buf = *b"b";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), None);
 }
 
 #[test]
 fn test_memnechr_tpl_single_element_not_found_3() {
-    let buf = [b'c'];
+    let buf = *b"c";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), None);
 }
 
 #[test]
 fn test_memnechr_tpl_needle_at_start() {
-    let buf = [b'd', b'a', b'b', b'c'];
+    let buf = *b"dabc";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), Some(0));
 }
 
 #[test]
 fn test_memnechr_tpl_needle_at_middle() {
-    let buf = [b'a', b'd', b'b', b'c'];
+    let buf = *b"adbc";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), Some(1));
 }
 
 #[test]
 fn test_memnechr_tpl_needle_at_end() {
-    let buf = [b'a', b'b', b'd', b'c'];
+    let buf = *b"abdc";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), Some(2));
 }
 
 #[test]
 fn test_memnechr_tpl_needle_not_found() {
-    let buf = [b'a', b'b', b'c', b'a'];
+    let buf = *b"abca";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), None);
 }
 
 #[test]
 fn test_memnechr_tpl_multiple_occurrences() {
-    let buf = [b'a', b'd', b'b', b'e', b'c', b'f'];
+    let buf = *b"adbecf";
     assert_eq!(test_memnechr_tpl(&buf, b'a', b'b', b'c'), Some(1));
 }
 

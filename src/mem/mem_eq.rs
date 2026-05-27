@@ -1,7 +1,7 @@
-use crate::utils::PtrOps;
-use crate::utils::PtrOpsPrefetch;
 use crate::utils::_unroll_loop_dual;
 use crate::utils::_unroll_loop_dual_with_prefetch;
+use crate::utils::PtrOps;
+use crate::utils::PtrOpsPrefetch;
 
 #[inline(never)]
 pub fn _memeq_impl(a: &[u8], b: &[u8]) -> bool {
@@ -100,30 +100,49 @@ pub(crate) fn _start_eq_128(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b16_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 16, bool, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _eq_b16_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b16_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b16_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b16_au_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b16_au_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -164,30 +183,49 @@ pub(crate) fn _start_eq_64(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u64() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 8, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b8_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 8, bool, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _eq_b8_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 8, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b8_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 8, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b8_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 8, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b8_au_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 8, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b8_au_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -228,30 +266,49 @@ fn _start_eq_32(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u32() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 4, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b4_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 4, bool, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _eq_b4_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 4, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b4_aa_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 4, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b4_aa_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 4, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _eq_b4_au_x1(ap, bp);
-                if !r { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 4, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _eq_b4_au_x1(ap, bp);
+                    if !r {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -372,37 +429,73 @@ fn _eq_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 
 #[inline(always)]
 fn _eq_b16_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<2, 16, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 2) }, |ap, bp| {
-        let r = _eq_b16_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<2, 16, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 2) },
+        |ap, bp| {
+            let r = _eq_b16_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b16_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<4, 16, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 4) }, |ap, bp| {
-        let r = _eq_b16_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<4, 16, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 4) },
+        |ap, bp| {
+            let r = _eq_b16_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b16_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<8, 16, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 8) }, |ap, bp| {
-        let r = _eq_b16_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<8, 16, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 8) },
+        |ap, bp| {
+            let r = _eq_b16_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b16_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<16, 16, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 16) }, |ap, bp| {
-        let r = _eq_b16_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<16, 16, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 16) },
+        |ap, bp| {
+            let r = _eq_b16_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
@@ -422,37 +515,61 @@ fn _eq_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 
 #[inline(always)]
 fn _eq_b8_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<2, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 2) }, |ap, bp| {
-        let r = _eq_b8_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<2, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 2) }, |ap, bp| {
+            let r = _eq_b8_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b8_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<4, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 4) }, |ap, bp| {
-        let r = _eq_b8_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<4, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 4) }, |ap, bp| {
+            let r = _eq_b8_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b8_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<8, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 8) }, |ap, bp| {
-        let r = _eq_b8_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<8, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 8) }, |ap, bp| {
+            let r = _eq_b8_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b8_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<16, 8, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 16) }, |ap, bp| {
-        let r = _eq_b8_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<16, 8, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(8 * 16) },
+        |ap, bp| {
+            let r = _eq_b8_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
@@ -472,37 +589,61 @@ fn _eq_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 
 #[inline(always)]
 fn _eq_b4_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<2, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 2) }, |ap, bp| {
-        let r = _eq_b4_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<2, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 2) }, |ap, bp| {
+            let r = _eq_b4_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b4_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<4, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 4) }, |ap, bp| {
-        let r = _eq_b4_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<4, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 4) }, |ap, bp| {
+            let r = _eq_b4_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b4_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<8, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 8) }, |ap, bp| {
-        let r = _eq_b4_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<8, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 8) }, |ap, bp| {
+            let r = _eq_b4_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b4_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<16, 4, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 16) }, |ap, bp| {
-        let r = _eq_b4_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<16, 4, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(4 * 16) },
+        |ap, bp| {
+            let r = _eq_b4_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 
@@ -522,37 +663,61 @@ fn _eq_b2_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
 
 #[inline(always)]
 fn _eq_b2_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<2, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 2) }, |ap, bp| {
-        let r = _eq_b2_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<2, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 2) }, |ap, bp| {
+            let r = _eq_b2_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b2_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<4, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 4) }, |ap, bp| {
-        let r = _eq_b2_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<4, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 4) }, |ap, bp| {
+            let r = _eq_b2_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b2_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<8, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 8) }, |ap, bp| {
-        let r = _eq_b2_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) =
+        _unroll_loop_dual::<8, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 8) }, |ap, bp| {
+            let r = _eq_b2_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        });
     r.unwrap_or(true)
 }
 
 #[inline(always)]
 fn _eq_b2_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> bool {
-    let (r, _, _) = _unroll_loop_dual::<16, 2, bool, _>(a_ptr, b_ptr, unsafe { a_ptr.add(2 * 16) }, |ap, bp| {
-        let r = _eq_b2_aa_x1(ap, bp);
-        if !r { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<16, 2, bool, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(2 * 16) },
+        |ap, bp| {
+            let r = _eq_b2_aa_x1(ap, bp);
+            if !r {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(true)
 }
 

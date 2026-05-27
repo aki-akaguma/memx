@@ -96,30 +96,49 @@ pub(crate) fn _start_cmp_128(a: &[u8], b: &[u8]) -> Ordering {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 16, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b16_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 16, Ordering, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _cmp_b16_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b16_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b16_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b16_au_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b16_au_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -158,30 +177,49 @@ pub(crate) fn _start_cmp_64(a: &[u8], b: &[u8]) -> Ordering {
         }
         // the loop
         if b_ptr.is_aligned_u64() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 8, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b8_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 8, Ordering, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _cmp_b8_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 8, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b8_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 8, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b8_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 8, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b8_au_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 8, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b8_au_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -220,30 +258,49 @@ fn _start_cmp_32(a: &[u8], b: &[u8]) -> Ordering {
         }
         // the loop
         if b_ptr.is_aligned_u32() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 4, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b4_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<8, 4, Ordering, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = _cmp_b4_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                },
+            );
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
             //
-            let (r, ap, bp) = _unroll_loop_dual::<1, 4, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b4_aa_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 4, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b4_aa_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual::<1, 4, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = _cmp_b4_au_x1(ap, bp);
-                if !r.is_eq() { Some(r) } else { None }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 4, Ordering, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = _cmp_b4_au_x1(ap, bp);
+                    if !r.is_eq() {
+                        Some(r)
+                    } else {
+                        None
+                    }
+                });
             if let Some(v) = r {
                 return v;
             }
@@ -403,28 +460,55 @@ fn _cmp_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_b16_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<2, 16, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 2) }, |ap, bp| {
-        let r = _cmp_b16_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<2, 16, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 2) },
+        |ap, bp| {
+            let r = _cmp_b16_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b16_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<4, 16, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 4) }, |ap, bp| {
-        let r = _cmp_b16_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<4, 16, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 4) },
+        |ap, bp| {
+            let r = _cmp_b16_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b16_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<8, 16, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(16 * 8) }, |ap, bp| {
-        let r = _cmp_b16_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<8, 16, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(16 * 8) },
+        |ap, bp| {
+            let r = _cmp_b16_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
@@ -480,28 +564,55 @@ fn _cmp_b8_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_b8_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<2, 8, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 2) }, |ap, bp| {
-        let r = _cmp_b8_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<2, 8, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(8 * 2) },
+        |ap, bp| {
+            let r = _cmp_b8_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b8_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<4, 8, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 4) }, |ap, bp| {
-        let r = _cmp_b8_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<4, 8, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(8 * 4) },
+        |ap, bp| {
+            let r = _cmp_b8_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b8_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<8, 8, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(8 * 8) }, |ap, bp| {
-        let r = _cmp_b8_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<8, 8, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(8 * 8) },
+        |ap, bp| {
+            let r = _cmp_b8_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
@@ -557,37 +668,73 @@ fn _cmp_b4_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
 
 #[inline(always)]
 fn _cmp_b4_aa_x2(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<2, 4, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 2) }, |ap, bp| {
-        let r = _cmp_b4_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<2, 4, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(4 * 2) },
+        |ap, bp| {
+            let r = _cmp_b4_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b4_aa_x4(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<4, 4, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 4) }, |ap, bp| {
-        let r = _cmp_b4_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<4, 4, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(4 * 4) },
+        |ap, bp| {
+            let r = _cmp_b4_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b4_aa_x8(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<8, 4, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 8) }, |ap, bp| {
-        let r = _cmp_b4_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<8, 4, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(4 * 8) },
+        |ap, bp| {
+            let r = _cmp_b4_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 
 #[inline(always)]
 fn _cmp_b4_aa_x16(a_ptr: *const u8, b_ptr: *const u8) -> Ordering {
-    let (r, _, _) = _unroll_loop_dual::<16, 4, Ordering, _>(a_ptr, b_ptr, unsafe { a_ptr.add(4 * 16) }, |ap, bp| {
-        let r = _cmp_b4_aa_x1(ap, bp);
-        if !r.is_eq() { Some(r) } else { None }
-    });
+    let (r, _, _) = _unroll_loop_dual::<16, 4, Ordering, _>(
+        a_ptr,
+        b_ptr,
+        unsafe { a_ptr.add(4 * 16) },
+        |ap, bp| {
+            let r = _cmp_b4_aa_x1(ap, bp);
+            if !r.is_eq() {
+                Some(r)
+            } else {
+                None
+            }
+        },
+    );
     r.unwrap_or(Ordering::Equal)
 }
 

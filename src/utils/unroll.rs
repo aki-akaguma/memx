@@ -72,7 +72,9 @@ where
 {
     while a_ptr.is_not_over(end_ptr, STEP * N) {
         for i in 0..N {
-            if let Some(r) = f(unsafe { a_ptr.add(STEP * i) }, unsafe { b_ptr.add(STEP * i) }) {
+            if let Some(r) = f(unsafe { a_ptr.add(STEP * i) }, unsafe {
+                b_ptr.add(STEP * i)
+            }) {
                 return (Some(r), a_ptr, b_ptr);
             }
         }
@@ -97,7 +99,9 @@ where
         a_ptr.prefetch_read_data();
         b_ptr.prefetch_read_data();
         for i in 0..N {
-            if let Some(r) = f(unsafe { a_ptr.add(STEP * i) }, unsafe { b_ptr.add(STEP * i) }) {
+            if let Some(r) = f(unsafe { a_ptr.add(STEP * i) }, unsafe {
+                b_ptr.add(STEP * i)
+            }) {
                 return (Some(r), a_ptr, b_ptr);
             }
         }
@@ -122,7 +126,9 @@ where
 {
     while a_ptr.is_not_over(end_ptr, STEP * N) {
         for i in 0..N {
-            f(unsafe { a_ptr.add(STEP * i) }, unsafe { b_ptr.add(STEP * i) });
+            f(unsafe { a_ptr.add(STEP * i) }, unsafe {
+                b_ptr.add(STEP * i)
+            });
         }
         a_ptr = unsafe { a_ptr.add(STEP * N) };
         b_ptr = unsafe { b_ptr.add(STEP * N) };
@@ -145,7 +151,9 @@ where
         a_ptr.prefetch_read_data();
         b_ptr.prefetch_read_data();
         for i in 0..N {
-            f(unsafe { a_ptr.add(STEP * i) }, unsafe { b_ptr.add(STEP * i) });
+            f(unsafe { a_ptr.add(STEP * i) }, unsafe {
+                b_ptr.add(STEP * i)
+            });
         }
         a_ptr = unsafe { a_ptr.add(STEP * N) };
         b_ptr = unsafe { b_ptr.add(STEP * N) };

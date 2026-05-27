@@ -7,7 +7,7 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let mut vv = [b'g', b'X', b'Y', b'Z'];
+    let mut vv = *b"gXYZ";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
@@ -15,7 +15,7 @@ fn test00() {
     }
     //
     let buf = vec![b'a', b'B', b'C'];
-    let mut vv = [b'a', b'X', b'Y', b'Z'];
+    let mut vv = *b"aXYZ";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
@@ -23,7 +23,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'b', b'C'];
-    let mut vv = [b'b', b'X', b'Y', b'Z'];
+    let mut vv = *b"bXYZ";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
@@ -31,7 +31,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'B', b'c'];
-    let mut vv = [b'c', b'X', b'Y', b'Z'];
+    let mut vv = *b"cXYZ";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
@@ -52,49 +52,49 @@ fn test01() {
         b'Y', b'Z'
     ];
     //
-    let mut vv = [b'j', b'K', b'L', b'M'];
+    let mut vv = *b"jKLM";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'k', b'L', b'M'];
+    let mut vv = *b"jkLM";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'K', b'l', b'M'];
+    let mut vv = *b"jKlM";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'K', b'L', b'm'];
+    let mut vv = *b"jKLm";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'k', b'l', b'M'];
+    let mut vv = *b"jklM";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'k', b'L', b'm'];
+    let mut vv = *b"jkLm";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'k', b'l', b'm'];
+    let mut vv = *b"jklm";
     for _ in 0..4 {
         vv.rotate_right(1);
         let r = test_memchr_qpl(&buf, vv[0], vv[1], vv[2], vv[3]);

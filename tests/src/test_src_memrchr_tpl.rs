@@ -7,7 +7,7 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let mut vv = [b'g', b'Y', b'Z'];
+    let mut vv = *b"gYZ";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
@@ -15,7 +15,7 @@ fn test00() {
     }
     //
     let buf = vec![b'a', b'B', b'C'];
-    let mut vv = [b'a', b'Y', b'Z'];
+    let mut vv = *b"aYZ";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
@@ -23,7 +23,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'b', b'C'];
-    let mut vv = [b'b', b'Y', b'Z'];
+    let mut vv = *b"bYZ";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
@@ -31,7 +31,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'B', b'c'];
-    let mut vv = [b'c', b'Y', b'Z'];
+    let mut vv = *b"cYZ";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
@@ -52,28 +52,28 @@ fn test01() {
         b'Y', b'Z'
     ];
     //
-    let mut vv = [b'j', b'K', b'L'];
+    let mut vv = *b"jKL";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b'k', b'L'];
+    let mut vv = *b"jkL";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
         assert_eq!(r, Some(10));
     }
     //
-    let mut vv = [b'j', b'K', b'l'];
+    let mut vv = *b"jKl";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);
         assert_eq!(r, Some(11));
     }
     //
-    let mut vv = [b'j', b'k', b'l'];
+    let mut vv = *b"jkl";
     for _ in 0..3 {
         vv.rotate_right(1);
         let r = test_memrchr_tpl(&buf, vv[0], vv[1], vv[2]);

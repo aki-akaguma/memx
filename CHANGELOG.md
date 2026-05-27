@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * xbench: update crate: cpufeatures(0.3), criterion(0.8)
 
 ### Fixed
+* `clippy::byte_char_slices`
 * `clippy::question_mark`
 
 

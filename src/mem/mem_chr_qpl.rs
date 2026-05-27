@@ -1,8 +1,14 @@
+use crate::utils::_read_a_little_endian_from_ptr_u128;
+use crate::utils::_read_a_little_endian_from_ptr_u16;
+use crate::utils::_read_a_little_endian_from_ptr_u32;
+use crate::utils::_read_a_little_endian_from_ptr_u64;
+use crate::utils::_unroll_loop;
+use crate::utils::_unroll_loop_with_prefetch;
+use crate::utils::B16Qpl;
 use crate::utils::B1Qpl;
 use crate::utils::B2Qpl;
 use crate::utils::B4Qpl;
 use crate::utils::B8Qpl;
-use crate::utils::B16Qpl;
 use crate::utils::BitOrt;
 use crate::utils::PackedU128;
 use crate::utils::PackedU16;
@@ -10,12 +16,6 @@ use crate::utils::PackedU32;
 use crate::utils::PackedU64;
 use crate::utils::PtrOps;
 use crate::utils::PtrOpsPrefetch;
-use crate::utils::_read_a_little_endian_from_ptr_u128;
-use crate::utils::_read_a_little_endian_from_ptr_u16;
-use crate::utils::_read_a_little_endian_from_ptr_u32;
-use crate::utils::_read_a_little_endian_from_ptr_u64;
-use crate::utils::_unroll_loop;
-use crate::utils::_unroll_loop_with_prefetch;
 
 #[inline(never)]
 pub fn _memchr_qpl_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {
@@ -63,9 +63,8 @@ fn _start_chr_qpl_64(buf: &[u8], needle: B1Qpl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| {
-                _chr_qpl_c8_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| _chr_qpl_c8_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }
@@ -109,9 +108,8 @@ fn _start_chr_qpl_32(buf: &[u8], needle: B1Qpl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| {
-                _chr_qpl_c4_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| _chr_qpl_c4_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }

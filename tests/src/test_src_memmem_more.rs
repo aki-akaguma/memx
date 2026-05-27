@@ -3,56 +3,56 @@
 #[test]
 fn test_memmem_empty_haystack() {
     let haystack = [];
-    let needle = [b'a'];
+    let needle = *b"a";
     assert_eq!(test_memmem(&haystack, &needle), None);
 }
 
 #[test]
 fn test_memmem_empty_needle() {
-    let haystack = [b'a', b'b', b'c'];
+    let haystack = *b"abc";
     let needle = [];
     assert_eq!(test_memmem(&haystack, &needle), Some(0));
 }
 
 #[test]
 fn test_memmem_needle_longer_than_haystack() {
-    let haystack = [b'a', b'b'];
-    let needle = [b'a', b'b', b'c'];
+    let haystack = *b"ab";
+    let needle = *b"abc";
     assert_eq!(test_memmem(&haystack, &needle), None);
 }
 
 #[test]
 fn test_memmem_needle_at_start() {
-    let haystack = [b'a', b'b', b'c', b'd'];
-    let needle = [b'a', b'b'];
+    let haystack = *b"abcd";
+    let needle = *b"ab";
     assert_eq!(test_memmem(&haystack, &needle), Some(0));
 }
 
 #[test]
 fn test_memmem_needle_at_middle() {
-    let haystack = [b'a', b'b', b'c', b'd'];
-    let needle = [b'b', b'c'];
+    let haystack = *b"abcd";
+    let needle = *b"bc";
     assert_eq!(test_memmem(&haystack, &needle), Some(1));
 }
 
 #[test]
 fn test_memmem_needle_at_end() {
-    let haystack = [b'a', b'b', b'c', b'd'];
-    let needle = [b'c', b'd'];
+    let haystack = *b"abcd";
+    let needle = *b"cd";
     assert_eq!(test_memmem(&haystack, &needle), Some(2));
 }
 
 #[test]
 fn test_memmem_needle_not_found() {
-    let haystack = [b'a', b'b', b'c', b'd'];
-    let needle = [b'x', b'y'];
+    let haystack = *b"abcd";
+    let needle = *b"xy";
     assert_eq!(test_memmem(&haystack, &needle), None);
 }
 
 #[test]
 fn test_memmem_multiple_occurrences() {
-    let haystack = [b'a', b'b', b'a', b'b', b'c'];
-    let needle = [b'a', b'b'];
+    let haystack = *b"ababc";
+    let needle = *b"ab";
     assert_eq!(test_memmem(&haystack, &needle), Some(0));
 }
 

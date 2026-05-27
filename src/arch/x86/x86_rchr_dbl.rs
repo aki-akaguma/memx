@@ -111,17 +111,18 @@ fn _memrchr_dbl_sse2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
         }
         // the loop
         {
-            let (r, p) = _unroll_loop_backward_with_prefetch::<4, 16, _>(buf_ptr, start_ptr, |p| {
-                unsafe { _rchr_dbl_c16_aa_x1(p, cc, start_ptr) }
-            });
+            let (r, p) =
+                _unroll_loop_backward_with_prefetch::<4, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                    _rchr_dbl_c16_aa_x1(p, cc, start_ptr)
+                });
             if r.is_some() {
                 return r;
             }
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| {
-                unsafe { _rchr_dbl_c16_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                _rchr_dbl_c16_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -168,8 +169,8 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
         }
         // the loop
         {
-            let (r, p) = _unroll_loop_backward::<1, 32, _>(buf_ptr, start_ptr, |p| {
-                unsafe { _rchr_dbl_c32_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop_backward::<1, 32, _>(buf_ptr, start_ptr, |p| unsafe {
+                _rchr_dbl_c32_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -178,8 +179,8 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
         }
         {
             let cc: MMB16Dbl = needle.into();
-            let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| {
-                unsafe { _rchr_dbl_c16_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                _rchr_dbl_c16_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -190,8 +191,8 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
         {
             let cc: MMB16Dbl = needle.into();
             if buf_ptr.is_aligned_u128() {
-                let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| {
-                    unsafe { _rchr_dbl_c16_aa_x1(p, cc, start_ptr) }
+                let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                    _rchr_dbl_c16_aa_x1(p, cc, start_ptr)
                 });
                 if r.is_some() {
                     return r;
@@ -200,9 +201,10 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
             } else {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| {
-                        unsafe { _rchr_dbl_c16_uu_x1(p, cc, start_ptr) }
-                    });
+                    let (r, p) =
+                        _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                            _rchr_dbl_c16_uu_x1(p, cc, start_ptr)
+                        });
                     if r.is_some() {
                         return r;
                     }
@@ -216,9 +218,10 @@ fn _memrchr_dbl_avx2_impl(buf: &[u8], needle: B1Dbl) -> Option<usize> {
                     } else if let Some(v) = r.1 {
                         return Some(v);
                     }
-                    let (r, p) = _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| {
-                        unsafe { _rchr_dbl_c16_aa_x1(p, cc, start_ptr) }
-                    });
+                    let (r, p) =
+                        _unroll_loop_backward::<1, 16, _>(buf_ptr, start_ptr, |p| unsafe {
+                            _rchr_dbl_c16_aa_x1(p, cc, start_ptr)
+                        });
                     if r.is_some() {
                         return r;
                     }
@@ -325,4 +328,3 @@ unsafe fn _rchr_dbl_c32_aa_x1(
         _return_rchr_dbl(base, mask_0_a, mask_0_b)
     }
 }
-

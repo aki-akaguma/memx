@@ -7,7 +7,7 @@ fn test00() {
     assert_eq!(r, None);
     //
     let buf = vec![b'A', b'g'];
-    let mut vv = [b'A', b'Z'];
+    let mut vv = *b"AZ";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);
@@ -15,7 +15,7 @@ fn test00() {
     }
     //
     let buf = vec![b'a', b'B', b'C'];
-    let mut vv = [b'A', b'Z'];
+    let mut vv = *b"AZ";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);
@@ -23,7 +23,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'b', b'C'];
-    let mut vv = [b'C', b'Z'];
+    let mut vv = *b"CZ";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);
@@ -31,7 +31,7 @@ fn test00() {
     }
     //
     let buf = vec![b'A', b'B', b'C'];
-    let mut vv = [b'C', b'B'];
+    let mut vv = *b"CB";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);
@@ -52,14 +52,14 @@ fn test01() {
         b' ', b' '
     ];
     //
-    let mut vv = [b'k', b' '];
+    let mut vv = *b"k ";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);
         assert_eq!(r, Some(9));
     }
     //
-    let mut vv = [b'j', b' '];
+    let mut vv = *b"j ";
     for _ in 0..2 {
         vv.rotate_right(1);
         let r = test_memrnechr_dbl(&buf, vv[0], vv[1]);

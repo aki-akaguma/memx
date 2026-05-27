@@ -114,10 +114,14 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            let (ap, bp) =
-                _unroll_loop_dual_action_with_prefetch::<8, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+            let (ap, bp) = _unroll_loop_dual_action_with_prefetch::<8, 16, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
                     unsafe { _cpy_b16_aa_x1(ap, bp) };
-                });
+                },
+            );
             a_ptr = ap;
             b_ptr = bp;
 
@@ -127,10 +131,14 @@ fn _memcpy_sse2_impl(dst: &mut [u8], src: &[u8]) -> Result<(), RangeError> {
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (ap, bp) =
-                _unroll_loop_dual_action_with_prefetch::<8, 16, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+            let (ap, bp) = _unroll_loop_dual_action_with_prefetch::<8, 16, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
                     unsafe { _cpy_b16_au_x1(ap, bp) };
-                });
+                },
+            );
             a_ptr = ap;
             b_ptr = bp;
 
@@ -163,7 +171,6 @@ unsafe fn _cpy_b16_aa_x1(a_ptr: *mut u8, b_ptr: *const u8) {
     let mm_0_b = unsafe { _mm_load_si128(b_ptr as *const __m128i) };
     unsafe { _mm_store_si128(a_ptr as *mut __m128i, mm_0_b) };
 }
-
 
 #[cfg(test)]
 mod disasm {

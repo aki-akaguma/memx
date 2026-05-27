@@ -127,18 +127,16 @@ fn _start_nechr_64(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<4, 8, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c8_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<4, 8, _>(buf_ptr, end_ptr, |p| _nechr_c8_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c8_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| _nechr_c8_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }
@@ -194,18 +192,16 @@ fn _start_nechr_32(buf: &[u8], needle: B1Sgl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<4, 4, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c4_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<4, 4, _>(buf_ptr, end_ptr, |p| _nechr_c4_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c4_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| _nechr_c4_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }

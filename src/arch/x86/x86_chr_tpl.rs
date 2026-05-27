@@ -111,8 +111,8 @@ fn _memchr_tpl_sse2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
         }
         // the loop
         {
-            let (r, p) = _unroll_loop_with_prefetch::<8, 16, _>(buf_ptr, end_ptr, |p| {
-                unsafe { _chr_tpl_c16_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop_with_prefetch::<8, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                _chr_tpl_c16_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -120,8 +120,8 @@ fn _memchr_tpl_sse2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| {
-                unsafe { _chr_tpl_c16_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                _chr_tpl_c16_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -169,8 +169,8 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
         }
         // the loop
         {
-            let (r, p) = _unroll_loop::<1, 32, _>(buf_ptr, end_ptr, |p| {
-                unsafe { _chr_tpl_c32_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop::<1, 32, _>(buf_ptr, end_ptr, |p| unsafe {
+                _chr_tpl_c32_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -179,8 +179,8 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
         }
         {
             let cc: MMB16Tpl = needle.into();
-            let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| {
-                unsafe { _chr_tpl_c16_aa_x1(p, cc, start_ptr) }
+            let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                _chr_tpl_c16_aa_x1(p, cc, start_ptr)
             });
             if r.is_some() {
                 return r;
@@ -191,8 +191,8 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
         {
             let cc: MMB16Tpl = needle.into();
             if buf_ptr.is_aligned_u128() {
-                let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| {
-                    unsafe { _chr_tpl_c16_aa_x1(p, cc, start_ptr) }
+                let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                    _chr_tpl_c16_aa_x1(p, cc, start_ptr)
                 });
                 if r.is_some() {
                     return r;
@@ -201,8 +201,8 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
             } else {
                 #[cfg(not(feature = "test_alignment_check"))]
                 {
-                    let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| {
-                        unsafe { _chr_tpl_c16_uu_x1(p, cc, start_ptr) }
+                    let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                        _chr_tpl_c16_uu_x1(p, cc, start_ptr)
                     });
                     if r.is_some() {
                         return r;
@@ -217,8 +217,8 @@ fn _memchr_tpl_avx2_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
                     } else if let Some(v) = r.1 {
                         return Some(v);
                     }
-                    let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| {
-                        unsafe { _chr_tpl_c16_aa_x1(p, cc, start_ptr) }
+                    let (r, p) = _unroll_loop::<1, 16, _>(buf_ptr, end_ptr, |p| unsafe {
+                        _chr_tpl_c16_aa_x1(p, cc, start_ptr)
                     });
                     if r.is_some() {
                         return r;

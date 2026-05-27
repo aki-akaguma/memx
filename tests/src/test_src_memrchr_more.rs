@@ -8,43 +8,43 @@ fn test_memrchr_empty_buffer() {
 
 #[test]
 fn test_memrchr_single_element_found() {
-    let buf = [b'a'];
+    let buf = *b"a";
     assert_eq!(test_memrchr(&buf, b'a'), Some(0));
 }
 
 #[test]
 fn test_memrchr_single_element_not_found() {
-    let buf = [b'b'];
+    let buf = *b"b";
     assert_eq!(test_memrchr(&buf, b'a'), None);
 }
 
 #[test]
 fn test_memrchr_needle_at_start() {
-    let buf = [b'a', b'b', b'c'];
+    let buf = *b"abc";
     assert_eq!(test_memrchr(&buf, b'a'), Some(0));
 }
 
 #[test]
 fn test_memrchr_needle_at_middle() {
-    let buf = [b'a', b'b', b'c'];
+    let buf = *b"abc";
     assert_eq!(test_memrchr(&buf, b'b'), Some(1));
 }
 
 #[test]
 fn test_memrchr_needle_at_end() {
-    let buf = [b'a', b'b', b'c'];
+    let buf = *b"abc";
     assert_eq!(test_memrchr(&buf, b'c'), Some(2));
 }
 
 #[test]
 fn test_memrchr_needle_not_found() {
-    let buf = [b'a', b'b', b'c'];
+    let buf = *b"abc";
     assert_eq!(test_memrchr(&buf, b'd'), None);
 }
 
 #[test]
 fn test_memrchr_multiple_occurrences() {
-    let buf = [b'a', b'b', b'a', b'c', b'a'];
+    let buf = *b"abaca";
     assert_eq!(test_memrchr(&buf, b'a'), Some(4));
 }
 

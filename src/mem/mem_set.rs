@@ -1,10 +1,10 @@
+use crate::utils::_unroll_loop_action;
+use crate::utils::B16Sgl;
 use crate::utils::B1Sgl;
 use crate::utils::B2Sgl;
 use crate::utils::B4Sgl;
 use crate::utils::B8Sgl;
-use crate::utils::B16Sgl;
 use crate::utils::PtrOps;
-use crate::utils::_unroll_loop_action;
 
 #[inline(never)]
 pub fn _memset_impl(buf: &mut [u8], c1: u8) {

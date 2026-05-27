@@ -221,7 +221,6 @@ unsafe fn _set_c32_aa_x1(buf_ptr: *mut u8, mm_c32: MMB32Sgl) {
     }
 }
 
-
 #[cfg(test)]
 mod disasm {
     use super::*;

@@ -1,8 +1,14 @@
+use crate::utils::_read_a_little_endian_from_ptr_u128;
+use crate::utils::_read_a_little_endian_from_ptr_u16;
+use crate::utils::_read_a_little_endian_from_ptr_u32;
+use crate::utils::_read_a_little_endian_from_ptr_u64;
+use crate::utils::_unroll_loop_backward;
+use crate::utils::_unroll_loop_backward_with_prefetch;
+use crate::utils::B16Qpl;
 use crate::utils::B1Qpl;
 use crate::utils::B2Qpl;
 use crate::utils::B4Qpl;
 use crate::utils::B8Qpl;
-use crate::utils::B16Qpl;
 use crate::utils::BitOrt;
 use crate::utils::HighBitProp;
 use crate::utils::PackedU128;
@@ -11,12 +17,6 @@ use crate::utils::PackedU32;
 use crate::utils::PackedU64;
 use crate::utils::PtrOps;
 use crate::utils::PtrOpsPrefetch;
-use crate::utils::_read_a_little_endian_from_ptr_u128;
-use crate::utils::_read_a_little_endian_from_ptr_u16;
-use crate::utils::_read_a_little_endian_from_ptr_u32;
-use crate::utils::_read_a_little_endian_from_ptr_u64;
-use crate::utils::_unroll_loop_backward;
-use crate::utils::_unroll_loop_backward_with_prefetch;
 
 #[inline(never)]
 pub fn _memrnechr_qpl_impl(buf: &[u8], needle: B1Qpl) -> Option<usize> {

@@ -121,56 +121,68 @@ fn _memeq_sse2_impl(a: &[u8], b: &[u8]) -> bool {
         }
         // the loop
         if b_ptr.is_aligned_u128() {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = unsafe { _eq_b16_aa_x1(ap, bp) };
-                if r {
-                    None
-                } else {
-                    Some(false)
-                }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = unsafe { _eq_b16_aa_x1(ap, bp) };
+                    if r {
+                        None
+                    } else {
+                        Some(false)
+                    }
+                },
+            );
             if let Some(res) = r {
                 return res;
             }
             a_ptr = ap;
             b_ptr = bp;
 
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = unsafe { _eq_b16_aa_x1(ap, bp) };
-                if r {
-                    None
-                } else {
-                    Some(false)
-                }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = unsafe { _eq_b16_aa_x1(ap, bp) };
+                    if r {
+                        None
+                    } else {
+                        Some(false)
+                    }
+                });
             if let Some(res) = r {
                 return res;
             }
             a_ptr = ap;
             b_ptr = bp;
         } else {
-            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = unsafe { _eq_b16_au_x1(ap, bp) };
-                if r {
-                    None
-                } else {
-                    Some(false)
-                }
-            });
+            let (r, ap, bp) = _unroll_loop_dual_with_prefetch::<4, 16, bool, _>(
+                a_ptr,
+                b_ptr,
+                end_ptr,
+                |ap, bp| {
+                    let r = unsafe { _eq_b16_au_x1(ap, bp) };
+                    if r {
+                        None
+                    } else {
+                        Some(false)
+                    }
+                },
+            );
             if let Some(res) = r {
                 return res;
             }
             a_ptr = ap;
             b_ptr = bp;
 
-            let (r, ap, bp) = _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
-                let r = unsafe { _eq_b16_au_x1(ap, bp) };
-                if r {
-                    None
-                } else {
-                    Some(false)
-                }
-            });
+            let (r, ap, bp) =
+                _unroll_loop_dual::<1, 16, bool, _>(a_ptr, b_ptr, end_ptr, |ap, bp| {
+                    let r = unsafe { _eq_b16_au_x1(ap, bp) };
+                    if r {
+                        None
+                    } else {
+                        Some(false)
+                    }
+                });
             if let Some(res) = r {
                 return res;
             }
@@ -208,7 +220,6 @@ unsafe fn _eq_b16_aa_x1(a_ptr: *const u8, b_ptr: *const u8) -> bool {
     let mask_0 = unsafe { _mm_movemask_epi8(mm_0_eq) } as u32;
     mask_0 == 0xffff
 }
-
 
 #[cfg(test)]
 mod disasm {

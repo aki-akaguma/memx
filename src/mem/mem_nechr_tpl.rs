@@ -1,8 +1,14 @@
+use crate::utils::_read_a_little_endian_from_ptr_u128;
+use crate::utils::_read_a_little_endian_from_ptr_u16;
+use crate::utils::_read_a_little_endian_from_ptr_u32;
+use crate::utils::_read_a_little_endian_from_ptr_u64;
+use crate::utils::_unroll_loop;
+use crate::utils::_unroll_loop_with_prefetch;
+use crate::utils::B16Tpl;
 use crate::utils::B1Tpl;
 use crate::utils::B2Tpl;
 use crate::utils::B4Tpl;
 use crate::utils::B8Tpl;
-use crate::utils::B16Tpl;
 use crate::utils::BitOrt;
 use crate::utils::HighBitProp;
 use crate::utils::PackedU128;
@@ -11,12 +17,6 @@ use crate::utils::PackedU32;
 use crate::utils::PackedU64;
 use crate::utils::PtrOps;
 use crate::utils::PtrOpsPrefetch;
-use crate::utils::_read_a_little_endian_from_ptr_u128;
-use crate::utils::_read_a_little_endian_from_ptr_u16;
-use crate::utils::_read_a_little_endian_from_ptr_u32;
-use crate::utils::_read_a_little_endian_from_ptr_u64;
-use crate::utils::_unroll_loop;
-use crate::utils::_unroll_loop_with_prefetch;
 
 #[inline(never)]
 pub fn _memnechr_tpl_impl(buf: &[u8], needle: B1Tpl) -> Option<usize> {
@@ -118,9 +118,8 @@ fn _start_nechr_64(buf: &[u8], needle: B1Tpl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c8_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 8, _>(buf_ptr, end_ptr, |p| _nechr_c8_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }
@@ -164,9 +163,8 @@ fn _start_nechr_32(buf: &[u8], needle: B1Tpl) -> Option<usize> {
             buf_ptr = p;
         }
         {
-            let (r, p) = _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| {
-                _nechr_c4_aa_x1(p, cc, start_ptr)
-            });
+            let (r, p) =
+                _unroll_loop::<1, 4, _>(buf_ptr, end_ptr, |p| _nechr_c4_aa_x1(p, cc, start_ptr));
             if r.is_some() {
                 return r;
             }

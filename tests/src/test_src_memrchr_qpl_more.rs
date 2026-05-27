@@ -8,61 +8,61 @@ fn test_memrchr_qpl_empty_buffer() {
 
 #[test]
 fn test_memrchr_qpl_single_element_found_1() {
-    let buf = [b'a'];
+    let buf = *b"a";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(0));
 }
 
 #[test]
 fn test_memrchr_qpl_single_element_found_2() {
-    let buf = [b'b'];
+    let buf = *b"b";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(0));
 }
 
 #[test]
 fn test_memrchr_qpl_single_element_found_3() {
-    let buf = [b'c'];
+    let buf = *b"c";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(0));
 }
 
 #[test]
 fn test_memrchr_qpl_single_element_found_4() {
-    let buf = [b'd'];
+    let buf = *b"d";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(0));
 }
 
 #[test]
 fn test_memrchr_qpl_single_element_not_found() {
-    let buf = [b'e'];
+    let buf = *b"e";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), None);
 }
 
 #[test]
 fn test_memrchr_qpl_needle_at_start() {
-    let buf = [b'a', b'e', b'f'];
+    let buf = *b"aef";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(0));
 }
 
 #[test]
 fn test_memrchr_qpl_needle_at_middle() {
-    let buf = [b'e', b'b', b'f'];
+    let buf = *b"ebf";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(1));
 }
 
 #[test]
 fn test_memrchr_qpl_needle_at_end() {
-    let buf = [b'e', b'f', b'c'];
+    let buf = *b"efc";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(2));
 }
 
 #[test]
 fn test_memrchr_qpl_needle_not_found() {
-    let buf = [b'e', b'f', b'g'];
+    let buf = *b"efg";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), None);
 }
 
 #[test]
 fn test_memrchr_qpl_multiple_occurrences() {
-    let buf = [b'a', b'e', b'b', b'f', b'c', b'g', b'd'];
+    let buf = *b"aebfcgd";
     assert_eq!(test_memrchr_qpl(&buf, b'a', b'b', b'c', b'd'), Some(6));
 }
 
